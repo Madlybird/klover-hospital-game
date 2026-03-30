@@ -1,0 +1,2586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>RIK ANIMATION — Puzzle Game</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+<style>
+:root {
+  --color-bg: #020202;
+  --color-primary: #ED008C;
+  --color-blue: #629DE8;
+  --color-surface: #F3F3F3;
+  --color-white: #FCFCFC;
+  --color-yellow: #FFD600;
+  --color-purple: #9B59B6;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--color-bg);
+  font-family: 'Barlow Condensed', sans-serif;
+  color: var(--color-white);
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  max-width: 430px;
+  margin: 0 auto;
+}
+
+/* ===== SCREENS ===== */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  overflow: hidden;
+}
+
+.screen.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ===== PARTICLES ===== */
+#particle-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ===== MAIN MENU ===== */
+#screen-menu {
+  background: var(--color-bg);
+  justify-content: flex-start;
+  padding: 0;
+}
+
+.menu-top {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px 0;
+  position: relative;
+  z-index: 10;
+}
+
+.coin-display {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(237,0,140,0.15);
+  border: 1px solid rgba(237,0,140,0.4);
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--color-primary);
+}
+
+.coin-icon {
+  width: 16px;
+  height: 16px;
+  background: var(--color-yellow);
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 6px var(--color-yellow);
+}
+
+.ton-btn-small {
+  background: rgba(98,157,232,0.15);
+  border: 1px solid rgba(98,157,232,0.5);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-blue);
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.ton-btn-small:hover { background: rgba(98,157,232,0.25); }
+
+.logo-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 30px;
+  position: relative;
+  z-index: 10;
+}
+
+.logo-img {
+  max-width: 200px;
+  max-height: 60px;
+  object-fit: contain;
+}
+
+.logo-fallback {
+  text-align: center;
+  line-height: 1;
+}
+
+.logo-rik {
+  font-size: 52px;
+  font-weight: 800;
+  color: var(--color-white);
+  letter-spacing: 4px;
+  display: block;
+}
+
+.logo-animation {
+  font-size: 22px;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--color-white);
+  letter-spacing: 8px;
+  display: block;
+  margin-top: -6px;
+}
+
+.logo-tagline {
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(252,252,252,0.4);
+  letter-spacing: 3px;
+  margin-top: 6px;
+  text-transform: uppercase;
+}
+
+.menu-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 260px;
+  margin-top: 48px;
+  position: relative;
+  z-index: 10;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  border: none;
+  border-radius: 12px;
+  padding: 16px 24px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--color-white);
+  cursor: pointer;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  transition: transform 0.1s, box-shadow 0.1s;
+  box-shadow: 0 4px 20px rgba(237,0,140,0.4);
+}
+
+.btn-primary:active { transform: scale(0.97); box-shadow: 0 2px 10px rgba(237,0,140,0.3); }
+
+.btn-secondary {
+  background: transparent;
+  border: 2px solid var(--color-primary);
+  border-radius: 12px;
+  padding: 14px 24px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-primary);
+  cursor: pointer;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  transition: transform 0.1s, background 0.15s;
+}
+
+.btn-secondary:active { transform: scale(0.97); background: rgba(237,0,140,0.1); }
+
+.rik-mascot {
+  position: absolute;
+  right: -10px;
+  bottom: 0;
+  width: 220px;
+  height: 320px;
+  object-fit: contain;
+  object-position: center bottom;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.rik-bounce {
+  animation: rikBounce 2.5s ease-in-out infinite;
+}
+
+@keyframes rikBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* ===== HOW TO PLAY ===== */
+#screen-howto {
+  background: var(--color-bg);
+  padding: 20px;
+}
+
+.howto-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.btn-back {
+  background: transparent;
+  border: 2px solid rgba(252,252,252,0.2);
+  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  color: var(--color-white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.screen-title {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--color-white);
+}
+
+.howto-content {
+  display: flex;
+  flex: 1;
+  gap: 16px;
+  width: 100%;
+  align-items: flex-start;
+}
+
+.rik-howto {
+  width: 110px;
+  flex-shrink: 0;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+.slide-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.slide-text {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--color-white);
+  min-height: 80px;
+}
+
+.slide-canvas-wrap {
+  width: 100%;
+  height: 140px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(237,0,140,0.2);
+  overflow: hidden;
+}
+
+#slide-canvas {
+  display: block;
+}
+
+.dots-row {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(252,252,252,0.2);
+  transition: background 0.2s;
+}
+
+.dot.active { background: var(--color-primary); }
+
+.btn-slide-next {
+  background: var(--color-primary);
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--color-white);
+  cursor: pointer;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  width: 100%;
+  margin-top: 6px;
+}
+
+.btn-lets-play {
+  background: var(--color-primary);
+  box-shadow: 0 4px 20px rgba(237,0,140,0.5);
+}
+
+/* ===== GAME SCREEN ===== */
+#screen-game {
+  background: var(--color-bg);
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.game-hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px 8px;
+  background: rgba(2,2,2,0.95);
+  border-bottom: 1px solid rgba(237,0,140,0.2);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 20;
+}
+
+.hud-score {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.hud-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(98,157,232,0.7);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.hud-value {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--color-blue);
+  line-height: 1;
+}
+
+.hud-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hud-level-name {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--color-white);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.hud-target {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(252,252,252,0.4);
+  letter-spacing: 1px;
+}
+
+.hud-lives {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.heart-icon {
+  font-size: 20px;
+  filter: drop-shadow(0 0 4px rgba(237,0,140,0.6));
+}
+
+.heart-icon.lost { filter: none; opacity: 0.25; }
+
+.game-area {
+  display: flex;
+  flex: 1;
+  position: relative;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 8px;
+  gap: 8px;
+  overflow: hidden;
+}
+
+#game-canvas {
+  display: block;
+  border-radius: 8px;
+  border: 1px solid rgba(237,0,140,0.15);
+  touch-action: none;
+  flex-shrink: 0;
+}
+
+.game-sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 70px;
+  flex-shrink: 0;
+}
+
+.next-label {
+  font-size: 12px;
+  font-weight: 800;
+  color: rgba(252,252,252,0.4);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+#next-canvas {
+  display: block;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(237,0,140,0.15);
+}
+
+.rik-game {
+  width: 70px;
+  object-fit: contain;
+  border-radius: 8px;
+  transition: opacity 0.3s;
+  margin-top: auto;
+}
+
+.combo-display {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--color-primary);
+  letter-spacing: 1px;
+  text-align: center;
+  min-height: 18px;
+  text-transform: uppercase;
+}
+
+.btn-pause {
+  background: transparent;
+  border: 1px solid rgba(252,252,252,0.15);
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  font-size: 16px;
+  color: var(--color-white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== OVERLAY MODALS ===== */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2,2,2,0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  max-width: 430px;
+  margin: 0 auto;
+}
+
+.overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modal {
+  background: #0F0F0F;
+  border: 1px solid rgba(237,0,140,0.3);
+  border-radius: 20px;
+  padding: 32px 28px;
+  width: calc(100% - 48px);
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+}
+
+.modal-rik {
+  width: 100px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+.modal-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--color-white);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.modal-score {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-blue);
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.modal-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+/* ===== LEVEL LOCKED ===== */
+.level-locked-badge {
+  position: absolute;
+  inset: 0;
+  background: rgba(2,2,2,0.7);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+}
+
+/* ===== PAUSE SCREEN ===== */
+.pause-content {
+  text-align: center;
+}
+
+/* ===== REFERRAL SCREEN ===== */
+#screen-referral {
+  background: linear-gradient(180deg, var(--color-primary) 0%, var(--color-bg) 50%);
+}
+
+.referral-top {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+}
+
+.rik-referral {
+  display: block;
+  width: 180px;
+  object-fit: contain;
+  margin: 0 auto;
+  filter: drop-shadow(0 0 20px rgba(237,0,140,0.6));
+  animation: rikFloat 3s ease-in-out infinite;
+}
+
+@keyframes rikFloat {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-12px) rotate(2deg); }
+}
+
+.referral-stats {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.stat-box {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(252,252,252,0.15);
+  border-radius: 16px;
+  padding: 16px 24px;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--color-white);
+  display: block;
+}
+
+.stat-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(252,252,252,0.5);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.referral-link-box {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(237,0,140,0.3);
+  border-radius: 12px;
+  padding: 12px 16px;
+  width: calc(100% - 40px);
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.referral-link-text {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-blue);
+  word-break: break-all;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.btn-copy {
+  background: rgba(237,0,140,0.2);
+  border: 1px solid var(--color-primary);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--color-primary);
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.referral-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: calc(100% - 40px);
+  margin-top: 8px;
+}
+
+.referral-reward-note {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(252,252,252,0.4);
+  text-align: center;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+
+/* ===== SETTINGS SCREEN ===== */
+#screen-settings {
+  background: var(--color-bg);
+  padding: 20px;
+}
+
+.settings-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 16px;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 0;
+  border-bottom: 1px solid rgba(252,252,252,0.07);
+}
+
+.settings-row-label {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-white);
+  letter-spacing: 0.5px;
+}
+
+.settings-row-sub {
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(252,252,252,0.4);
+  margin-top: 2px;
+}
+
+/* Toggle switch */
+.toggle {
+  position: relative;
+  width: 48px;
+  height: 26px;
+  cursor: pointer;
+}
+
+.toggle input { opacity: 0; width: 0; height: 0; }
+
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: rgba(252,252,252,0.15);
+  border-radius: 26px;
+  transition: background 0.2s;
+}
+
+.toggle-slider:before {
+  content: '';
+  position: absolute;
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  top: 3px;
+  background: var(--color-white);
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+
+.toggle input:checked + .toggle-slider { background: var(--color-primary); }
+.toggle input:checked + .toggle-slider:before { transform: translateX(22px); }
+
+.lang-toggle {
+  display: flex;
+  background: rgba(255,255,255,0.08);
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+.lang-btn {
+  padding: 6px 16px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  border: none;
+  background: transparent;
+  color: rgba(252,252,252,0.4);
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: all 0.15s;
+}
+
+.lang-btn.active {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+.wallet-address {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-blue);
+  letter-spacing: 0.5px;
+}
+
+.settings-version {
+  margin-top: auto;
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(252,252,252,0.2);
+  letter-spacing: 1px;
+  padding: 20px 0;
+}
+
+/* ===== VICTORY / LEVEL COMPLETE OVERLAY ===== */
+.fireworks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: 20px;
+}
+
+.firework-particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  animation: fireworkBurst 1s ease-out forwards;
+}
+
+@keyframes fireworkBurst {
+  0% { transform: translate(0,0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+}
+
+/* ===== SCORE POPUP ===== */
+.score-popup {
+  position: absolute;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-yellow);
+  text-shadow: 0 0 10px rgba(255,214,0,0.6);
+  pointer-events: none;
+  animation: scoreFloat 1s ease-out forwards;
+  z-index: 50;
+  white-space: nowrap;
+}
+
+@keyframes scoreFloat {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(-60px) scale(1.3); opacity: 0; }
+}
+
+/* ===== COMBO FLASH ===== */
+.combo-flash {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 52px;
+  font-weight: 800;
+  color: var(--color-primary);
+  text-shadow: 0 0 20px rgba(237,0,140,0.8);
+  pointer-events: none;
+  animation: comboFlash 0.8s ease-out forwards;
+  z-index: 60;
+  white-space: nowrap;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+@keyframes comboFlash {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+  50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+}
+
+/* ===== DAILY BONUS TOAST ===== */
+.toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(237,0,140,0.9);
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--color-white);
+  letter-spacing: 1px;
+  z-index: 200;
+  white-space: nowrap;
+  animation: toastIn 0.3s ease, toastOut 0.3s ease 2.5s forwards;
+}
+
+@keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+@keyframes toastOut { from { opacity: 1; } to { opacity: 0; } }
+
+/* ===== LOADING SCREEN ===== */
+#screen-loading {
+  background: var(--color-bg);
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+}
+
+.loading-logo {
+  font-size: 42px;
+  font-weight: 800;
+  letter-spacing: 6px;
+  color: var(--color-white);
+}
+
+.loading-bar-wrap {
+  width: 200px;
+  height: 4px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.loading-bar {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 4px;
+  animation: loadBar 1.2s ease-in-out forwards;
+}
+
+@keyframes loadBar {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+.rik-loading {
+  width: 160px;
+  object-fit: contain;
+  animation: rikPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes rikPulse {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.04); }
+}
+
+/* ===== LEVEL SELECT ===== */
+#screen-levels {
+  background: var(--color-bg);
+  padding: 20px;
+  align-items: stretch;
+}
+
+.levels-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  margin-top: 16px;
+}
+
+.level-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(237,0,140,0.2);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+
+.level-card:not(.locked):hover {
+  background: rgba(237,0,140,0.08);
+  border-color: rgba(237,0,140,0.5);
+}
+
+.level-card.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.level-card-num {
+  font-size: 40px;
+  font-weight: 800;
+  color: var(--color-primary);
+  line-height: 1;
+  min-width: 50px;
+}
+
+.level-card-info {
+  flex: 1;
+}
+
+.level-card-name {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-white);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.level-card-meta {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(98,157,232,0.7);
+  margin-top: 2px;
+  letter-spacing: 0.5px;
+}
+
+.level-card-badge {
+  font-size: 13px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.badge-complete { background: rgba(0,200,80,0.15); color: #00C850; border: 1px solid rgba(0,200,80,0.3); }
+.badge-play { background: rgba(237,0,140,0.15); color: var(--color-primary); border: 1px solid rgba(237,0,140,0.3); }
+.badge-locked { background: rgba(255,255,255,0.05); color: rgba(252,252,252,0.3); border: 1px solid rgba(255,255,255,0.1); }
+
+/* ===== SHOP SCREEN ===== */
+#screen-shop {
+  background: var(--color-bg);
+  padding: 20px;
+  align-items: stretch;
+}
+
+.shop-coins {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-yellow);
+}
+
+.shop-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.skin-card {
+  background: rgba(255,255,255,0.04);
+  border: 2px solid rgba(237,0,140,0.15);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.skin-card.owned { border-color: rgba(0,200,80,0.4); }
+.skin-card.equipped { border-color: var(--color-primary); background: rgba(237,0,140,0.08); }
+
+.skin-preview {
+  display: flex;
+  gap: 4px;
+}
+
+.skin-blob {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+.skin-info { flex: 1; }
+.skin-name { font-size: 20px; font-weight: 800; color: var(--color-white); text-transform: uppercase; letter-spacing: 1px; }
+.skin-price { font-size: 14px; font-weight: 700; color: var(--color-yellow); }
+
+.btn-skin-buy {
+  background: var(--color-primary);
+  border: none;
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--color-white);
+  cursor: pointer;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.btn-skin-equip {
+  background: rgba(237,0,140,0.2);
+  border: 1px solid var(--color-primary);
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--color-primary);
+  cursor: pointer;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.btn-skin-equipped {
+  background: rgba(0,200,80,0.15);
+  border: 1px solid rgba(0,200,80,0.4);
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: #00C850;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-height: 700px) {
+  .rik-mascot { width: 160px; height: 240px; }
+  .menu-buttons { margin-top: 28px; }
+  .logo-rik { font-size: 42px; }
+}
+</style>
+</head>
+<body>
+<canvas id="particle-canvas"></canvas>
+<div id="app">
+
+  <!-- LOADING -->
+  <div id="screen-loading" class="screen active">
+    <img src="assets/character/rik_machine.jpg" class="rik-loading" alt="Rik" onerror="this.style.display='none'">
+    <div class="loading-logo">RIK</div>
+    <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
+    <div style="font-size:14px;font-weight:700;color:rgba(252,252,252,0.3);letter-spacing:3px;margin-top:4px;">ANIMATION</div>
+  </div>
+
+  <!-- MAIN MENU -->
+  <div id="screen-menu" class="screen">
+    <div class="menu-top">
+      <div class="coin-display">
+        <span class="coin-icon"></span>
+        <span id="menu-coins">0</span>
+      </div>
+      <button class="ton-btn-small" id="menu-ton-btn" onclick="Game.toggleTonConnect()">CONNECT WALLET</button>
+    </div>
+
+    <div class="logo-area">
+      <img src="assets/brand/logo_white.png" class="logo-img" alt="RIK ANIMATION"
+        onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='block'">
+      <div id="logo-fallback" class="logo-fallback" style="display:none">
+        <span class="logo-rik">RIK</span>
+        <span class="logo-animation">ANIMATION</span>
+      </div>
+      <div class="logo-tagline">Puzzle Game</div>
+    </div>
+
+    <div class="menu-buttons">
+      <button class="btn-primary" onclick="Game.goToLevels()">PLAY</button>
+      <button class="btn-secondary" onclick="Game.showScreen('howto')">HOW TO PLAY</button>
+      <button class="btn-secondary" onclick="Game.showScreen('referral')">REFERRALS</button>
+      <button class="btn-secondary" onclick="Game.showScreen('settings')">SETTINGS</button>
+      <button class="btn-secondary" onclick="Game.showScreen('shop')">SKIN SHOP</button>
+    </div>
+
+    <img src="assets/character/rik_idle.jpg" class="rik-mascot rik-bounce" alt="Rik"
+      id="menu-rik" onerror="this.style.display='none'">
+  </div>
+
+  <!-- HOW TO PLAY -->
+  <div id="screen-howto" class="screen">
+    <div class="howto-header">
+      <button class="btn-back" onclick="Game.showScreen('menu')">&#8592;</button>
+      <div class="screen-title">HOW TO PLAY</div>
+    </div>
+    <div class="howto-content">
+      <img src="assets/character/rik_tablet.jpg" class="rik-howto" alt="Rik" onerror="this.style.display='none'">
+      <div class="slide-area">
+        <div class="slide-text" id="slide-text">Blobs fall from above. Move them left and right!</div>
+        <div class="slide-canvas-wrap">
+          <canvas id="slide-canvas" width="200" height="130"></canvas>
+        </div>
+        <div class="dots-row" id="slide-dots">
+          <div class="dot active"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+        <button class="btn-slide-next" id="slide-btn" onclick="Game.nextSlide()">TAP TO CONTINUE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEVEL SELECT -->
+  <div id="screen-levels" class="screen">
+    <div class="howto-header">
+      <button class="btn-back" onclick="Game.showScreen('menu')">&#8592;</button>
+      <div class="screen-title">SELECT LEVEL</div>
+    </div>
+    <div class="levels-grid">
+      <div class="level-card" id="level-card-1" onclick="Game.startLevel(1)">
+        <div class="level-card-num">01</div>
+        <div class="level-card-info">
+          <div class="level-card-name">PINK RUSH</div>
+          <div class="level-card-meta">Target: 5,000 pts &nbsp;|&nbsp; 3 lives</div>
+        </div>
+        <div class="level-card-badge badge-play" id="level-badge-1">PLAY</div>
+      </div>
+      <div class="level-card locked" id="level-card-2" onclick="Game.startLevel(2)">
+        <div class="level-card-num">02</div>
+        <div class="level-card-info">
+          <div class="level-card-name">NEON STORM</div>
+          <div class="level-card-meta">Target: 12,000 pts &nbsp;|&nbsp; 2 lives</div>
+        </div>
+        <div class="level-card-badge badge-locked" id="level-badge-2">LOCKED</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAME -->
+  <div id="screen-game" class="screen">
+    <div class="game-hud">
+      <div class="hud-score">
+        <div class="hud-label">SCORE</div>
+        <div class="hud-value" id="hud-score">0</div>
+      </div>
+      <div class="hud-center">
+        <div class="hud-level-name" id="hud-level-name">PINK RUSH</div>
+        <div class="hud-target" id="hud-target">TARGET: 5,000</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="hud-lives" id="hud-lives"></div>
+        <button class="btn-pause" onclick="Game.pauseGame()">&#9646;&#9646;</button>
+      </div>
+    </div>
+    <div class="game-area" id="game-area">
+      <canvas id="game-canvas" width="252" height="504"></canvas>
+      <div class="game-sidebar">
+        <div class="next-label">NEXT</div>
+        <canvas id="next-canvas" width="60" height="72"></canvas>
+        <div class="combo-display" id="combo-display"></div>
+        <img src="assets/character/rik_idle.jpg" class="rik-game" alt="Rik"
+          id="rik-game-img" onerror="this.style.display='none'">
+      </div>
+    </div>
+  </div>
+
+  <!-- REFERRAL -->
+  <div id="screen-referral" class="screen">
+    <div class="referral-top">
+      <button class="btn-back" onclick="Game.showScreen('menu')">&#8592;</button>
+      <div class="screen-title">REFERRALS</div>
+      <div style="width:40px;"></div>
+    </div>
+    <img src="assets/character/rik_fly.jpg" class="rik-referral" alt="Rik" onerror="this.style.display='none'">
+    <div class="referral-stats">
+      <div class="stat-box">
+        <span class="stat-value" id="ref-friends">0</span>
+        <span class="stat-label">Friends</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-value" id="ref-coins">0</span>
+        <span class="stat-label">Coins Earned</span>
+      </div>
+    </div>
+    <div class="referral-link-box">
+      <div class="referral-link-text" id="referral-link-text">Loading...</div>
+      <button class="btn-copy" onclick="Game.copyReferralLink()">COPY</button>
+    </div>
+    <div class="referral-buttons">
+      <button class="btn-primary" onclick="Game.inviteFriend()">INVITE FRIEND</button>
+      <button class="btn-secondary" onclick="Game.showScreen('menu')">BACK TO MENU</button>
+    </div>
+    <div class="referral-reward-note">+500 coins per friend who completes Level 1</div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div id="screen-settings" class="screen">
+    <div class="howto-header">
+      <button class="btn-back" onclick="Game.showScreen('menu')">&#8592;</button>
+      <div class="screen-title">SETTINGS</div>
+    </div>
+    <div class="settings-list">
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Sound Effects</div>
+          <div class="settings-row-sub">Game sounds and music</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="sound-toggle" checked onchange="Game.toggleSound(this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">Language</div>
+        </div>
+        <div class="lang-toggle">
+          <button class="lang-btn active" id="lang-en" onclick="Game.setLang('en')">EN</button>
+          <button class="lang-btn" id="lang-ru" onclick="Game.setLang('ru')">RU</button>
+        </div>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">TON Wallet</div>
+          <div class="settings-row-sub" id="wallet-sub">Not connected</div>
+        </div>
+        <button class="ton-btn-small" id="settings-ton-btn" onclick="Game.toggleTonConnect()">CONNECT</button>
+      </div>
+    </div>
+    <div class="settings-version">v0.1.0 &nbsp;|&nbsp; RIK ANIMATION Puzzle Game</div>
+  </div>
+
+  <!-- SHOP -->
+  <div id="screen-shop" class="screen">
+    <div class="howto-header">
+      <button class="btn-back" onclick="Game.showScreen('menu')">&#8592;</button>
+      <div class="screen-title">SKIN SHOP</div>
+    </div>
+    <div class="shop-coins">
+      <span class="coin-icon" style="width:20px;height:20px;"></span>
+      <span id="shop-coins">0</span> coins
+    </div>
+    <div class="shop-grid" id="shop-grid"></div>
+  </div>
+
+  <!-- OVERLAYS -->
+
+  <!-- Pause -->
+  <div class="overlay" id="overlay-pause">
+    <div class="modal">
+      <img src="assets/character/rik_eating.jpg" class="modal-rik" alt="Rik" onerror="this.style.display='none'">
+      <div class="modal-title">PAUSED</div>
+      <div class="modal-buttons">
+        <button class="btn-primary" onclick="Game.resumeGame()">RESUME</button>
+        <button class="btn-secondary" onclick="Game.quitToMenu()">QUIT TO MENU</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Level Complete -->
+  <div class="overlay" id="overlay-complete">
+    <div class="modal">
+      <div class="fireworks" id="fireworks-container"></div>
+      <img src="assets/character/rik_fly.jpg" class="modal-rik" alt="Rik" onerror="this.style.display='none'">
+      <div class="modal-title">LEVEL COMPLETE!</div>
+      <div class="modal-score" id="complete-score">Score: 0</div>
+      <div class="modal-buttons">
+        <button class="btn-primary" id="btn-next-level" onclick="Game.nextLevel()">NEXT LEVEL</button>
+        <button class="btn-secondary" onclick="Game.shareResult()">SHARE RESULT</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Over -->
+  <div class="overlay" id="overlay-gameover">
+    <div class="modal">
+      <img src="assets/character/rik_books.jpg" class="modal-rik" alt="Rik" onerror="this.style.display='none'">
+      <div class="modal-title">GAME OVER</div>
+      <div class="modal-score" id="gameover-score">Score: 0</div>
+      <div class="modal-buttons">
+        <button class="btn-primary" onclick="Game.restartLevel()">TRY AGAIN</button>
+        <button class="btn-secondary" onclick="Game.quitToMenu()">MENU</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ============================================================
+// GAME STATE
+// ============================================================
+const COLS = 6, ROWS = 12;
+const CELL = 42; // px per cell
+const COLORS = {
+  pink:   '#ED008C',
+  blue:   '#629DE8',
+  white:  '#F0F0F0',
+  yellow: '#FFD600',
+  purple: '#9B59B6',
+};
+const COLOR_KEYS = Object.keys(COLORS);
+
+const LEVELS = [
+  { id:1, name:'PINK RUSH',  target:5000,  lives:3, speed:800,  unlocked: true  },
+  { id:2, name:'NEON STORM', target:12000, lives:2, speed:560,  unlocked: false },
+];
+
+const SKINS = [
+  { id:'default', name:'DEFAULT',  price:0,    blobs:['#ED008C','#629DE8','#F0F0F0','#FFD600','#9B59B6'] },
+  { id:'neon',    name:'NEON',     price:1000, blobs:['#FF00FF','#00FFFF','#00FF80','#FFFF00','#FF6600'] },
+  { id:'pastel',  name:'PASTEL',   price:2000, blobs:['#FFB3D9','#B3D9FF','#FFE5B3','#D9FFB3','#E5B3FF'] },
+  { id:'mono',    name:'MONO',     price:3000, blobs:['#FFFFFF','#CCCCCC','#999999','#666666','#333333'] },
+];
+
+// ============================================================
+// AUDIO (Web Audio API stubs)
+// ============================================================
+const Audio = (() => {
+  let ctx = null, enabled = true;
+
+  function getCtx() {
+    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    return ctx;
+  }
+
+  function beep(freq, dur, vol = 0.15, type = 'sine') {
+    if (!enabled) return;
+    try {
+      const c = getCtx();
+      const osc = c.createOscillator();
+      const gain = c.createGain();
+      osc.connect(gain);
+      gain.connect(c.destination);
+      osc.type = type;
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(vol, c.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + dur);
+      osc.start(c.currentTime);
+      osc.stop(c.currentTime + dur);
+    } catch(e) {}
+  }
+
+  return {
+    move:    () => beep(440, 0.05, 0.08, 'square'),
+    rotate:  () => beep(520, 0.05, 0.08, 'square'),
+    land:    () => beep(200, 0.08, 0.12, 'sawtooth'),
+    clear:   () => { beep(660, 0.1, 0.2); setTimeout(() => beep(880, 0.1, 0.2), 100); },
+    combo:   (n) => beep(440 + n * 110, 0.15, 0.25, 'sine'),
+    levelUp: () => { [523, 659, 784, 1047].forEach((f,i) => setTimeout(() => beep(f, 0.15, 0.2), i * 120)); },
+    over:    () => { [300, 250, 200, 150].forEach((f,i) => setTimeout(() => beep(f, 0.15, 0.15, 'sawtooth'), i * 100)); },
+    enable:  (v) => { enabled = v; },
+  };
+})();
+
+// ============================================================
+// PARTICLE SYSTEM (menu background)
+// ============================================================
+const Particles = (() => {
+  const canvas = document.getElementById('particle-canvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  let running = false;
+  let raf = null;
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  function spawn() {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: canvas.height + 10,
+      r: Math.random() * 3 + 1,
+      speed: Math.random() * 0.6 + 0.2,
+      alpha: Math.random() * 0.5 + 0.1,
+      hue: Math.random() < 0.7 ? 325 : 210,
+    });
+  }
+
+  function tick() {
+    if (!running) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (Math.random() < 0.1) spawn();
+    particles = particles.filter(p => p.y > -10);
+    for (const p of particles) {
+      p.y -= p.speed;
+      p.x += Math.sin(p.y * 0.02) * 0.3;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `hsla(${p.hue}, 100%, 60%, ${p.alpha})`;
+      ctx.fill();
+    }
+    raf = requestAnimationFrame(tick);
+  }
+
+  return {
+    start() { running = true; resize(); tick(); },
+    stop()  { running = false; cancelAnimationFrame(raf); ctx.clearRect(0, 0, canvas.width, canvas.height); },
+  };
+})();
+
+window.addEventListener('resize', () => {
+  const c = document.getElementById('particle-canvas');
+  c.width = window.innerWidth;
+  c.height = window.innerHeight;
+});
+
+// ============================================================
+// SAVE / LOAD
+// ============================================================
+const Save = {
+  key: 'rik_game_v1',
+  defaults() {
+    return {
+      coins: 0,
+      level1complete: false,
+      level2complete: false,
+      lastLogin: null,
+      lang: 'en',
+      sound: true,
+      equippedSkin: 'default',
+      ownedSkins: ['default'],
+      refFriends: 0,
+      refCoins: 0,
+    };
+  },
+  load() {
+    try {
+      return Object.assign(this.defaults(), JSON.parse(localStorage.getItem(this.key) || '{}'));
+    } catch(e) { return this.defaults(); }
+  },
+  save(state) {
+    localStorage.setItem(this.key, JSON.stringify(state));
+  },
+};
+
+// ============================================================
+// MAIN GAME OBJECT
+// ============================================================
+const Game = (() => {
+  let state = Save.load();
+  let currentScreen = 'loading';
+  let currentLevel = 1;
+  let score = 0;
+  let lives = 3;
+  let paused = false;
+  let gameRunning = false;
+
+  // Grid: ROWS x COLS, null = empty, string = color key
+  let grid = [];
+  let currentPair = null; // { x, y, c1, c2, rotation } rotation: 0=vertical(c1 top), 1=horiz(c1 left), 2=vert(c1 bottom), 3=horiz(c1 right)
+  let nextPair = null;
+  let fallTimer = 0;
+  let lastTime = 0;
+  let animRaf = null;
+  let combo = 0;
+  let fallSpeed = 800;
+
+  // Slide tutorial
+  let slideIndex = 0;
+  const slides = [
+    { text: 'Blobs fall from above. Move them left and right!' },
+    { text: 'Tap to rotate the pair before it lands.' },
+    { text: 'Match 4 or more same-color blobs to clear them!' },
+    { text: 'Chain clears for massive combo bonuses. Good luck!' },
+  ];
+
+  // TON Connect
+  let tonUI = null;
+  let walletAddress = null;
+
+  // Touch state
+  let touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+
+  // Canvas refs
+  let gameCanvas, gameCtx, nextCanvas, nextCtx;
+
+  // ---- SKIN COLORS ----
+  function getSkinColors() {
+    const skin = SKINS.find(s => s.id === state.equippedSkin) || SKINS[0];
+    const map = {};
+    COLOR_KEYS.forEach((k, i) => { map[k] = skin.blobs[i]; });
+    return map;
+  }
+
+  // ---- INIT ----
+  function init() {
+    gameCanvas = document.getElementById('game-canvas');
+    gameCtx = gameCanvas.getContext('2d');
+    nextCanvas = document.getElementById('next-canvas');
+    nextCtx = nextCanvas.getContext('2d');
+
+    // Resize canvas to fit
+    const area = document.getElementById('game-area');
+    const availW = Math.min(window.innerWidth, 430) - 70 - 24; // sidebar + padding
+    const cellSize = Math.floor(availW / COLS);
+    const canvasW = cellSize * COLS;
+    const canvasH = cellSize * ROWS;
+    gameCanvas.width = canvasW;
+    gameCanvas.height = canvasH;
+    gameCanvas.style.width = canvasW + 'px';
+    gameCanvas.style.height = canvasH + 'px';
+
+    setupTouchControls();
+    checkDailyBonus();
+    initTonConnect();
+
+    // Loading -> menu after 1.4s
+    setTimeout(() => {
+      showScreen('menu');
+      Particles.start();
+    }, 1400);
+  }
+
+  function checkDailyBonus() {
+    const today = new Date().toDateString();
+    if (state.lastLogin !== today) {
+      state.lastLogin = today;
+      state.coins += 100;
+      Save.save(state);
+      setTimeout(() => showToast('+100 DAILY BONUS COINS!'), 1600);
+    }
+  }
+
+  // ---- SCREENS ----
+  function showScreen(name) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-' + name).classList.add('active');
+    currentScreen = name;
+
+    if (name !== 'menu') Particles.stop();
+    else Particles.start();
+
+    if (name === 'menu') updateMenuUI();
+    if (name === 'howto') { slideIndex = 0; renderSlide(); }
+    if (name === 'referral') updateReferralUI();
+    if (name === 'settings') updateSettingsUI();
+    if (name === 'shop') renderShop();
+    if (name === 'levels') updateLevelsUI();
+    if (name !== 'game' && gameRunning) stopGame();
+  }
+
+  function updateMenuUI() {
+    document.getElementById('menu-coins').textContent = state.coins;
+    const btn = document.getElementById('menu-ton-btn');
+    if (walletAddress) {
+      btn.textContent = walletAddress.slice(0,6) + '...' + walletAddress.slice(-4);
+    } else {
+      btn.textContent = 'CONNECT WALLET';
+    }
+  }
+
+  function updateLevelsUI() {
+    const l2card = document.getElementById('level-card-2');
+    const l2badge = document.getElementById('level-badge-2');
+    if (state.level1complete) {
+      l2card.classList.remove('locked');
+      l2badge.textContent = state.level2complete ? 'COMPLETE' : 'PLAY';
+      l2badge.className = 'level-card-badge ' + (state.level2complete ? 'badge-complete' : 'badge-play');
+    }
+    const l1badge = document.getElementById('level-badge-1');
+    if (state.level1complete) {
+      l1badge.textContent = 'COMPLETE';
+      l1badge.className = 'level-card-badge badge-complete';
+    }
+  }
+
+  // ---- SLIDE TUTORIAL ----
+  function renderSlide() {
+    const s = slides[slideIndex];
+    document.getElementById('slide-text').textContent = s.text;
+    const dots = document.querySelectorAll('#slide-dots .dot');
+    dots.forEach((d, i) => d.classList.toggle('active', i === slideIndex));
+    const btn = document.getElementById('slide-btn');
+    if (slideIndex === slides.length - 1) {
+      btn.textContent = "LET'S PLAY";
+      btn.classList.add('btn-lets-play');
+    } else {
+      btn.textContent = 'TAP TO CONTINUE';
+      btn.classList.remove('btn-lets-play');
+    }
+    drawSlideDemo(slideIndex);
+  }
+
+  function nextSlide() {
+    if (slideIndex === slides.length - 1) {
+      goToLevels();
+    } else {
+      slideIndex++;
+      renderSlide();
+    }
+  }
+
+  function drawSlideDemo(idx) {
+    const canvas = document.getElementById('slide-canvas');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const skinColors = getSkinColors();
+    const c = Object.values(skinColors);
+
+    if (idx === 0) {
+      // Show grid with falling pair
+      const cw = 20, ch = 20, gap = 2;
+      const offX = 10, offY = 5;
+      for (let r = 0; r < 4; r++) {
+        for (let cl = 0; cl < 5; cl++) {
+          ctx.fillStyle = 'rgba(255,255,255,0.04)';
+          ctx.beginPath();
+          ctx.roundRect(offX + cl*(cw+gap), offY + r*(ch+gap), cw, ch, 4);
+          ctx.fill();
+        }
+      }
+      // falling pair
+      const t = (Date.now() % 2000) / 2000;
+      const fy = offY + t * ((ch+gap)*3);
+      drawDemoBlob(ctx, offX + 2*(cw+gap), fy, cw, ch, c[0]);
+      drawDemoBlob(ctx, offX + 2*(cw+gap), fy + ch + gap, cw, ch, c[1]);
+      // arrows
+      ctx.fillStyle = 'rgba(252,252,252,0.5)';
+      ctx.font = 'bold 18px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('◀', 30, 100);
+      ctx.fillText('▶', 170, 100);
+    } else if (idx === 1) {
+      // Show rotation
+      const cw = 22, ch = 22;
+      const cx = 100, cy = 65;
+      const angle = ((Date.now() % 2000) / 2000) * Math.PI * 2;
+      const r = 28;
+      const x1 = cx + Math.cos(angle) * r - cw/2;
+      const y1 = cy + Math.sin(angle) * r - ch/2;
+      const x2 = cx + Math.cos(angle + Math.PI) * r - cw/2;
+      const y2 = cy + Math.sin(angle + Math.PI) * r - ch/2;
+      drawDemoBlob(ctx, x1, y1, cw, ch, c[0]);
+      drawDemoBlob(ctx, x2, y2, cw, ch, c[2]);
+      ctx.strokeStyle = 'rgba(252,252,252,0.15)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r + cw/2, 0, Math.PI*2);
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(252,252,252,0.5)';
+      ctx.font = 'bold 22px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('TAP', 100, 120);
+    } else if (idx === 2) {
+      // Show 4-in-a-row match clearing
+      const cw = 22, ch = 22, gap = 3;
+      const offX = 15, offY = 40;
+      const row = [c[0], c[0], c[0], c[0], c[2], c[1]];
+      const flash = Math.floor(Date.now() / 500) % 2;
+      for (let i = 0; i < 6; i++) {
+        const alpha = (i < 4 && flash) ? 0.3 : 1;
+        ctx.globalAlpha = alpha;
+        drawDemoBlob(ctx, offX + i*(cw+gap), offY, cw, ch, row[i]);
+      }
+      ctx.globalAlpha = 1;
+      if (flash) {
+        ctx.fillStyle = '#FFD600';
+        ctx.font = 'bold 14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('CLEAR!', 100, 30);
+      }
+    } else if (idx === 3) {
+      // Combo chain animation
+      const t = (Date.now() % 3000) / 3000;
+      const step = Math.floor(t * 4);
+      ctx.textAlign = 'center';
+      ctx.font = 'bold 16px sans-serif';
+      const labels = ['CLEAR x1', 'CHAIN x2!', 'CHAIN x3!!', 'CHAIN x4!!!'];
+      const colors = [COLORS.pink, COLORS.blue, COLORS.yellow, COLORS.purple];
+      for (let i = 0; i <= step && i < 4; i++) {
+        ctx.fillStyle = colors[i];
+        ctx.globalAlpha = i === step ? 1 : 0.3;
+        ctx.font = `bold ${i === step ? 22 : 16}px Barlow Condensed, sans-serif`;
+        ctx.fillText(labels[i], 100, 30 + i*26);
+      }
+      ctx.globalAlpha = 1;
+    }
+    requestAnimationFrame(() => {
+      if (currentScreen === 'howto') drawSlideDemo(slideIndex);
+    });
+  }
+
+  function drawDemoBlob(ctx, x, y, w, h, color) {
+    const r = Math.min(w, h) * 0.4;
+    ctx.beginPath();
+    ctx.roundRect(x, y, w, h, r);
+    ctx.fillStyle = color;
+    ctx.fill();
+    // Highlight
+    ctx.beginPath();
+    ctx.roundRect(x + 3, y + 2, w * 0.35, h * 0.3, r * 0.5);
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    ctx.fill();
+  }
+
+  // ---- LEVEL START ----
+  function goToLevels() {
+    showScreen('levels');
+  }
+
+  function startLevel(levelId) {
+    const lvl = LEVELS.find(l => l.id === levelId);
+    if (!lvl) return;
+    if (!lvl.unlocked && !state.level1complete && levelId === 2) {
+      showToast('Complete Level 1 first!');
+      return;
+    }
+    currentLevel = levelId;
+    score = 0;
+    lives = lvl.lives;
+    fallSpeed = lvl.speed;
+    combo = 0;
+    paused = false;
+    grid = Array.from({length: ROWS}, () => Array(COLS).fill(null));
+    nextPair = spawnPair();
+    currentPair = spawnPair();
+
+    document.getElementById('hud-level-name').textContent = lvl.name;
+    document.getElementById('hud-target').textContent = 'TARGET: ' + lvl.target.toLocaleString();
+    updateHUD();
+
+    showScreen('game');
+    gameRunning = true;
+    lastTime = performance.now();
+    fallTimer = 0;
+
+    requestAnimationFrame(gameLoop);
+  }
+
+  function spawnPair() {
+    const c1 = COLOR_KEYS[Math.floor(Math.random() * COLOR_KEYS.length)];
+    const c2 = COLOR_KEYS[Math.floor(Math.random() * COLOR_KEYS.length)];
+    return { x: Math.floor(COLS/2) - 1, y: 0, c1, c2, rotation: 0 };
+  }
+
+  // ---- GAME LOOP ----
+  function gameLoop(now) {
+    if (!gameRunning) return;
+    const dt = now - lastTime;
+    lastTime = now;
+
+    if (!paused) {
+      fallTimer += dt;
+      if (fallTimer >= fallSpeed) {
+        fallTimer = 0;
+        dropStep();
+      }
+      render();
+    }
+
+    animRaf = requestAnimationFrame(gameLoop);
+  }
+
+  function stopGame() {
+    gameRunning = false;
+    cancelAnimationFrame(animRaf);
+  }
+
+  // ---- PAIR POSITIONS ----
+  function getPairCells(pair) {
+    const { x, y, rotation } = pair;
+    // c1 is "main", c2 is "satellite"
+    if (rotation === 0) return [{ x, y, c: pair.c1 }, { x, y: y+1, c: pair.c2 }]; // c1 top
+    if (rotation === 1) return [{ x, y, c: pair.c1 }, { x: x+1, y, c: pair.c2 }]; // c1 left
+    if (rotation === 2) return [{ x, y, c: pair.c2 }, { x, y: y+1, c: pair.c1 }]; // c1 bottom
+    if (rotation === 3) return [{ x: x+1, y, c: pair.c2 }, { x, y, c: pair.c1 }]; // c1 right
+    return [];
+  }
+
+  function isValidPosition(pair) {
+    const cells = getPairCells(pair);
+    for (const cell of cells) {
+      if (cell.x < 0 || cell.x >= COLS || cell.y >= ROWS) return false;
+      if (cell.y >= 0 && grid[cell.y][cell.x] !== null) return false;
+    }
+    return true;
+  }
+
+  // ---- DROP STEP ----
+  function dropStep() {
+    const moved = { ...currentPair, y: currentPair.y + 1 };
+    if (isValidPosition(moved)) {
+      currentPair = moved;
+    } else {
+      placePair();
+    }
+  }
+
+  function placePair() {
+    const cells = getPairCells(currentPair);
+    for (const cell of cells) {
+      if (cell.y < 0) {
+        // Game over — blob at top
+        triggerGameOver();
+        return;
+      }
+      grid[cell.y][cell.x] = cell.c;
+    }
+    Audio.land();
+    applyGravity();
+    processMatches();
+  }
+
+  function applyGravity() {
+    // Columns: blobs fall down
+    for (let c = 0; c < COLS; c++) {
+      let write = ROWS - 1;
+      for (let r = ROWS - 1; r >= 0; r--) {
+        if (grid[r][c] !== null) {
+          grid[write][c] = grid[r][c];
+          if (write !== r) grid[r][c] = null;
+          write--;
+        }
+      }
+    }
+  }
+
+  function processMatches() {
+    let totalCleared = 0;
+    let chainCombo = 0;
+
+    const doChain = () => {
+      const cleared = findAndClear();
+      if (cleared > 0) {
+        totalCleared += cleared;
+        chainCombo++;
+        combo = chainCombo;
+        const pts = cleared * chainCombo * 10;
+        score += pts;
+        state.coins += Math.floor(pts / 100);
+
+        // Show combo flash
+        if (chainCombo > 1) showComboFlash(chainCombo);
+        showScorePopup(pts);
+
+        Audio.clear();
+        if (chainCombo > 1) Audio.combo(chainCombo);
+
+        // Haptic
+        if (window.Telegram?.WebApp?.HapticFeedback) {
+          if (chainCombo > 1) Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+          else Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+        }
+
+        updateHUD();
+        applyGravity();
+        setTimeout(doChain, 350);
+      } else {
+        combo = 0;
+        document.getElementById('combo-display').textContent = '';
+        // Check win
+        const lvl = LEVELS.find(l => l.id === currentLevel);
+        if (score >= lvl.target) {
+          setTimeout(triggerLevelComplete, 300);
+          return;
+        }
+        // Next pair
+        currentPair = nextPair;
+        nextPair = spawnPair();
+        fallTimer = 0;
+        // Check spawn collision
+        if (!isValidPosition(currentPair)) {
+          triggerGameOver();
+        }
+        renderNext();
+        updateRikPose();
+      }
+    };
+    setTimeout(doChain, 150);
+  }
+
+  function findAndClear() {
+    const toRemove = new Set();
+    // Find groups of 4+
+    const visited = Array.from({length: ROWS}, () => Array(COLS).fill(false));
+
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        if (grid[r][c] === null || visited[r][c]) continue;
+        const color = grid[r][c];
+        const group = [];
+        const stack = [[r, c]];
+        while (stack.length) {
+          const [cr, cc] = stack.pop();
+          if (cr < 0 || cr >= ROWS || cc < 0 || cc >= COLS) continue;
+          if (visited[cr][cc] || grid[cr][cc] !== color) continue;
+          visited[cr][cc] = true;
+          group.push([cr, cc]);
+          stack.push([cr-1,cc],[cr+1,cc],[cr,cc-1],[cr,cc+1]);
+        }
+        if (group.length >= 4) group.forEach(([gr,gc]) => toRemove.add(`${gr},${gc}`));
+      }
+    }
+
+    for (const key of toRemove) {
+      const [r, c] = key.split(',').map(Number);
+      grid[r][c] = null;
+    }
+    return toRemove.size;
+  }
+
+  // ---- RENDER ----
+  function render() {
+    const canvas = gameCanvas;
+    const ctx = gameCtx;
+    const cellW = canvas.width / COLS;
+    const cellH = canvas.height / ROWS;
+    const skinColors = getSkinColors();
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Grid background
+    ctx.fillStyle = '#0A0A0A';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Grid lines
+    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+    ctx.lineWidth = 1;
+    for (let r = 1; r < ROWS; r++) {
+      ctx.beginPath();
+      ctx.moveTo(0, r * cellH);
+      ctx.lineTo(canvas.width, r * cellH);
+      ctx.stroke();
+    }
+    for (let c = 1; c < COLS; c++) {
+      ctx.beginPath();
+      ctx.moveTo(c * cellW, 0);
+      ctx.lineTo(c * cellW, canvas.height);
+      ctx.stroke();
+    }
+
+    // Placed blobs
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        if (grid[r][c]) {
+          drawBlob(ctx, c * cellW, r * cellH, cellW, cellH, skinColors[grid[r][c]] || grid[r][c]);
+        }
+      }
+    }
+
+    // Current pair
+    if (currentPair) {
+      const cells = getPairCells(currentPair);
+      for (const cell of cells) {
+        if (cell.y >= 0) {
+          drawBlob(ctx, cell.x * cellW, cell.y * cellH, cellW, cellH, skinColors[cell.c] || cell.c);
+        }
+      }
+      // Ghost (drop preview)
+      drawGhost(ctx, cellW, cellH, skinColors);
+    }
+  }
+
+  function drawBlob(ctx, x, y, w, h, color) {
+    const pad = 2;
+    const r = Math.min(w, h) * 0.38;
+    ctx.beginPath();
+    ctx.roundRect(x + pad, y + pad, w - pad*2, h - pad*2, r);
+    ctx.fillStyle = color;
+    ctx.fill();
+    // Gloss highlight
+    ctx.beginPath();
+    ctx.roundRect(x + pad + 4, y + pad + 3, (w - pad*2) * 0.38, (h - pad*2) * 0.28, r * 0.4);
+    ctx.fillStyle = 'rgba(255,255,255,0.32)';
+    ctx.fill();
+    // Outline
+    ctx.beginPath();
+    ctx.roundRect(x + pad, y + pad, w - pad*2, h - pad*2, r);
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  function drawGhost(ctx, cellW, cellH, skinColors) {
+    let ghost = { ...currentPair };
+    while (true) {
+      const next = { ...ghost, y: ghost.y + 1 };
+      if (isValidPosition(next)) ghost = next;
+      else break;
+    }
+    if (ghost.y === currentPair.y) return;
+    const cells = getPairCells(ghost);
+    ctx.globalAlpha = 0.18;
+    for (const cell of cells) {
+      if (cell.y >= 0) {
+        drawBlob(ctx, cell.x * cellW, cell.y * cellH, cellW, cellH, skinColors[cell.c] || cell.c);
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function renderNext() {
+    const ctx = nextCtx;
+    const canvas = nextCanvas;
+    const skinColors = getSkinColors();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#0A0A0A';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    if (!nextPair) return;
+    const cw = canvas.width / 2 - 4;
+    const ch = canvas.height / 3 - 4;
+    // Draw vertically centered
+    const c1 = skinColors[nextPair.c1] || nextPair.c1;
+    const c2 = skinColors[nextPair.c2] || nextPair.c2;
+    drawBlob(ctx, 6, 6, cw, ch, c1);
+    drawBlob(ctx, 6, 6 + ch + 4, cw, ch, c2);
+  }
+
+  function updateHUD() {
+    document.getElementById('hud-score').textContent = score.toLocaleString();
+    const heartsEl = document.getElementById('hud-lives');
+    heartsEl.innerHTML = '';
+    const maxLives = LEVELS.find(l => l.id === currentLevel)?.lives || 3;
+    for (let i = 0; i < maxLives; i++) {
+      const h = document.createElement('span');
+      h.className = 'heart-icon' + (i >= lives ? ' lost' : '');
+      h.textContent = '♥';
+      heartsEl.appendChild(h);
+    }
+    const comboEl = document.getElementById('combo-display');
+    if (combo > 1) {
+      comboEl.textContent = 'COMBO x' + combo;
+    }
+  }
+
+  function updateRikPose() {
+    const img = document.getElementById('rik-game-img');
+    if (!img) return;
+    const filledRows = grid.filter(r => r.some(c => c !== null)).length;
+    const dangerThreshold = Math.floor(ROWS * 0.6);
+    if (filledRows >= dangerThreshold) {
+      img.src = 'assets/character/rik_shocked.jpg';
+    } else if (combo >= 3) {
+      img.src = 'assets/character/rik_fly.jpg';
+    } else {
+      img.src = 'assets/character/rik_idle.jpg';
+    }
+  }
+
+  // ---- CONTROLS ----
+  function setupTouchControls() {
+    const canvas = document.getElementById('game-canvas');
+
+    canvas.addEventListener('touchstart', e => {
+      e.preventDefault();
+      const t = e.touches[0];
+      touchStartX = t.clientX;
+      touchStartY = t.clientY;
+      touchStartTime = Date.now();
+    }, { passive: false });
+
+    canvas.addEventListener('touchend', e => {
+      e.preventDefault();
+      if (!gameRunning || paused || !currentPair) return;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - touchStartX;
+      const dy = t.clientY - touchStartY;
+      const dt = Date.now() - touchStartTime;
+      const absDx = Math.abs(dx);
+      const absDy = Math.abs(dy);
+
+      if (absDx < 12 && absDy < 12 && dt < 300) {
+        // Tap = rotate
+        rotatePair();
+      } else if (absDy > absDx && dy > 30) {
+        // Swipe down = fast drop
+        hardDrop();
+      } else if (absDx > absDy) {
+        // Swipe horizontal = move
+        const cells = Math.round(absDx / (gameCanvas.width / COLS));
+        const dir = dx > 0 ? 1 : -1;
+        for (let i = 0; i < Math.max(1, cells); i++) movePair(dir);
+      }
+    }, { passive: false });
+
+    // Keyboard for desktop testing
+    document.addEventListener('keydown', e => {
+      if (!gameRunning || paused || currentScreen !== 'game') return;
+      if (e.key === 'ArrowLeft')  movePair(-1);
+      if (e.key === 'ArrowRight') movePair(1);
+      if (e.key === 'ArrowDown')  dropStep();
+      if (e.key === 'ArrowUp' || e.key === ' ') { e.preventDefault(); rotatePair(); }
+      if (e.key === 'Escape') pauseGame();
+      if (e.key === 'Enter') hardDrop();
+    });
+  }
+
+  function movePair(dir) {
+    const moved = { ...currentPair, x: currentPair.x + dir };
+    if (isValidPosition(moved)) {
+      currentPair = moved;
+      Audio.move();
+      if (window.Telegram?.WebApp?.HapticFeedback) {
+        Telegram.WebApp.HapticFeedback.selectionChanged();
+      }
+    }
+  }
+
+  function rotatePair() {
+    const rotated = { ...currentPair, rotation: (currentPair.rotation + 1) % 4 };
+    if (isValidPosition(rotated)) {
+      currentPair = rotated;
+      Audio.rotate();
+    } else {
+      // Wall kick: try shifting
+      const kick1 = { ...rotated, x: rotated.x - 1 };
+      const kick2 = { ...rotated, x: rotated.x + 1 };
+      if (isValidPosition(kick1)) currentPair = kick1;
+      else if (isValidPosition(kick2)) currentPair = kick2;
+    }
+  }
+
+  function hardDrop() {
+    while (true) {
+      const moved = { ...currentPair, y: currentPair.y + 1 };
+      if (isValidPosition(moved)) currentPair = moved;
+      else break;
+    }
+    fallTimer = fallSpeed; // force immediate place
+    dropStep();
+  }
+
+  // ---- GAME EVENTS ----
+  function pauseGame() {
+    paused = true;
+    document.getElementById('overlay-pause').classList.add('active');
+  }
+
+  function resumeGame() {
+    paused = false;
+    document.getElementById('overlay-pause').classList.remove('active');
+    lastTime = performance.now();
+    fallTimer = 0;
+  }
+
+  function quitToMenu() {
+    document.querySelectorAll('.overlay').forEach(o => o.classList.remove('active'));
+    stopGame();
+    Save.save(state);
+    showScreen('menu');
+  }
+
+  function triggerGameOver() {
+    stopGame();
+    Audio.over();
+    lives--;
+    Save.save(state);
+    document.getElementById('gameover-score').textContent = 'Score: ' + score.toLocaleString();
+    document.getElementById('overlay-gameover').classList.add('active');
+    if (window.Telegram?.WebApp?.HapticFeedback) {
+      Telegram.WebApp.HapticFeedback.notificationOccurred('error');
+    }
+  }
+
+  function triggerLevelComplete() {
+    stopGame();
+    Audio.levelUp();
+
+    if (currentLevel === 1) {
+      state.level1complete = true;
+      LEVELS[1].unlocked = true;
+    } else if (currentLevel === 2) {
+      state.level2complete = true;
+    }
+
+    state.coins += Math.floor(score / 100);
+    Save.save(state);
+
+    document.getElementById('complete-score').textContent =
+      'Score: ' + score.toLocaleString() + ' / Target: ' + LEVELS.find(l=>l.id===currentLevel).target.toLocaleString();
+
+    const btnNext = document.getElementById('btn-next-level');
+    if (currentLevel >= LEVELS.length) {
+      btnNext.textContent = 'ALL LEVELS DONE!';
+      btnNext.onclick = () => quitToMenu();
+    } else {
+      btnNext.textContent = 'NEXT LEVEL';
+    }
+
+    spawnFireworks();
+    document.getElementById('overlay-complete').classList.add('active');
+    if (window.Telegram?.WebApp?.HapticFeedback) {
+      Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+    }
+  }
+
+  function restartLevel() {
+    document.getElementById('overlay-gameover').classList.remove('active');
+    startLevel(currentLevel);
+  }
+
+  function nextLevel() {
+    document.getElementById('overlay-complete').classList.remove('active');
+    if (currentLevel < LEVELS.length) {
+      startLevel(currentLevel + 1);
+    } else {
+      quitToMenu();
+    }
+  }
+
+  // ---- FIREWORKS ----
+  function spawnFireworks() {
+    const container = document.getElementById('fireworks-container');
+    container.innerHTML = '';
+    const colors = [COLORS.pink, COLORS.blue, COLORS.yellow, COLORS.purple, '#00FF80'];
+    for (let burst = 0; burst < 3; burst++) {
+      setTimeout(() => {
+        const bx = 30 + Math.random() * 280;
+        const by = 20 + Math.random() * 100;
+        for (let i = 0; i < 14; i++) {
+          const p = document.createElement('div');
+          p.className = 'firework-particle';
+          const angle = (i / 14) * Math.PI * 2;
+          const dist = 40 + Math.random() * 60;
+          p.style.left = bx + 'px';
+          p.style.top = by + 'px';
+          p.style.background = colors[Math.floor(Math.random() * colors.length)];
+          p.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+          p.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+          p.style.animationDelay = (burst * 0.4) + 's';
+          container.appendChild(p);
+        }
+      }, burst * 400);
+    }
+  }
+
+  // ---- SCORE / COMBO POPUPS ----
+  function showScorePopup(pts) {
+    const area = document.getElementById('game-area');
+    const el = document.createElement('div');
+    el.className = 'score-popup';
+    el.textContent = '+' + pts;
+    el.style.left = (20 + Math.random() * 100) + 'px';
+    el.style.top = (100 + Math.random() * 150) + 'px';
+    area.appendChild(el);
+    setTimeout(() => el.remove(), 1000);
+  }
+
+  function showComboFlash(n) {
+    const area = document.getElementById('game-area');
+    const el = document.createElement('div');
+    el.className = 'combo-flash';
+    el.textContent = 'COMBO x' + n + '!';
+    area.appendChild(el);
+    setTimeout(() => el.remove(), 800);
+  }
+
+  // ---- REFERRAL ----
+  function updateReferralUI() {
+    const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || 'demo';
+    const link = `https://t.me/RikAnimationBot/game?startapp=${userId}`;
+    document.getElementById('referral-link-text').textContent = link;
+    document.getElementById('ref-friends').textContent = state.refFriends;
+    document.getElementById('ref-coins').textContent = state.refCoins;
+  }
+
+  function copyReferralLink() {
+    const text = document.getElementById('referral-link-text').textContent;
+    navigator.clipboard?.writeText(text).then(() => showToast('LINK COPIED!'))
+      .catch(() => showToast('LINK COPIED!'));
+  }
+
+  function inviteFriend() {
+    const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || 'demo';
+    const link = `https://t.me/RikAnimationBot/game?startapp=${userId}`;
+    const msg = encodeURIComponent(`Play RIK ANIMATION puzzle game with me! ${link}`);
+    if (window.Telegram?.WebApp) {
+      Telegram.WebApp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${msg}`);
+    } else {
+      window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${msg}`, '_blank');
+    }
+  }
+
+  function shareResult() {
+    const lvl = LEVELS.find(l => l.id === currentLevel);
+    const msg = `I scored ${score.toLocaleString()} in ${lvl.name} on RIK ANIMATION Puzzle Game! Can you beat me?`;
+    if (window.Telegram?.WebApp) {
+      Telegram.WebApp.openTelegramLink(`https://t.me/share/url?url=https://rik.studio&text=${encodeURIComponent(msg)}`);
+    }
+    document.getElementById('overlay-complete').classList.remove('active');
+    quitToMenu();
+  }
+
+  // ---- SETTINGS ----
+  function updateSettingsUI() {
+    document.getElementById('sound-toggle').checked = state.sound;
+    const langEn = document.getElementById('lang-en');
+    const langRu = document.getElementById('lang-ru');
+    if (state.lang === 'ru') {
+      langRu.classList.add('active'); langEn.classList.remove('active');
+    } else {
+      langEn.classList.add('active'); langRu.classList.remove('active');
+    }
+    const walletSub = document.getElementById('wallet-sub');
+    const settingsBtn = document.getElementById('settings-ton-btn');
+    if (walletAddress) {
+      walletSub.textContent = walletAddress.slice(0,8) + '...' + walletAddress.slice(-6);
+      settingsBtn.textContent = 'DISCONNECT';
+    } else {
+      walletSub.textContent = 'Not connected';
+      settingsBtn.textContent = 'CONNECT';
+    }
+  }
+
+  function toggleSound(v) {
+    state.sound = v;
+    Audio.enable(v);
+    Save.save(state);
+  }
+
+  function setLang(lang) {
+    state.lang = lang;
+    Save.save(state);
+    document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+    document.getElementById('lang-ru').classList.toggle('active', lang === 'ru');
+  }
+
+  // ---- TON CONNECT ----
+  function initTonConnect() {
+    try {
+      tonUI = new TON_CONNECT_UI.TonConnectUI({
+        manifestUrl: window.location.origin + '/tonconnect-manifest.json',
+        buttonRootId: null,
+      });
+      tonUI.onStatusChange(wallet => {
+        if (wallet) {
+          walletAddress = wallet.account.address;
+          onChainReward(walletAddress, 0);
+        } else {
+          walletAddress = null;
+        }
+        updateMenuUI();
+        if (currentScreen === 'settings') updateSettingsUI();
+      });
+    } catch(e) {
+      console.warn('TON Connect init failed:', e);
+    }
+  }
+
+  async function toggleTonConnect() {
+    if (!tonUI) { showToast('TON Connect unavailable'); return; }
+    if (walletAddress) {
+      await tonUI.disconnect();
+      walletAddress = null;
+    } else {
+      try {
+        await tonUI.openModal();
+      } catch(e) { console.warn(e); }
+    }
+    updateMenuUI();
+    if (currentScreen === 'settings') updateSettingsUI();
+  }
+
+  // Stub for future on-chain rewards
+  async function onChainReward(walletAddress, coins) {
+    console.log('[TON] onChainReward', walletAddress, coins);
+    // Future: send TON transaction
+  }
+
+  // ---- SHOP ----
+  function renderShop() {
+    document.getElementById('shop-coins').textContent = state.coins;
+    const grid = document.getElementById('shop-grid');
+    grid.innerHTML = '';
+    for (const skin of SKINS) {
+      const owned = state.ownedSkins.includes(skin.id);
+      const equipped = state.equippedSkin === skin.id;
+      const card = document.createElement('div');
+      card.className = 'skin-card' + (owned ? ' owned' : '') + (equipped ? ' equipped' : '');
+
+      const preview = document.createElement('div');
+      preview.className = 'skin-preview';
+      skin.blobs.forEach(c => {
+        const b = document.createElement('div');
+        b.className = 'skin-blob';
+        b.style.background = c;
+        b.style.boxShadow = `0 0 6px ${c}60`;
+        preview.appendChild(b);
+      });
+
+      const info = document.createElement('div');
+      info.className = 'skin-info';
+      info.innerHTML = `<div class="skin-name">${skin.name}</div>
+        <div class="skin-price">${skin.id === 'default' ? 'FREE' : skin.price.toLocaleString() + ' coins'}</div>`;
+
+      let actionBtn;
+      if (equipped) {
+        actionBtn = document.createElement('button');
+        actionBtn.className = 'btn-skin-equipped';
+        actionBtn.textContent = 'EQUIPPED';
+      } else if (owned) {
+        actionBtn = document.createElement('button');
+        actionBtn.className = 'btn-skin-equip';
+        actionBtn.textContent = 'EQUIP';
+        actionBtn.onclick = () => { equipSkin(skin.id); renderShop(); };
+      } else {
+        actionBtn = document.createElement('button');
+        actionBtn.className = 'btn-skin-buy';
+        actionBtn.textContent = 'BUY';
+        actionBtn.onclick = () => buySkin(skin.id);
+      }
+
+      card.appendChild(preview);
+      card.appendChild(info);
+      card.appendChild(actionBtn);
+      grid.appendChild(card);
+    }
+  }
+
+  function buySkin(id) {
+    const skin = SKINS.find(s => s.id === id);
+    if (!skin || state.ownedSkins.includes(id)) return;
+    if (state.coins < skin.price) { showToast('Not enough coins!'); return; }
+    state.coins -= skin.price;
+    state.ownedSkins.push(id);
+    Save.save(state);
+    renderShop();
+    showToast(skin.name + ' SKIN UNLOCKED!');
+  }
+
+  function equipSkin(id) {
+    if (!state.ownedSkins.includes(id)) return;
+    state.equippedSkin = id;
+    Save.save(state);
+  }
+
+  // ---- TOAST ----
+  function showToast(msg) {
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.textContent = msg;
+    document.getElementById('app').appendChild(el);
+    setTimeout(() => el.remove(), 3000);
+  }
+
+  // ---- PUBLIC API ----
+  return {
+    init,
+    showScreen,
+    nextSlide,
+    goToLevels,
+    startLevel,
+    pauseGame,
+    resumeGame,
+    quitToMenu,
+    restartLevel,
+    nextLevel,
+    copyReferralLink,
+    inviteFriend,
+    shareResult,
+    updateReferralUI,
+    toggleSound,
+    setLang,
+    toggleTonConnect,
+    renderShop,
+  };
+})();
+
+// ============================================================
+// TELEGRAM WEB APP INIT
+// ============================================================
+(function() {
+  if (window.Telegram?.WebApp) {
+    Telegram.WebApp.ready();
+    Telegram.WebApp.expand();
+    Telegram.WebApp.setHeaderColor('#020202');
+    Telegram.WebApp.setBackgroundColor('#020202');
+  }
+})();
+
+// ============================================================
+// BOOT
+// ============================================================
+window.addEventListener('DOMContentLoaded', () => {
+  // Polyfill roundRect if needed
+  if (!CanvasRenderingContext2D.prototype.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+      if (w < 2*r) r = w/2;
+      if (h < 2*r) r = h/2;
+      this.beginPath();
+      this.moveTo(x+r, y);
+      this.arcTo(x+w, y, x+w, y+h, r);
+      this.arcTo(x+w, y+h, x, y+h, r);
+      this.arcTo(x, y+h, x, y, r);
+      this.arcTo(x, y, x+w, y, r);
+      this.closePath();
+      return this;
+    };
+  }
+  Game.init();
+});
+</script>
+</body>
+</html>
