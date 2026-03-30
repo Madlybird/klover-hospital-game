@@ -219,28 +219,6 @@ html, body {
 
 .btn-secondary:active { transform: scale(0.97); background: rgba(237,0,140,0.1); }
 
-.rik-mascot {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  height: 45vh;
-  width: auto;
-  max-width: 55vw;
-  object-fit: contain;
-  object-position: right bottom;
-  pointer-events: none;
-  z-index: 5;
-  mix-blend-mode: darken;
-}
-
-.rik-bounce {
-  animation: rikBounce 2.5s ease-in-out infinite;
-}
-
-@keyframes rikBounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
 
 /* ===== HOW TO PLAY ===== */
 #screen-howto {
@@ -286,13 +264,6 @@ html, body {
   align-items: flex-start;
 }
 
-.rik-howto {
-  width: 110px;
-  flex-shrink: 0;
-  object-fit: contain;
-  border-radius: 12px;
-  mix-blend-mode: darken;
-}
 
 .slide-area {
   flex: 1;
@@ -456,26 +427,6 @@ html, body {
   flex-shrink: 0;
 }
 
-/* Left panel: Rik portrait */
-.game-sidebar-left {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 64px;
-  flex-shrink: 0;
-  align-self: stretch;
-}
-
-.rik-game {
-  width: 64px;
-  height: 120px;
-  object-fit: contain;
-  object-position: center top;
-  mix-blend-mode: darken;
-  transition: opacity 0.3s;
-  flex-shrink: 0;
-}
 
 /* Right panel: next piece + combo */
 .game-sidebar {
@@ -561,12 +512,6 @@ html, body {
   position: relative;
 }
 
-.modal-rik {
-  width: 100px;
-  object-fit: contain;
-  border-radius: 10px;
-  mix-blend-mode: darken;
-}
 
 .modal-title {
   font-size: 32px;
@@ -622,20 +567,6 @@ html, body {
   padding: 16px 20px;
 }
 
-.rik-referral {
-  display: block;
-  width: 180px;
-  object-fit: contain;
-  margin: 0 auto;
-  mix-blend-mode: darken;
-  filter: drop-shadow(0 0 20px rgba(237,0,140,0.6));
-  animation: rikFloat 3s ease-in-out infinite;
-}
-
-@keyframes rikFloat {
-  0%, 100% { transform: translateY(0) rotate(-2deg); }
-  50% { transform: translateY(-12px) rotate(2deg); }
-}
 
 .referral-stats {
   display: flex;
@@ -953,17 +884,6 @@ html, body {
   to { width: 100%; }
 }
 
-.rik-loading {
-  width: 160px;
-  object-fit: contain;
-  mix-blend-mode: darken;
-  animation: rikPulse 1.5s ease-in-out infinite;
-}
-
-@keyframes rikPulse {
-  0%, 100% { opacity: 0.7; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.04); }
-}
 
 /* ===== LEVEL SELECT ===== */
 #screen-levels {
@@ -1143,7 +1063,6 @@ html, body {
 
 /* ===== RESPONSIVE ===== */
 @media (max-height: 700px) {
-  .rik-mascot { height: 38vh; }
   .menu-buttons { margin-top: 28px; }
   .logo-rik { font-size: 42px; }
 }
@@ -1155,7 +1074,6 @@ html, body {
 
   <!-- LOADING -->
   <div id="screen-loading" class="screen active">
-    <img src="./assets/character/rik_machine.jpg" class="rik-loading" alt="Rik" onerror="rikFallback(this)">
     <div class="loading-logo">RIK</div>
     <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
     <div style="font-size:14px;font-weight:700;color:rgba(252,252,252,0.3);letter-spacing:3px;margin-top:4px;">ANIMATION</div>
@@ -1189,8 +1107,6 @@ html, body {
       <button class="btn-secondary" onclick="Game.showScreen('shop')">SKIN SHOP</button>
     </div>
 
-    <img src="./assets/character/rik_idle.jpg" class="rik-mascot rik-bounce" alt="Rik"
-      id="menu-rik" onerror="rikFallback(this)">
   </div>
 
   <!-- HOW TO PLAY -->
@@ -1199,21 +1115,18 @@ html, body {
       <button class="btn-back" onclick="Game.showScreen('menu')">&#8592;</button>
       <div class="screen-title">HOW TO PLAY</div>
     </div>
-    <div class="howto-content">
-      <img src="./assets/character/rik_tablet.jpg" class="rik-howto" alt="Rik" onerror="rikFallback(this)">
-      <div class="slide-area">
-        <div class="slide-text" id="slide-text">Blobs fall from above. Move them left and right!</div>
-        <div class="slide-canvas-wrap">
-          <canvas id="slide-canvas" width="200" height="130"></canvas>
-        </div>
-        <div class="dots-row" id="slide-dots">
-          <div class="dot active"></div>
-          <div class="dot"></div>
-          <div class="dot"></div>
-          <div class="dot"></div>
-        </div>
-        <button class="btn-slide-next" id="slide-btn" onclick="Game.nextSlide()">TAP TO CONTINUE</button>
+    <div class="slide-area">
+      <div class="slide-text" id="slide-text">Blobs fall from above. Move them left and right!</div>
+      <div class="slide-canvas-wrap">
+        <canvas id="slide-canvas" width="200" height="130"></canvas>
       </div>
+      <div class="dots-row" id="slide-dots">
+        <div class="dot active"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+      <button class="btn-slide-next" id="slide-btn" onclick="Game.nextSlide()">TAP TO CONTINUE</button>
     </div>
   </div>
 
@@ -1260,10 +1173,6 @@ html, body {
       </div>
     </div>
     <div class="game-area" id="game-area">
-      <div class="game-sidebar-left">
-        <img src="./assets/character/rik_idle.jpg" class="rik-game" alt="Rik"
-          id="rik-game-img" onerror="rikFallback(this)">
-      </div>
       <canvas id="game-canvas" width="252" height="504"></canvas>
       <div class="game-sidebar">
         <div class="next-label">NEXT</div>
@@ -1280,7 +1189,6 @@ html, body {
       <div class="screen-title">REFERRALS</div>
       <div style="width:40px;"></div>
     </div>
-    <img src="./assets/character/rik_fly.jpg" class="rik-referral" alt="Rik" onerror="rikFallback(this)">
     <div class="referral-stats">
       <div class="stat-box">
         <span class="stat-value" id="ref-friends">0</span>
@@ -1357,7 +1265,6 @@ html, body {
   <!-- Pause -->
   <div class="overlay" id="overlay-pause">
     <div class="modal">
-      <img src="./assets/character/rik_eating.jpg" class="modal-rik" alt="Rik" onerror="rikFallback(this)">
       <div class="modal-title">PAUSED</div>
       <div class="modal-buttons">
         <button class="btn-primary" onclick="Game.resumeGame()">RESUME</button>
@@ -1370,7 +1277,6 @@ html, body {
   <div class="overlay" id="overlay-complete">
     <div class="modal">
       <div class="fireworks" id="fireworks-container"></div>
-      <img src="./assets/character/rik_fly.jpg" class="modal-rik" alt="Rik" onerror="rikFallback(this)">
       <div class="modal-title">LEVEL COMPLETE!</div>
       <div class="modal-score" id="complete-score">Score: 0</div>
       <div class="modal-buttons">
@@ -1383,7 +1289,6 @@ html, body {
   <!-- Game Over -->
   <div class="overlay" id="overlay-gameover">
     <div class="modal">
-      <img src="./assets/character/rik_books.jpg" class="modal-rik" alt="Rik" onerror="rikFallback(this)">
       <div class="modal-title">GAME OVER</div>
       <div class="modal-score" id="gameover-score">Score: 0</div>
       <div class="modal-buttons">
@@ -1975,7 +1880,6 @@ const Game = (() => {
           triggerGameOver();
         }
         renderNext();
-        updateRikPose();
       }
     };
     setTimeout(doChain, 150);
@@ -2135,19 +2039,6 @@ const Game = (() => {
     }
   }
 
-  function updateRikPose() {
-    const el = document.getElementById('rik-game-img');
-    if (!el || el.dataset.rikPlaceholder) return; // placeholder div — skip src swap
-    const filledRows = grid.filter(r => r.some(c => c !== null)).length;
-    const dangerThreshold = Math.floor(ROWS * 0.6);
-    if (filledRows >= dangerThreshold) {
-      el.src = './assets/character/rik_shocked.jpg';
-    } else if (combo >= 3) {
-      el.src = './assets/character/rik_fly.jpg';
-    } else {
-      el.src = './assets/character/rik_idle.jpg';
-    }
-  }
 
   // ---- CONTROLS ----
   function setupTouchControls() {
@@ -2585,49 +2476,6 @@ const Game = (() => {
   }
 })();
 
-// ============================================================
-// RIK IMAGE FALLBACK
-// Called via onerror on every <img> showing Rik.
-// Replaces the broken img with a pink circle placeholder so
-// layout never collapses, and the slot stays visible.
-// ============================================================
-function rikFallback(img) {
-  const div = document.createElement('div');
-  // Copy all classes, id, and computed inline styles
-  div.className = img.className;
-  if (img.id) div.id = img.id;
-  div.style.cssText = img.style.cssText;
-
-  // Size: use the img's natural CSS dimensions or sensible defaults
-  const cs = window.getComputedStyle(img);
-  const w = parseInt(cs.width)  || parseInt(img.style.width)  || 80;
-  const h = parseInt(cs.height) || parseInt(img.style.height) || 80;
-  const size = Math.min(w, h);
-
-  Object.assign(div.style, {
-    display:        'flex',
-    alignItems:     'center',
-    justifyContent: 'center',
-    width:          w + 'px',
-    height:         h + 'px',
-    background:     'radial-gradient(circle at 38% 32%, #ff60bf, #ED008C 60%, #7a0046)',
-    borderRadius:   '50%',
-    flexShrink:     '0',
-    boxShadow:      '0 0 18px rgba(237,0,140,0.55)',
-    fontSize:       Math.max(12, Math.round(size * 0.28)) + 'px',
-    fontWeight:     '800',
-    color:          '#FCFCFC',
-    letterSpacing:  '1px',
-    fontFamily:     "'Barlow Condensed', sans-serif",
-    pointerEvents:  'none',
-  });
-  div.textContent = 'RIK';
-
-  // Keep a data attribute so updateRikPose can still swap "src" via div.dataset.pose
-  div.dataset.rikPlaceholder = 'true';
-
-  img.parentNode.replaceChild(div, img);
-}
 
 // ============================================================
 // BOOT
