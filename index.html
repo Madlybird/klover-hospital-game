@@ -3744,19 +3744,28 @@ const Game = (() => {
   function inviteFriend() {
     const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || 'demo';
     const link = buildReferralLink(userId);
-    const msg = encodeURIComponent(`Play Klover Hospital pill puzzle game with me! ${link}`);
+    // Telegram's share dialog attaches `url=` as a rich preview card,
+    // so `text=` must NOT contain the link too — otherwise the URL
+    // appears twice in the shared message.
+    const msg = encodeURIComponent('Play Klover Hospital pill puzzle game with me!');
+    const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${msg}`;
     if (window.Telegram?.WebApp) {
-      Telegram.WebApp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${msg}`);
+      Telegram.WebApp.openTelegramLink(shareUrl);
     } else {
-      window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${msg}`, '_blank');
+      window.open(shareUrl, '_blank');
     }
   }
 
   function shareResult() {
     const lvl = LEVELS.find(l => l.id === currentLevel);
-    const msg = `I scored ${score.toLocaleString()} in ${lvl.name} on Klover Hospital Pill Puzzle! Can you beat me?`;
+    const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || 'demo';
+    const link = buildReferralLink(userId);
+    const msg = encodeURIComponent(
+      `I scored ${score.toLocaleString()} in ${lvl.name} on Klover Hospital Pill Puzzle. Can you beat me?`
+    );
+    const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${msg}`;
     if (window.Telegram?.WebApp) {
-      Telegram.WebApp.openTelegramLink(`https://t.me/share/url?url=https://rik.studio&text=${encodeURIComponent(msg)}`);
+      Telegram.WebApp.openTelegramLink(shareUrl);
     }
     document.getElementById('overlay-complete').classList.remove('active');
     quitToMenu();
