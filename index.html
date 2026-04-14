@@ -2359,6 +2359,33 @@ const Sync = (() => {
     } catch { return null; }
   }
 
+  // Detect referral from either the ?startapp= URL param (works when the
+  // mini-app is opened in a browser for testing) or from Telegram's
+  // start_param (set when opened through a t.me/bot/game?startapp=ID link).
+  // Persisted in localStorage so it survives until the first /api/save-user.
+  function detectReferral() {
+    try {
+      if (localStorage.getItem('klover_referral_from')) {
+        const cached = Number(localStorage.getItem('klover_referral_from'));
+        return Number.isFinite(cached) && cached > 0 ? cached : null;
+      }
+      const url = new URLSearchParams(window.location.search).get('startapp');
+      const tg  = window.Telegram?.WebApp?.initDataUnsafe?.start_param;
+      const raw = url || tg;
+      if (!raw || raw === 'null') return null;
+      if (!/^\d+$/.test(String(raw))) return null;
+      const id = Number(raw);
+      if (!id) return null;
+      localStorage.setItem('klover_referral_from', String(id));
+      localStorage.setItem('klover_referral_pending', '1');
+      console.log('[Sync] referral detected from user:', id);
+      return id;
+    } catch (e) {
+      console.warn('[Sync] detectReferral error:', e);
+      return null;
+    }
+  }
+
   async function saveUserOnce() {
     // Wait briefly for Telegram.WebApp to populate initData
     let initData = getInitData();
@@ -2377,11 +2404,7 @@ const Sync = (() => {
     }
     const key = 'klover_user_saved_v1';
     if (sessionStorage.getItem(key)) { console.log('[Sync] already saved this session'); return; }
-    let referredBy = null;
-    try {
-      const sp = window.Telegram?.WebApp?.initDataUnsafe?.start_param;
-      if (sp && /^\d+$/.test(sp)) referredBy = Number(sp);
-    } catch {}
+    const referredBy = detectReferral();
     try {
       const res = await fetch('/api/save-user', {
         method: 'POST',
@@ -2403,6 +2426,7 @@ const Sync = (() => {
 
   return {
     get enabled() { return !!getInitData(); },
+    detectReferral,
     saveUserOnce,
     async fetchRemote() { return call('GET'); },
     queue(patch) {
@@ -2512,6 +2536,10 @@ const Game = (() => {
     setupBombButton();
     checkDailyBonus();
     initTonConnect();
+    // Detect referral immediately so it's captured even if the
+    // /api/save-user hydrate path is delayed by a slow Telegram ready.
+    Sync.detectReferral();
+    showReferralWelcomeIfPending();
     hydrateFromRemote();
 
     // Loading -> menu after 1.4s
@@ -3945,6 +3973,17 @@ const Game = (() => {
         renderShop();
       }
     }
+  }
+
+  function showReferralWelcomeIfPending() {
+    try {
+      if (localStorage.getItem('klover_referral_pending') !== '1') return;
+      // Defer until loading screen dismisses to the menu.
+      setTimeout(() => {
+        showToast('Welcome! You were invited by a friend.');
+        localStorage.removeItem('klover_referral_pending');
+      }, 1600);
+    } catch {}
   }
 
   // ---- TOAST ----
