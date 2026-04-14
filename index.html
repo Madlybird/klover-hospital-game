@@ -1937,7 +1937,7 @@ const Game = (() => {
   let slideIndex = 0;
   const slides = [
     { text: '\u2764 Pills fall from above! Move them left and right!' },
-    { text: '\u2764 Tap = rotate \u21bb. Double-tap or swipe up = \u21ba. Use \u21bb \u21ba buttons too!' },
+    { text: '\u2764 \u2190 \u2192 MOVE   \u2022 TAP TO ROTATE   \u2193 DROP' },
     { text: '\u2764 Match 4+ same color pills to clear them!' },
     { text: '\u2764 Chain reactions give huge combo bonuses. Good luck, nurse!' },
   ];
@@ -2590,15 +2590,8 @@ const Game = (() => {
       const absDy = Math.abs(dy);
 
       if (absDx < 12 && absDy < 12 && dt < 300) {
-        // Tap: detect double-tap (within 280ms) for counter-clockwise
-        const now = Date.now();
-        if (now - lastTapTime < 280) {
-          rotatePair(-1);
-          lastTapTime = 0;
-        } else {
-          rotatePair(1);
-          lastTapTime = now;
-        }
+        // Tap = always rotate clockwise (cycles 0->1->2->3->0)
+        rotatePair(1);
       } else if (absDy > absDx && dy < -30) {
         // Swipe up = rotate counter-clockwise
         rotatePair(-1);
