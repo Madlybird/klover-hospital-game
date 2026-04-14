@@ -1128,7 +1128,7 @@ html, body {
 }
 
 #screen-menu {
-  padding-bottom: 90px;
+  padding-bottom: calc(30px + env(safe-area-inset-bottom, 0px));
 }
 #screen-howto, #screen-levels, #screen-settings, #screen-shop, #screen-referral {
   padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px));
@@ -1300,24 +1300,7 @@ html, body {
 .menu-buttons { margin-top: 28px; }
 
 /* Bottom system bar */
-.klas-bottom-bar {
-  position: absolute;
-  left: 0; right: 0;
-  bottom: env(safe-area-inset-bottom, 0px);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 18px calc(10px + env(safe-area-inset-bottom, 0px));
-  background: #fff;
-  border-top: 2px solid #b8d4f0;
-  font-family: 'Nunito', sans-serif;
-  font-weight: 800;
-  font-size: 13px;
-  letter-spacing: 2px;
-  color: #3a8fd4;
-  z-index: 8;
-  margin-bottom: 20px;
-}
+.klas-bottom-bar { display: none !important; }
 .klas-bottom-bar .klas-right {
   color: #e8609a;
   cursor: pointer;
@@ -1433,7 +1416,13 @@ html, body {
 #screen-referral .referral-reward-note { color: #6a8bab; }
 
 /* Game HUD dark stays, tweaked accents */
-#screen-game { background: #0a1a3a; }
+#screen-game {
+  background: #0a1a3a;
+  height: 100dvh;
+  min-height: 100vh;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+#screen-game .game-area { flex: 1; overflow: hidden; }
 .game-hud {
   background: rgba(10,26,58,0.95);
   border-bottom: 1px solid rgba(91,157,232,0.3);
@@ -2268,16 +2257,28 @@ const Game = (() => {
     nextCanvas = document.getElementById('next-canvas');
     nextCtx = nextCanvas.getContext('2d');
 
-    // Resize canvas to fit
-    const area = document.getElementById('game-area');
-    const availW = Math.min(window.innerWidth, 430) - 70 - 24; // sidebar + padding
-    const cellSize = Math.floor(availW / COLS);
-    const canvasW = cellSize * COLS;
-    const canvasH = cellSize * ROWS;
-    gameCanvas.width = canvasW;
-    gameCanvas.height = canvasH;
-    gameCanvas.style.width = canvasW + 'px';
-    gameCanvas.style.height = canvasH + 'px';
+    // Resize canvas to fit — bound by BOTH width and height so short
+    // viewports (mobile browsers, Telegram with its top bar) can't crop
+    // the play field.
+    const sizeCanvas = () => {
+      const vw = Math.min(window.innerWidth, 430);
+      const vh = window.innerHeight;
+      const HUD_RESERVE = 130; // score bar + top padding + safe area
+      const availW = vw - 70 - 24; // sidebar + padding
+      const availH = vh - HUD_RESERVE;
+      const cellSize = Math.max(18, Math.floor(Math.min(availW / COLS, availH / ROWS)));
+      const canvasW = cellSize * COLS;
+      const canvasH = cellSize * ROWS;
+      gameCanvas.width = canvasW;
+      gameCanvas.height = canvasH;
+      gameCanvas.style.width = canvasW + 'px';
+      gameCanvas.style.height = canvasH + 'px';
+    };
+    sizeCanvas();
+    window.addEventListener('resize', sizeCanvas);
+    if (window.Telegram?.WebApp) {
+      try { window.Telegram.WebApp.onEvent('viewportChanged', sizeCanvas); } catch {}
+    }
 
     setupTouchControls();
     setupMaiInteraction();
