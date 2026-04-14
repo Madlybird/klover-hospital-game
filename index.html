@@ -1067,9 +1067,23 @@ html, body {
 }
 
 .skin-blob {
-  width: 20px;
-  height: 20px;
+  position: relative;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
+  border: 1.5px solid rgba(0,0,0,0.2);
+}
+.skin-blob::after {
+  content: "\2665";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -55%);
+  color: #fff;
+  font-size: 11px;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+  pointer-events: none;
 }
 
 .skin-info { flex: 1; }
@@ -1485,6 +1499,12 @@ html, body {
   text-transform: none;
   white-space: pre-line; /* lets \n in slide data become a real line break */
 }
+
+/* Tutorial title: medium weight only, per hospital-clean spec */
+#screen-howto .howto-title {
+  font-weight: 500;
+  letter-spacing: 0.1px;
+}
 #screen-howto .slide-canvas-wrap {
   background: #fff;
   border: 2px solid #b8d4f0;
@@ -1832,7 +1852,7 @@ html, body {
   <div id="screen-howto" class="screen">
     <div class="howto-header">
       <button class="btn-back" onclick="Game.showScreen('menu')">&#8592;</button>
-      <div class="screen-title">Nurse Mai's Treatment Guide</div>
+      <div class="screen-title howto-title">Nurse Mai's treatment guide</div>
     </div>
     <div class="slide-area">
       <div class="slide-text" id="slide-text">Nurse Mai's treatment guide.</div>
@@ -2341,10 +2361,10 @@ const Game = (() => {
   // Slide tutorial
   let slideIndex = 0;
   const slides = [
-    { text: "Nurse Mai's treatment guide.\nPills fall from above. Guide them to the patients." },
-    { text: 'Left or right to move. Tap to rotate. Down to drop.' },
+    { text: "Nurse Mai's treatment guide." },
+    { text: 'Left/Right to move. Tap to rotate. Down to drop.' },
     { text: 'Match four or more pills of the same color to clear them.' },
-    { text: 'Chains of clears create healing combos. Complete treatments to help patients recover.' },
+    { text: 'Chain reactions create powerful healing effects.' },
   ];
 
   // TON Connect
@@ -2972,16 +2992,19 @@ const Game = (() => {
     const canvas = nextCanvas;
     const skinColors = getSkinColors();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#0A0A0A';
+    ctx.fillStyle = '#0a1a3a';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     if (!nextPair) return;
-    const cw = canvas.width / 2 - 4;
-    const ch = canvas.height / 3 - 4;
-    // Draw vertically centered
+    // Square cells, centered horizontally, stacked vertically so the
+    // preview matches the round pill-with-heart look on the board.
+    const cell = Math.min(canvas.width - 8, (canvas.height - 6) / 2);
+    const x = (canvas.width - cell) / 2;
+    const yTop = 2;
+    const yBot = yTop + cell + 2;
     const c1 = skinColors[nextPair.c1] || nextPair.c1;
     const c2 = skinColors[nextPair.c2] || nextPair.c2;
-    drawBlob(ctx, 6, 6, cw, ch, c1);
-    drawBlob(ctx, 6, 6 + ch + 4, cw, ch, c2);
+    drawBlob(ctx, x, yTop, cell, cell, c1);
+    drawBlob(ctx, x, yBot, cell, cell, c2);
   }
 
   function updateHUD() {
@@ -3693,7 +3716,9 @@ const Game = (() => {
       skin.blobs.forEach(c => {
         const b = document.createElement('div');
         b.className = 'skin-blob';
-        b.style.background = c;
+        // Round pill with radial gradient + heart glyph (via ::after)
+        b.style.background = `radial-gradient(circle at 30% 30%, ${shadeColor(c, 55)}, ${c})`;
+        b.style.borderColor = shadeColor(c, -40);
         b.style.boxShadow = `0 0 6px ${c}60`;
         preview.appendChild(b);
       });
