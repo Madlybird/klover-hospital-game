@@ -2106,13 +2106,18 @@ const Save = {
 // REMOTE SYNC (Vercel API → Supabase, verified by Telegram initData)
 // ============================================================
 const Sync = (() => {
-  const initData = window.Telegram?.WebApp?.initData || '';
-  const enabled = !!initData;
+  // Read initData fresh each call — Telegram.WebApp may not be ready
+  // at module-load time on some clients, which would otherwise leave
+  // initData permanently empty.
+  function getInitData() {
+    try { return window.Telegram?.WebApp?.initData || ''; } catch { return ''; }
+  }
   let pending = null;
   let timer = null;
 
   async function call(method, body) {
-    if (!enabled) return null;
+    const initData = getInitData();
+    if (!initData) return null;
     try {
       const res = await fetch('/api/user', {
         method,
@@ -2128,9 +2133,18 @@ const Sync = (() => {
   }
 
   async function saveUserOnce() {
+    // Wait briefly for Telegram.WebApp to populate initData
+    let initData = getInitData();
+    if (!initData && window.Telegram?.WebApp) {
+      try { window.Telegram.WebApp.ready(); } catch {}
+      for (let i = 0; i < 10 && !initData; i++) {
+        await new Promise(r => setTimeout(r, 100));
+        initData = getInitData();
+      }
+    }
     const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
     console.log('[Sync] saveUserOnce: initData len=', initData.length, 'tg user=', tgUser?.id, tgUser?.username);
-    if (!enabled) {
+    if (!initData) {
       console.warn('[Sync] disabled (no initData). Open the app via your Telegram bot, not a browser URL.');
       return;
     }
@@ -2161,11 +2175,11 @@ const Sync = (() => {
   }
 
   return {
-    enabled,
+    get enabled() { return !!getInitData(); },
     saveUserOnce,
     async fetchRemote() { return call('GET'); },
     queue(patch) {
-      if (!enabled) return;
+      if (!getInitData()) return;
       pending = Object.assign(pending || {}, patch);
       clearTimeout(timer);
       timer = setTimeout(async () => {
@@ -2174,7 +2188,7 @@ const Sync = (() => {
       }, 1200);
     },
     async flushNow() {
-      if (!enabled || !pending) return;
+      if (!getInitData() || !pending) return;
       const body = pending; pending = null;
       clearTimeout(timer);
       await call('POST', body);
