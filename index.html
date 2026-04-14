@@ -1536,6 +1536,62 @@ html, body {
   75% { transform: translate(-1px,-1px); }
 }
 
+.modal-best {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: #6a8bab;
+  letter-spacing: 1px;
+  margin-top: -8px;
+}
+.record-modal { gap: 14px; }
+.record-confetti {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: 22px;
+  color: #e8609a;
+  text-align: center;
+  letter-spacing: 1px;
+  animation: comboFlash 0.8s ease-out;
+}
+.record-rows {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.record-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f3faff;
+  border: 1.5px solid #b8d4f0;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  color: #6a8bab;
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+.record-row b { color: #1a2a4a; font-size: 20px; }
+.record-row.record-new { background: linear-gradient(90deg,#fff4fa,#ffe7f3); border-color: #e8609a; }
+.record-row.record-new b { color: #e8609a; }
+.coin-reward {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff7d6;
+  border: 1.5px solid #f0c030;
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  color: #b07d00;
+  letter-spacing: 1px;
+}
+.coin-reward .coin-icon { background: #f0c030; box-shadow: 0 0 8px #f0c030; }
+
 .bomb-explosion {
   position: absolute;
   pointer-events: none;
@@ -1870,9 +1926,25 @@ html, body {
     <div class="modal">
       <div class="modal-title">GAME OVER</div>
       <div class="modal-score" id="gameover-score">Score: 0</div>
+      <div class="modal-best" id="gameover-best">Best: 0</div>
       <div class="modal-buttons">
         <button class="btn-primary" onclick="Game.restartLevel()">TRY AGAIN</button>
         <button class="btn-secondary" onclick="Game.quitToMenu()">MENU</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Record -->
+  <div class="overlay" id="overlay-record">
+    <div class="modal record-modal">
+      <div class="record-confetti">&#127881; NEW RECORD! &#127881;</div>
+      <div class="record-rows">
+        <div class="record-row"><span>Previous</span><b id="record-prev">0</b></div>
+        <div class="record-row record-new"><span>New best</span><b id="record-new">0</b></div>
+      </div>
+      <div class="coin-reward"><span class="coin-icon"></span> +20 coins</div>
+      <div class="modal-buttons">
+        <button class="btn-primary" onclick="Game.closeRecordScreen()">CONTINUE</button>
       </div>
     </div>
   </div>
@@ -2017,6 +2089,7 @@ const Save = {
       ownedSkins: ['default'],
       refFriends: 0,
       refCoins: 0,
+      highScores: {},
     };
   },
   load() {
@@ -2952,12 +3025,53 @@ const Game = (() => {
     stopGame();
     Audio.over();
     lives--;
+    const record = checkHighScore(score);
     Save.save(state);
     document.getElementById('gameover-score').textContent = 'Score: ' + score.toLocaleString();
-    document.getElementById('overlay-gameover').classList.add('active');
+    document.getElementById('gameover-best').textContent =
+      'Best: ' + (state.highScores[currentLevel] || 0).toLocaleString();
     if (window.Telegram?.WebApp?.HapticFeedback) {
       Telegram.WebApp.HapticFeedback.notificationOccurred('error');
     }
+    if (record.isNew && score > 0) {
+      showRecordScreen(record.prev, score, 'overlay-gameover');
+    } else {
+      document.getElementById('overlay-gameover').classList.add('active');
+    }
+  }
+
+  function checkHighScore(s) {
+    if (!state.highScores) state.highScores = {};
+    const prev = state.highScores[currentLevel] || 0;
+    if (s > prev) {
+      state.highScores[currentLevel] = s;
+      state.coins = (state.coins || 0) + 20;
+      Save.save(state);
+      updateMenuCoins();
+      return { isNew: true, prev };
+    }
+    return { isNew: false, prev };
+  }
+
+  let recordNextOverlay = 'overlay-gameover';
+  function showRecordScreen(prev, current, nextOverlay = 'overlay-gameover') {
+    recordNextOverlay = nextOverlay;
+    document.getElementById('record-prev').textContent = prev.toLocaleString();
+    document.getElementById('record-new').textContent = current.toLocaleString();
+    document.getElementById('overlay-record').classList.add('active');
+    if (window.Telegram?.WebApp?.HapticFeedback) {
+      Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+    }
+  }
+
+  function closeRecordScreen() {
+    document.getElementById('overlay-record').classList.remove('active');
+    document.getElementById(recordNextOverlay).classList.add('active');
+  }
+
+  function updateMenuCoins() {
+    const el = document.getElementById('menu-coins');
+    if (el) el.textContent = (state.coins || 0).toLocaleString();
   }
 
   function triggerLevelComplete() {
@@ -2972,7 +3086,9 @@ const Game = (() => {
     }
 
     state.coins += Math.floor(score / 100);
+    const record = checkHighScore(score);
     Save.save(state);
+    updateMenuCoins();
 
     document.getElementById('complete-score').textContent =
       'Score: ' + score.toLocaleString() + ' / Target: ' + LEVELS.find(l=>l.id===currentLevel).target.toLocaleString();
@@ -2986,9 +3102,13 @@ const Game = (() => {
     }
 
     spawnFireworks();
-    document.getElementById('overlay-complete').classList.add('active');
     if (window.Telegram?.WebApp?.HapticFeedback) {
       Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+    }
+    if (record.isNew && score > 0) {
+      showRecordScreen(record.prev, score, 'overlay-complete');
+    } else {
+      document.getElementById('overlay-complete').classList.add('active');
     }
   }
 
@@ -3354,6 +3474,7 @@ const Game = (() => {
     renderShop,
     rotateCW: () => { if (gameRunning && !paused && currentPair) rotatePair(1); },
     rotateCCW: () => { if (gameRunning && !paused && currentPair) rotatePair(-1); },
+    closeRecordScreen,
   };
 })();
 
