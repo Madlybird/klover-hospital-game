@@ -2182,6 +2182,24 @@ html, body {
 // ============================================================
 // GAME STATE
 // ============================================================
+// ------------------------------------------------------------------
+// Telegram bot / mini-app identifiers.
+// Must match BotFather exactly, or invite links 404 with
+// "Bot application not found".
+//   BOT_USERNAME  = @username without the @ (case-insensitive)
+//   APP_SHORT_NAME = the short_name you set via BotFather /newapp.
+// If your Mini App is registered under a different short name,
+// change APP_SHORT_NAME below — that is almost always why
+// t.me/<bot>/<short>?startapp=... fails.
+// ------------------------------------------------------------------
+const BOT_USERNAME = 'kloverl_bot';
+const APP_SHORT_NAME = 'game';
+function buildReferralLink(userId) {
+  const link = `https://t.me/${BOT_USERNAME}/${APP_SHORT_NAME}?startapp=${userId}`;
+  console.log('[referral] generated link =', link);
+  return link;
+}
+
 const COLS = 6, ROWS = 12;
 const CELL = 42; // px per cell
 const COLORS = {
@@ -3711,7 +3729,7 @@ const Game = (() => {
   // ---- REFERRAL ----
   function updateReferralUI() {
     const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || 'demo';
-    const link = `https://t.me/kloverl_bot/game?startapp=${userId}`;
+    const link = buildReferralLink(userId);
     document.getElementById('referral-link-text').textContent = link;
     document.getElementById('ref-friends').textContent = state.refFriends;
     document.getElementById('ref-coins').textContent = state.refCoins;
@@ -3725,7 +3743,7 @@ const Game = (() => {
 
   function inviteFriend() {
     const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || 'demo';
-    const link = `https://t.me/kloverl_bot/game?startapp=${userId}`;
+    const link = buildReferralLink(userId);
     const msg = encodeURIComponent(`Play Klover Hospital pill puzzle game with me! ${link}`);
     if (window.Telegram?.WebApp) {
       Telegram.WebApp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${msg}`);
