@@ -6,16 +6,10 @@
 <title>KLOVER HOSPITAL — Pill Puzzle Game</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700;1,800&family=Barlow+Condensed:ital,wght@0,400;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700;1,800&family=Barlow+Condensed:ital,wght@0,400;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
 <style>
-@font-face {
-  font-family: 'AA-Magnum';
-  src: url('./assets/fonts/AA-Magnum.ttf') format('truetype');
-  font-display: swap;
-}
-
 :root {
   --color-bg: #0a1a3a;
   --color-primary: #e8609a;
@@ -1123,14 +1117,13 @@ html, body {
    KLOVER HOSPITAL THEME OVERRIDES
    ============================================================ */
 html, body {
-  font-family: 'AA-Magnum', 'Nunito', 'Barlow Condensed', Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Nunito', Arial, sans-serif;
   color: #1a2a4a;
   background: #d8eeff;
   padding-bottom: env(safe-area-inset-bottom, 40px);
 }
 
-/* Promote AA-Magnum across every themed element that previously pinned
-   Nunito. Kept Nunito as fallback so weight variants still look right. */
+/* Promote Inter across every themed element. Nunito kept as fallback. */
 .logo-rik, .logo-animation, .logo-tagline,
 .screen-title,
 .btn-primary, .btn-secondary, .btn-slide-next, .btn-lets-play,
@@ -1150,7 +1143,7 @@ html, body {
 .combo-flash, .record-confetti, .record-row, .record-row b,
 .coin-reward, .bomb-btn,
 .rot-btn {
-  font-family: 'AA-Magnum', 'Nunito', sans-serif !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Nunito', sans-serif !important;
 }
 
 #app {
