@@ -2238,11 +2238,11 @@ const Game = (() => {
   // ---- PAIR POSITIONS ----
   function getPairCells(pair) {
     const { x, y, rotation } = pair;
-    // c1 is "main", c2 is "satellite"
-    if (rotation === 0) return [{ x, y, c: pair.c1 }, { x, y: y+1, c: pair.c2 }]; // c1 top
-    if (rotation === 1) return [{ x, y, c: pair.c1 }, { x: x+1, y, c: pair.c2 }]; // c1 left
-    if (rotation === 2) return [{ x, y, c: pair.c2 }, { x, y: y+1, c: pair.c1 }]; // c1 bottom
-    if (rotation === 3) return [{ x: x+1, y, c: pair.c2 }, { x, y, c: pair.c1 }]; // c1 right
+    // c1 = pivot pill (always at x,y). c2 = satellite, orbits c1.
+    if (rotation === 0) return [{ x, y, c: pair.c1 }, { x,     y: y+1, c: pair.c2 }]; // c2 below
+    if (rotation === 1) return [{ x, y, c: pair.c1 }, { x: x+1, y,     c: pair.c2 }]; // c2 right
+    if (rotation === 2) return [{ x, y, c: pair.c1 }, { x,     y: y-1, c: pair.c2 }]; // c2 above
+    if (rotation === 3) return [{ x, y, c: pair.c1 }, { x: x-1, y,     c: pair.c2 }]; // c2 left
     return [];
   }
 
