@@ -103,6 +103,46 @@ rik-puyo-game/
     └── sounds/              # Audio (Web Audio API placeholders)
 ```
 
+## Backend (Supabase + Vercel API)
+
+Secure player progress sync. The frontend never talks to Supabase directly
+— all writes go through `api/user.js`, which verifies Telegram `initData`
+HMAC against the bot token before touching the database.
+
+### Required Vercel env vars
+
+| Name                    | Where it comes from |
+|-------------------------|---------------------|
+| `TELEGRAM_BOT_TOKEN`    | `@BotFather`        |
+| `SUPABASE_URL`          | Supabase → Project Settings → API (Project URL) |
+| `SUPABASE_SERVICE_KEY`  | Supabase → Project Settings → API (`service_role` — **never commit**) |
+
+Set these in Vercel → Project → Settings → Environment Variables for
+Production + Preview + Development, then redeploy.
+
+### Supabase table
+
+```sql
+create table if not exists public.users (
+  telegram_id bigint primary key,
+  username    varchar(50),
+  coins       integer default 100,
+  high_score  integer default 0,
+  referred_by bigint references public.users(telegram_id) on delete set null,
+  created_at  timestamptz default now()
+);
+alter table public.users enable row level security;
+-- No anon policies needed: all access is via service key from the API.
+```
+
+### API
+
+- `GET  /api/user` → returns the caller's row (creates if missing). Requires
+  header `telegram-init-data: <WebApp.initData>`.
+- `POST /api/user` body `{ coins?, highScore?, referredBy? }` → upserts.
+  `high_score` is always `max(db, client)`; `coins` trust the client
+  (capped at 10M) so skin purchases can decrement.
+
 ## Version
 
-v0.1.0 - Prototype
+v0.2.0 - Klover Hospital reskin + backend

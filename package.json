@@ -1,0 +1,10 @@
+{
+  "name": "klover-hospital-game",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Klover Hospital Pill Puzzle — Telegram mini-app",
+  "type": "module",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0"
+  }
+}

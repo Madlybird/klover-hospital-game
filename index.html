@@ -2103,6 +2103,52 @@ const Save = {
 };
 
 // ============================================================
+// REMOTE SYNC (Vercel API → Supabase, verified by Telegram initData)
+// ============================================================
+const Sync = (() => {
+  const initData = window.Telegram?.WebApp?.initData || '';
+  const enabled = !!initData;
+  let pending = null;
+  let timer = null;
+
+  async function call(method, body) {
+    if (!enabled) return null;
+    try {
+      const res = await fetch('/api/user', {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'telegram-init-data': initData,
+        },
+        body: body ? JSON.stringify(body) : undefined,
+      });
+      if (!res.ok) return null;
+      return await res.json();
+    } catch { return null; }
+  }
+
+  return {
+    enabled,
+    async fetchRemote() { return call('GET'); },
+    queue(patch) {
+      if (!enabled) return;
+      pending = Object.assign(pending || {}, patch);
+      clearTimeout(timer);
+      timer = setTimeout(async () => {
+        const body = pending; pending = null;
+        await call('POST', body);
+      }, 1200);
+    },
+    async flushNow() {
+      if (!enabled || !pending) return;
+      const body = pending; pending = null;
+      clearTimeout(timer);
+      await call('POST', body);
+    },
+  };
+})();
+
+// ============================================================
 // MAIN GAME OBJECT
 // ============================================================
 const Game = (() => {
@@ -2179,6 +2225,7 @@ const Game = (() => {
     setupBombButton();
     checkDailyBonus();
     initTonConnect();
+    hydrateFromRemote();
 
     // Loading -> menu after 1.4s
     setTimeout(() => {
@@ -2192,6 +2239,7 @@ const Game = (() => {
     if (state.lastLogin !== today) {
       state.lastLogin = today;
       state.coins += 100;
+      pushProgress();
       Save.save(state);
       setTimeout(() => showToast('+100 DAILY BONUS COINS!'), 1600);
     }
@@ -3048,6 +3096,7 @@ const Game = (() => {
       state.coins = (state.coins || 0) + 20;
       Save.save(state);
       updateMenuCoins();
+      pushProgress();
       return { isNew: true, prev };
     }
     return { isNew: false, prev };
@@ -3074,6 +3123,37 @@ const Game = (() => {
     if (el) el.textContent = (state.coins || 0).toLocaleString();
   }
 
+  function bestHighScore() {
+    let best = 0;
+    for (const k in (state.highScores || {})) {
+      const v = state.highScores[k] | 0;
+      if (v > best) best = v;
+    }
+    return best;
+  }
+
+  function pushProgress() {
+    Sync.queue({ coins: state.coins | 0, highScore: bestHighScore() });
+  }
+
+  async function hydrateFromRemote() {
+    if (!Sync.enabled) return;
+    const data = await Sync.fetchRemote();
+    if (!data?.user) return;
+    const u = data.user;
+    // Adopt server values when they're higher — prevents rollback on reinstall.
+    let changed = false;
+    if ((u.coins | 0) > (state.coins | 0)) { state.coins = u.coins | 0; changed = true; }
+    const localBest = bestHighScore();
+    if ((u.high_score | 0) > localBest) {
+      // Store under a synthetic "best" bucket so menu badge reflects it
+      state.highScores = state.highScores || {};
+      state.highScores._remoteBest = u.high_score | 0;
+      changed = true;
+    }
+    if (changed) { Save.save(state); updateMenuCoins(); }
+  }
+
   function triggerLevelComplete() {
     stopGame();
     Audio.levelUp();
@@ -3089,6 +3169,7 @@ const Game = (() => {
     const record = checkHighScore(score);
     Save.save(state);
     updateMenuCoins();
+    pushProgress();
 
     document.getElementById('complete-score').textContent =
       'Score: ' + score.toLocaleString() + ' / Target: ' + LEVELS.find(l=>l.id===currentLevel).target.toLocaleString();
@@ -3431,6 +3512,7 @@ const Game = (() => {
     state.coins -= skin.price;
     state.ownedSkins.push(id);
     Save.save(state);
+    pushProgress();
     renderShop();
     showToast(skin.name + ' SKIN UNLOCKED!');
   }
