@@ -3,21 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>RIK ANIMATION — Puzzle Game</title>
+<title>KLOVER HOSPITAL — Pill Puzzle Game</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700;1,800&family=Barlow+Condensed:ital,wght@0,400;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
 <style>
 :root {
-  --color-bg: #020202;
-  --color-primary: #ED008C;
-  --color-blue: #629DE8;
-  --color-surface: #F3F3F3;
+  --color-bg: #0a1a3a;
+  --color-primary: #e8609a;
+  --color-blue: #5b9de8;
+  --color-blue-dark: #3a8fd4;
+  --color-surface: #d8eeff;
   --color-white: #FCFCFC;
-  --color-yellow: #FFD600;
-  --color-purple: #9B59B6;
+  --color-yellow: #f0c030;
+  --color-purple: #9060cc;
+  --color-teal: #2aaa88;
+  --color-board: #0a1a3a;
+  --color-border: #b8d4f0;
 }
 
 * {
@@ -1066,6 +1070,366 @@ html, body {
   .menu-buttons { margin-top: 28px; }
   .logo-rik { font-size: 42px; }
 }
+
+/* ============================================================
+   KLOVER HOSPITAL THEME OVERRIDES
+   ============================================================ */
+html, body {
+  font-family: 'Nunito', 'Barlow Condensed', sans-serif;
+  color: #1a2a4a;
+  background: #d8eeff;
+}
+
+.checker-bg {
+  background-color: #d8eeff;
+  background-image:
+    linear-gradient(rgba(180,210,240,0.45) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(180,210,240,0.45) 1px, transparent 1px);
+  background-size: 14px 14px;
+}
+
+/* Light screens */
+#screen-menu,
+#screen-howto,
+#screen-levels,
+#screen-settings,
+#screen-shop,
+#screen-loading {
+  background-color: #d8eeff;
+  background-image:
+    linear-gradient(rgba(180,210,240,0.45) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(180,210,240,0.45) 1px, transparent 1px);
+  background-size: 14px 14px;
+  color: #1a2a4a;
+}
+#screen-referral {
+  background: linear-gradient(180deg, #e8f4ff 0%, #d8eeff 100%);
+  color: #1a2a4a;
+}
+
+/* Menu top bar */
+.coin-display {
+  background: #fff;
+  border: 1.5px solid #b8d4f0;
+  color: #e8609a;
+}
+.ton-btn-small {
+  background: #fff;
+  border: 1.5px solid #5b9de8;
+  color: #3a8fd4;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+}
+
+/* Menu logo */
+.logo-rik {
+  font-family: 'Nunito', sans-serif;
+  color: #3a8fd4;
+  font-weight: 900;
+  letter-spacing: 2px;
+  font-size: 28px;
+  text-align: center;
+  display: inline-block;
+}
+.logo-animation {
+  font-family: 'Nunito', sans-serif;
+  color: #e8609a;
+  font-weight: 800;
+  font-style: normal;
+  letter-spacing: 4px;
+  font-size: 20px;
+}
+.logo-tagline {
+  color: rgba(58,143,212,0.75);
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.menu-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 6px;
+  width: 100%;
+  text-align: center;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+.medical-cross {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  background: #e8609a;
+  position: relative;
+  border-radius: 4px;
+}
+.medical-cross::before,
+.medical-cross::after {
+  content: '';
+  position: absolute;
+  background: #fff;
+  border-radius: 2px;
+}
+.medical-cross::before { left: 9px; top: 3px; width: 4px; height: 16px; }
+.medical-cross::after { top: 9px; left: 3px; height: 4px; width: 16px; }
+
+/* Buttons: blue w/ white text */
+.btn-primary {
+  background: #5b9de8;
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  border: 2px solid #3a8fd4;
+  box-shadow: 0 4px 14px rgba(91,157,232,0.35);
+  border-radius: 14px;
+  letter-spacing: 1.5px;
+}
+.btn-secondary {
+  background: #fff;
+  color: #3a8fd4;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  border: 2px solid #5b9de8;
+  border-radius: 14px;
+  letter-spacing: 1.5px;
+}
+.btn-secondary:active { background: #e8f4ff; }
+.btn-slide-next, .btn-lets-play {
+  background: #5b9de8;
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  border: 2px solid #3a8fd4;
+  box-shadow: 0 4px 14px rgba(91,157,232,0.4);
+  border-radius: 14px;
+}
+.btn-back {
+  background: #fff;
+  border: 2px solid #5b9de8;
+  color: #3a8fd4;
+  font-weight: 800;
+}
+.btn-pause {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(184,212,240,0.4);
+  color: #fff;
+}
+
+/* Screen titles */
+.screen-title {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  color: #3a8fd4;
+  letter-spacing: 2px;
+}
+
+/* Mai corner character on menu */
+.mai-corner {
+  position: absolute;
+  right: 10px;
+  bottom: 56px;
+  pointer-events: none;
+  z-index: 5;
+  filter: drop-shadow(0 6px 14px rgba(58,143,212,0.25));
+}
+
+/* Bottom system bar */
+.klas-bottom-bar {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 18px;
+  background: #fff;
+  border-top: 2px solid #b8d4f0;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: #3a8fd4;
+  z-index: 8;
+}
+.klas-bottom-bar .klas-right {
+  color: #e8609a;
+  cursor: pointer;
+}
+
+/* Patient ID card */
+.level-card {
+  background: #fff;
+  border: 2px solid #b8d4f0;
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 4px 10px rgba(91,157,232,0.12);
+  gap: 12px;
+  color: #1a2a4a;
+}
+.level-card:not(.locked):hover {
+  background: #f5fbff;
+  border-color: #5b9de8;
+}
+.level-card.locked { background: #eef5fc; border-color: #cfe0f2; }
+.level-card-num { display: none; }
+.level-card-name { color: #3a8fd4; font-family: 'Nunito', sans-serif; font-weight: 900; letter-spacing: 1.5px; }
+.level-card-meta { color: #6a8bab; font-family: 'Nunito', sans-serif; font-weight: 700; }
+
+.patient-photo {
+  width: 64px; height: 64px;
+  border-radius: 10px;
+  background: #e8f4ff;
+  border: 2px solid #b8d4f0;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.patient-info { flex: 1; }
+.id-card-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #e8609a;
+}
+.id-card-label::before {
+  content: '';
+  width: 10px; height: 10px;
+  background: #e8609a;
+  clip-path: polygon(40% 0, 60% 0, 60% 40%, 100% 40%, 100% 60%, 60% 60%, 60% 100%, 40% 100%, 40% 60%, 0 60%, 0 40%, 40% 40%);
+}
+.patient-meta-row {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  color: #6a8bab;
+  letter-spacing: 1px;
+}
+.patient-meta-row b { color: #1a2a4a; font-weight: 800; }
+.patient-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.btn-proceed, .btn-decline {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  border: 2px solid #3a8fd4;
+}
+.btn-proceed { background: #5b9de8; color: #fff; }
+.btn-decline { background: #e8f4ff; color: #3a8fd4; }
+
+/* How-to light styling */
+#screen-howto .slide-text { color: #1a2a4a; font-family: 'Nunito', sans-serif; }
+#screen-howto .slide-canvas-wrap {
+  background: #fff;
+  border: 2px solid #b8d4f0;
+}
+#screen-howto .dot { background: #b8d4f0; }
+#screen-howto .dot.active { background: #e8609a; }
+
+/* Settings light */
+#screen-settings .settings-row { border-bottom-color: #b8d4f0; }
+#screen-settings .settings-row-label { color: #1a2a4a; font-family: 'Nunito', sans-serif; }
+#screen-settings .settings-row-sub { color: #6a8bab; }
+#screen-settings .settings-version { color: #6a8bab; font-family: 'Nunito', sans-serif; font-weight: 700; }
+.toggle-slider { background: #b8d4f0; }
+.toggle input:checked + .toggle-slider { background: #e8609a; }
+.lang-toggle { background: #fff; border-color: #b8d4f0; }
+.lang-btn { color: #6a8bab; }
+.lang-btn.active { background: #5b9de8; color: #fff; }
+
+/* Shop light */
+#screen-shop .skin-card { background: #fff; border-color: #b8d4f0; color: #1a2a4a; }
+#screen-shop .skin-card.equipped { border-color: #e8609a; background: #fff5fa; }
+#screen-shop .skin-name { color: #1a2a4a; font-family: 'Nunito', sans-serif; }
+#screen-shop .skin-price { color: #e8609a; }
+#screen-shop .shop-coins { color: #e8609a; }
+
+/* Referral light */
+#screen-referral .stat-box { background: #fff; border-color: #b8d4f0; }
+#screen-referral .stat-value { color: #3a8fd4; font-family: 'Nunito', sans-serif; }
+#screen-referral .stat-label { color: #6a8bab; }
+#screen-referral .referral-link-box { background: #fff; border-color: #b8d4f0; }
+#screen-referral .referral-link-text { color: #3a8fd4; }
+#screen-referral .btn-copy { background: #e8609a; color: #fff; border-color: #c04080; }
+#screen-referral .referral-reward-note { color: #6a8bab; }
+
+/* Game HUD dark stays, tweaked accents */
+#screen-game { background: #0a1a3a; }
+.game-hud {
+  background: rgba(10,26,58,0.95);
+  border-bottom: 1px solid rgba(91,157,232,0.3);
+}
+.hud-label { color: rgba(184,212,240,0.7); font-family: 'Nunito', sans-serif; }
+.hud-value { color: #5b9de8; font-family: 'Nunito', sans-serif; }
+.hud-level-name { color: #fff; font-family: 'Nunito', sans-serif; }
+.hud-target { color: #b8d4f0; font-family: 'Nunito', sans-serif; }
+.next-label { color: #b8d4f0; font-family: 'Nunito', sans-serif; }
+.combo-display { color: #e8609a; font-family: 'Nunito', sans-serif; }
+#next-canvas { background: rgba(255,255,255,0.06); border-color: rgba(91,157,232,0.3); }
+
+/* Sidebar additions */
+.stat-pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(184,212,240,0.3);
+  border-radius: 10px;
+  padding: 3px 7px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+.stat-pill.psy { color: #f080b0; }
+.stat-pill.int { color: #5b9de8; }
+.fact-card {
+  width: 100%;
+  background: #fff;
+  color: #1a2a4a;
+  border-radius: 8px;
+  padding: 6px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.3px;
+  border: 2px solid #e8609a;
+}
+.fact-card b { color: #e8609a; display: block; margin-bottom: 2px; font-size: 9px; letter-spacing: 1.5px; }
+.sidebar-mai {
+  width: 52px;
+  margin-top: 4px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+/* Loading screen light */
+#screen-loading .loading-logo { color: #3a8fd4; font-family: 'Nunito', sans-serif; font-weight: 900; }
+#screen-loading .loading-bar-wrap { background: #b8d4f0; }
+#screen-loading .loading-bar { background: #e8609a; }
+
+/* Modals light */
+.modal {
+  background: #fff;
+  border: 2px solid #b8d4f0;
+  color: #1a2a4a;
+}
+.modal-title { color: #3a8fd4; font-family: 'Nunito', sans-serif; }
+.modal-score { color: #e8609a; font-family: 'Nunito', sans-serif; }
+.overlay { background: rgba(10,26,58,0.6); }
 </style>
 </head>
 <body>
@@ -1074,9 +1438,9 @@ html, body {
 
   <!-- LOADING -->
   <div id="screen-loading" class="screen active">
-    <div class="loading-logo">RIK</div>
+    <div class="loading-logo">KLOVER</div>
     <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
-    <div style="font-size:14px;font-weight:700;color:rgba(252,252,252,0.3);letter-spacing:3px;margin-top:4px;">ANIMATION</div>
+    <div style="font-size:14px;font-weight:700;color:rgba(252,252,252,0.4);letter-spacing:3px;margin-top:4px;">HOSPITAL</div>
   </div>
 
   <!-- MAIN MENU -->
@@ -1090,21 +1454,44 @@ html, body {
     </div>
 
     <div class="logo-area">
-      <img src="assets/brand/logo_white.png" class="logo-img" alt="RIK ANIMATION"
-        onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='block'">
-      <div id="logo-fallback" class="logo-fallback" style="display:none">
-        <span class="logo-rik">RIK</span>
-        <span class="logo-animation">ANIMATION</span>
+      <svg viewBox="0 0 60 88" width="120" height="176" style="filter: drop-shadow(0 6px 20px rgba(232,96,154,0.4));">
+        <ellipse cx="30" cy="25" rx="20" ry="18" fill="#e8609a" stroke="#c04080" stroke-width="2"/>
+        <path d="M12 20 Q10 12 18 8 Q24 4 30 6 Q36 4 42 8 Q50 12 48 20 Q46 28 42 32 Q36 36 30 36 Q24 36 18 32 Q14 28 12 20Z" fill="#f080b0" stroke="#e8609a" stroke-width="1.5"/>
+        <path d="M18 12 Q22 8 30 8 Q38 8 42 12 Q40 6 30 6 Q20 6 18 12Z" fill="#fff" stroke="#333" stroke-width="2"/>
+        <path d="M30 10 C30 10 27 8 25 10 C23 12 26 15 30 16 C34 15 37 12 35 10 C33 8 30 10 30 10Z" fill="#3a8fd4"/>
+        <ellipse cx="30" cy="30" rx="13" ry="12" fill="#ffc0d0"/>
+        <ellipse cx="24" cy="28" rx="5" ry="6" fill="#fff" stroke="#333" stroke-width="2"/>
+        <ellipse cx="36" cy="28" rx="5" ry="6" fill="#fff" stroke="#333" stroke-width="2"/>
+        <ellipse cx="24" cy="30" rx="3" ry="4" fill="#f080b0"/>
+        <ellipse cx="36" cy="30" rx="3" ry="4" fill="#f080b0"/>
+        <ellipse cx="24" cy="28" rx="2" ry="2.5" fill="#fff"/>
+        <ellipse cx="36" cy="28" rx="2" ry="2.5" fill="#fff"/>
+        <ellipse cx="17" cy="32" rx="3" ry="2" fill="#f080b0" opacity="0.6"/>
+        <ellipse cx="43" cy="32" rx="3" ry="2" fill="#f080b0" opacity="0.6"/>
+        <path d="M28 36 Q30 38 32 36" stroke="#c04080" stroke-width="1.5" fill="none"/>
+        <rect x="18" y="42" width="24" height="28" rx="4" fill="#fff" stroke="#b8d4f0" stroke-width="1.5"/>
+        <path d="M18 42 L24 42 L30 48 L36 42 L42 42 L42 50 L18 50 Z" fill="#3a8fd4"/>
+        <path d="M44 56 C44 56 41.5 54 40 56 C38.5 58 41 60 44 62 C47 60 49.5 58 48 56 C46.5 54 44 56 44 56Z" fill="#f080b0"/>
+      </svg>
+      <div class="menu-title-row">
+        <span class="medical-cross"></span>
+        <span class="logo-rik">KLOVER HOSPITAL</span>
+        <span class="medical-cross"></span>
       </div>
-      <div class="logo-tagline">Puzzle Game</div>
+      <div class="logo-tagline">PILL PUZZLE GAME</div>
     </div>
 
     <div class="menu-buttons">
-      <button class="btn-primary" onclick="Game.goToLevels()">PLAY</button>
-      <button class="btn-secondary" onclick="Game.showScreen('howto')">HOW TO PLAY</button>
-      <button class="btn-secondary" onclick="Game.showScreen('referral')">REFERRALS</button>
-      <button class="btn-secondary" onclick="Game.showScreen('settings')">SETTINGS</button>
-      <button class="btn-secondary" onclick="Game.showScreen('shop')">SKIN SHOP</button>
+      <button class="btn-primary" onclick="Game.goToLevels()">&#9829; PLAY</button>
+      <button class="btn-secondary" onclick="Game.showScreen('howto')">? HOW TO PLAY</button>
+      <button class="btn-secondary" onclick="Game.showScreen('referral')">&#9825; REFERRALS</button>
+      <button class="btn-secondary" onclick="Game.showScreen('shop')">&#8853; PILL SHOP</button>
+      <button class="btn-secondary" onclick="Game.showScreen('settings')">&#9881; SETTINGS</button>
+    </div>
+
+    <div class="klas-bottom-bar">
+      <span>KLAS SYSTEM v2.0</span>
+      <span class="klas-right" onclick="Game.toggleTonConnect()">&#9673; CONNECT</span>
     </div>
 
   </div>
@@ -1134,24 +1521,55 @@ html, body {
   <div id="screen-levels" class="screen">
     <div class="howto-header">
       <button class="btn-back" onclick="Game.showScreen('menu')">&#8592;</button>
-      <div class="screen-title">SELECT LEVEL</div>
+      <div class="screen-title">&#9829; PLEASE PICK A PATIENT...</div>
     </div>
     <div class="levels-grid">
       <div class="level-card" id="level-card-1" onclick="Game.startLevel(1)">
-        <div class="level-card-num">01</div>
-        <div class="level-card-info">
-          <div class="level-card-name">PINK RUSH</div>
-          <div class="level-card-meta">Target: 5,000 pts &nbsp;|&nbsp; 3 lives</div>
+        <div class="patient-photo">
+          <svg viewBox="0 0 60 72" width="52" height="62">
+            <ellipse cx="30" cy="25" rx="20" ry="18" fill="#e8609a" stroke="#c04080" stroke-width="2"/>
+            <path d="M18 12 Q22 8 30 8 Q38 8 42 12 Q40 6 30 6 Q20 6 18 12Z" fill="#fff" stroke="#333" stroke-width="1.5"/>
+            <path d="M30 10 C30 10 27 8 25 10 C23 12 26 15 30 16 C34 15 37 12 35 10 C33 8 30 10 30 10Z" fill="#3a8fd4"/>
+            <ellipse cx="30" cy="30" rx="13" ry="12" fill="#ffc0d0"/>
+            <ellipse cx="24" cy="28" rx="4.5" ry="5.5" fill="#fff" stroke="#333" stroke-width="1.5"/>
+            <ellipse cx="36" cy="28" rx="4.5" ry="5.5" fill="#fff" stroke="#333" stroke-width="1.5"/>
+            <ellipse cx="24" cy="30" rx="2.5" ry="3.5" fill="#f080b0"/>
+            <ellipse cx="36" cy="30" rx="2.5" ry="3.5" fill="#f080b0"/>
+            <path d="M28 36 Q30 38 32 36" stroke="#c04080" stroke-width="1.5" fill="none"/>
+            <rect x="18" y="42" width="24" height="22" rx="3" fill="#fff" stroke="#b8d4f0" stroke-width="1.5"/>
+            <path d="M18 42 L24 42 L30 48 L36 42 L42 42 L42 50 L18 50 Z" fill="#3a8fd4"/>
+          </svg>
         </div>
-        <div class="level-card-badge badge-play" id="level-badge-1">PLAY</div>
+        <div class="patient-info">
+          <div class="id-card-label">ID CARD</div>
+          <div class="level-card-name">MAI</div>
+          <div class="patient-meta-row">NAME <b>_______</b></div>
+          <div class="patient-meta-row">DIFFICULTY <b>&bull;</b></div>
+          <div class="patient-meta-row">KLASS_ID <b>0900009</b></div>
+        </div>
+        <div class="patient-actions">
+          <button class="btn-proceed" onclick="event.stopPropagation();Game.startLevel(1)">PROCEED</button>
+          <button class="btn-decline" onclick="event.stopPropagation();Game.showScreen('menu')">DECLINE</button>
+        </div>
       </div>
       <div class="level-card locked" id="level-card-2" onclick="Game.startLevel(2)">
-        <div class="level-card-num">02</div>
-        <div class="level-card-info">
-          <div class="level-card-name">NEON STORM</div>
-          <div class="level-card-meta">Target: 12,000 pts &nbsp;|&nbsp; 2 lives</div>
+        <div class="patient-photo" style="opacity:0.5">
+          <svg viewBox="0 0 60 72" width="52" height="62">
+            <ellipse cx="30" cy="25" rx="20" ry="18" fill="#b8b8b8" stroke="#808080" stroke-width="2"/>
+            <ellipse cx="30" cy="30" rx="13" ry="12" fill="#e0e0e0"/>
+            <text x="30" y="50" text-anchor="middle" font-size="18" fill="#808080" font-weight="900">?</text>
+          </svg>
         </div>
-        <div class="level-card-badge badge-locked" id="level-badge-2">LOCKED</div>
+        <div class="patient-info">
+          <div class="id-card-label">ID CARD</div>
+          <div class="level-card-name">???</div>
+          <div class="patient-meta-row">NAME <b>_______</b></div>
+          <div class="patient-meta-row">DIFFICULTY <b>&bull;&bull;&bull;</b></div>
+          <div class="patient-meta-row">KLASS_ID <b>0900010</b></div>
+        </div>
+        <div class="patient-actions">
+          <div class="level-card-badge badge-locked" id="level-badge-2">&#128274; LOCKED</div>
+        </div>
       </div>
     </div>
   </div>
@@ -1164,8 +1582,12 @@ html, body {
         <div class="hud-value" id="hud-score">0</div>
       </div>
       <div class="hud-center">
-        <div class="hud-level-name" id="hud-level-name">PINK RUSH</div>
+        <div class="hud-level-name" id="hud-level-name">MAI</div>
         <div class="hud-target" id="hud-target">TARGET: 5,000</div>
+        <div style="display:flex;gap:4px;margin-top:3px;">
+          <span class="stat-pill psy">PSY &#9829;5/5</span>
+          <span class="stat-pill int">INT +5/5</span>
+        </div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
         <div class="hud-lives" id="hud-lives"></div>
@@ -1178,6 +1600,20 @@ html, body {
         <div class="next-label">NEXT</div>
         <canvas id="next-canvas" width="60" height="72"></canvas>
         <div class="combo-display" id="combo-display"></div>
+        <div class="fact-card"><b>!! FACT</b>Match 4+ same pills to clear them.</div>
+        <svg class="sidebar-mai" viewBox="0 0 60 88">
+          <ellipse cx="30" cy="25" rx="20" ry="18" fill="#e8609a" stroke="#c04080" stroke-width="2"/>
+          <path d="M18 12 Q22 8 30 8 Q38 8 42 12 Q40 6 30 6 Q20 6 18 12Z" fill="#fff" stroke="#333" stroke-width="1.5"/>
+          <path d="M30 10 C30 10 27 8 25 10 C23 12 26 15 30 16 C34 15 37 12 35 10 C33 8 30 10 30 10Z" fill="#3a8fd4"/>
+          <ellipse cx="30" cy="30" rx="13" ry="12" fill="#ffc0d0"/>
+          <ellipse cx="24" cy="28" rx="5" ry="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
+          <ellipse cx="36" cy="28" rx="5" ry="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
+          <ellipse cx="24" cy="30" rx="3" ry="4" fill="#f080b0"/>
+          <ellipse cx="36" cy="30" rx="3" ry="4" fill="#f080b0"/>
+          <path d="M28 36 Q30 38 32 36" stroke="#c04080" stroke-width="1.5" fill="none"/>
+          <rect x="18" y="42" width="24" height="28" rx="4" fill="#fff" stroke="#b8d4f0" stroke-width="1.5"/>
+          <path d="M18 42 L24 42 L30 48 L36 42 L42 42 L42 50 L18 50 Z" fill="#3a8fd4"/>
+        </svg>
       </div>
     </div>
   </div>
@@ -1244,14 +1680,14 @@ html, body {
         <button class="ton-btn-small" id="settings-ton-btn" onclick="Game.toggleTonConnect()">CONNECT</button>
       </div>
     </div>
-    <div class="settings-version">v0.1.0 &nbsp;|&nbsp; RIK ANIMATION Puzzle Game</div>
+    <div class="settings-version">KLAS SYSTEM v2.0 &nbsp;|&nbsp; KLOVER HOSPITAL</div>
   </div>
 
   <!-- SHOP -->
   <div id="screen-shop" class="screen">
     <div class="howto-header">
       <button class="btn-back" onclick="Game.showScreen('menu')">&#8592;</button>
-      <div class="screen-title">SKIN SHOP</div>
+      <div class="screen-title">PILL SHOP</div>
     </div>
     <div class="shop-coins">
       <span class="coin-icon" style="width:20px;height:20px;"></span>
@@ -1307,21 +1743,21 @@ html, body {
 const COLS = 6, ROWS = 12;
 const CELL = 42; // px per cell
 const COLORS = {
-  pink:   '#ED008C',
-  blue:   '#629DE8',
-  white:  '#F0F0F0',
-  yellow: '#FFD600',
-  purple: '#9B59B6',
+  pink:   '#e8609a',
+  blue:   '#4a8fd4',
+  white:  '#2aaa88',
+  yellow: '#f0c030',
+  purple: '#9060cc',
 };
 const COLOR_KEYS = Object.keys(COLORS);
 
 const LEVELS = [
-  { id:1, name:'PINK RUSH',  target:5000,  lives:3, speed:800,  unlocked: true  },
-  { id:2, name:'NEON STORM', target:12000, lives:2, speed:560,  unlocked: false },
+  { id:1, name:'MAI',     target:5000,  lives:3, speed:800,  unlocked: true  },
+  { id:2, name:'WARD 2',  target:12000, lives:2, speed:560,  unlocked: false },
 ];
 
 const SKINS = [
-  { id:'default', name:'DEFAULT',  price:0,    blobs:['#ED008C','#629DE8','#F0F0F0','#FFD600','#9B59B6'] },
+  { id:'default', name:'DEFAULT',  price:0,    blobs:['#e8609a','#4a8fd4','#2aaa88','#f0c030','#9060cc'] },
   { id:'neon',    name:'NEON',     price:1000, blobs:['#FF00FF','#00FFFF','#00FF80','#FFFF00','#FF6600'] },
   { id:'pastel',  name:'PASTEL',   price:2000, blobs:['#FFB3D9','#B3D9FF','#FFE5B3','#D9FFB3','#E5B3FF'] },
   { id:'mono',    name:'MONO',     price:3000, blobs:['#FFFFFF','#CCCCCC','#999999','#666666','#333333'] },
@@ -1475,10 +1911,10 @@ const Game = (() => {
   // Slide tutorial
   let slideIndex = 0;
   const slides = [
-    { text: 'Blobs fall from above. Move them left and right!' },
-    { text: 'Tap to rotate the pair before it lands.' },
-    { text: 'Match 4 or more same-color blobs to clear them!' },
-    { text: 'Chain clears for massive combo bonuses. Good luck!' },
+    { text: '\u2764 Pills fall from above! Move them left and right!' },
+    { text: '\u2764 Tap to rotate the capsule before it lands.' },
+    { text: '\u2764 Match 4+ same color pills to clear them!' },
+    { text: '\u2764 Chain reactions give huge combo bonuses. Good luck, nurse!' },
   ];
 
   // TON Connect
@@ -1926,11 +2362,11 @@ const Game = (() => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Grid background
-    ctx.fillStyle = '#0A0A0A';
+    ctx.fillStyle = '#0a1a3a';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Grid lines
-    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+    ctx.strokeStyle = 'rgba(184,212,240,0.08)';
     ctx.lineWidth = 1;
     for (let r = 1; r < ROWS; r++) {
       ctx.beginPath();
@@ -1968,23 +2404,44 @@ const Game = (() => {
   }
 
   function drawBlob(ctx, x, y, w, h, color) {
-    const pad = 2;
-    const r = Math.min(w, h) * 0.38;
+    // Pill / capsule rendering
+    const padX = w * 0.06;
+    const padY = h * 0.15;
+    const bx = x + padX, by = y + padY;
+    const bw = w - padX * 2, bh = h - padY * 2;
+    const r = bh / 2;
+
+    // Darker border tint
+    const border = shadeColor(color, -30);
+
+    // Body
     ctx.beginPath();
-    ctx.roundRect(x + pad, y + pad, w - pad*2, h - pad*2, r);
+    ctx.roundRect(bx, by, bw, bh, r);
     ctx.fillStyle = color;
     ctx.fill();
-    // Gloss highlight
-    ctx.beginPath();
-    ctx.roundRect(x + pad + 4, y + pad + 3, (w - pad*2) * 0.38, (h - pad*2) * 0.28, r * 0.4);
-    ctx.fillStyle = 'rgba(255,255,255,0.32)';
-    ctx.fill();
-    // Outline
-    ctx.beginPath();
-    ctx.roundRect(x + pad, y + pad, w - pad*2, h - pad*2, r);
-    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = border;
     ctx.stroke();
+
+    // Top gloss highlight
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(bx + 2, by + 1, bw - 4, bh * 0.38, r);
+    ctx.clip();
+    ctx.fillStyle = 'rgba(255,255,255,0.45)';
+    ctx.fillRect(bx, by, bw, bh * 0.5);
+    ctx.restore();
+  }
+
+  function shadeColor(hex, amt) {
+    const h = hex.replace('#','');
+    let r = parseInt(h.substr(0,2),16);
+    let g = parseInt(h.substr(2,2),16);
+    let b = parseInt(h.substr(4,2),16);
+    r = Math.max(0, Math.min(255, r + amt));
+    g = Math.max(0, Math.min(255, g + amt));
+    b = Math.max(0, Math.min(255, b + amt));
+    return '#' + [r,g,b].map(v => v.toString(16).padStart(2,'0')).join('');
   }
 
   function drawGhost(ctx, cellW, cellH, skinColors) {
@@ -2269,7 +2726,7 @@ const Game = (() => {
   function inviteFriend() {
     const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || 'demo';
     const link = `https://t.me/RikAnimationBot/game?startapp=${userId}`;
-    const msg = encodeURIComponent(`Play RIK ANIMATION puzzle game with me! ${link}`);
+    const msg = encodeURIComponent(`Play Klover Hospital pill puzzle game with me! ${link}`);
     if (window.Telegram?.WebApp) {
       Telegram.WebApp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${msg}`);
     } else {
@@ -2279,7 +2736,7 @@ const Game = (() => {
 
   function shareResult() {
     const lvl = LEVELS.find(l => l.id === currentLevel);
-    const msg = `I scored ${score.toLocaleString()} in ${lvl.name} on RIK ANIMATION Puzzle Game! Can you beat me?`;
+    const msg = `I scored ${score.toLocaleString()} in ${lvl.name} on Klover Hospital Pill Puzzle! Can you beat me?`;
     if (window.Telegram?.WebApp) {
       Telegram.WebApp.openTelegramLink(`https://t.me/share/url?url=https://rik.studio&text=${encodeURIComponent(msg)}`);
     }
