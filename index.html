@@ -862,6 +862,21 @@ html, body {
   animation: particleFly 1.1s ease-out forwards;
   will-change: transform, opacity;
 }
+.pill-particle {
+  border-radius: 50%;
+  border: 1.5px solid rgba(0,0,0,0.25);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+.pill-particle::after {
+  content: "\2665";
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -55%);
+  color: #fff;
+  font-size: 55%;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+}
 @keyframes particleFly {
   0%   { transform: translate(0,0) scale(0.4) rotate(0); opacity: 1; }
   60%  { opacity: 1; }
@@ -1773,17 +1788,75 @@ html, body {
 }
 .coin-reward .coin-icon { background: #f0c030; box-shadow: 0 0 8px #f0c030; }
 
+/* Skin preview modal */
+.skin-preview-modal { gap: 14px; max-width: 360px; }
+.preview-title {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: #3a8fd4;
+  letter-spacing: 0.3px;
+  text-align: center;
+}
+.preview-pill-samples {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 4px 0;
+}
+.preview-sample {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid rgba(0,0,0,0.25);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+.preview-sample::after {
+  content: "\2665";
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -55%);
+  color: #fff;
+  font-size: 16px;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+}
+.preview-description {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.45;
+  color: #1a2a4a;
+  text-align: center;
+  margin: 0 4px;
+}
+.preview-price-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff7d6;
+  border: 1.5px solid #f0c030;
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  color: #b07d00;
+  font-size: 13px;
+}
+.preview-price-row.free { background: #e8f4ff; border-color: #5b9de8; color: #3a8fd4; }
+.preview-price-row .coin-icon { background: #f0c030; box-shadow: 0 0 6px #f0c030; width: 14px; height: 14px; }
+
 .bomb-explosion {
   position: absolute;
   pointer-events: none;
-  font-size: 32px;
   z-index: 56;
   animation: bombExplode 0.6s ease-out forwards;
 }
 @keyframes bombExplode {
-  0%   { transform: translate(-50%,-50%) scale(0.3); opacity: 1; }
-  60%  { transform: translate(-50%,-50%) scale(1.4); opacity: 1; }
-  100% { transform: translate(-50%,-50%) scale(2); opacity: 0; }
+  0%   { transform: scale(0.3); opacity: 1; }
+  60%  { transform: scale(1.4); opacity: 1; }
+  100% { transform: scale(2); opacity: 0; }
 }
 
 /* Loading screen light */
@@ -2075,6 +2148,20 @@ html, body {
   </div>
 
   <!-- New Record -->
+  <!-- Skin / medicine preview -->
+  <div class="overlay" id="overlay-skin-preview">
+    <div class="modal skin-preview-modal">
+      <div class="preview-title" id="preview-title">Medicine preview</div>
+      <div class="preview-pill-samples" id="preview-pill-samples"></div>
+      <p class="preview-description" id="preview-description"></p>
+      <div class="preview-price-row" id="preview-price-row"></div>
+      <div class="modal-buttons preview-buttons">
+        <button class="btn-primary" id="preview-action-btn" onclick="Game.previewPrimary()">Purchase</button>
+        <button class="btn-secondary" onclick="Game.closeSkinPreview()">Close</button>
+      </div>
+    </div>
+  </div>
+
   <div class="overlay" id="overlay-record">
     <div class="modal record-modal">
       <div class="record-confetti">&#127881; NEW RECORD! &#127881;</div>
@@ -3093,14 +3180,21 @@ const Game = (() => {
     const offsetX = canvasRect.left - areaRect.left;
     const offsetY = canvasRect.top - areaRect.top;
 
+    const skinColors = getSkinColors();
+    const palette = Object.values(skinColors);
     targets.forEach(({ r, c }, i) => {
       setTimeout(() => {
         grid[r][c] = null;
         const ex = document.createElement('div');
-        ex.className = 'bomb-explosion';
-        ex.textContent = '💥';
-        ex.style.left = (offsetX + c * cellW + cellW / 2) + 'px';
-        ex.style.top  = (offsetY + r * cellH + cellH / 2) + 'px';
+        ex.className = 'bomb-explosion pill-particle';
+        const pc = palette[Math.floor(Math.random() * palette.length)];
+        const size = Math.round(Math.min(cellW, cellH) * 0.9);
+        ex.style.width = size + 'px';
+        ex.style.height = size + 'px';
+        ex.style.background = `radial-gradient(circle at 30% 30%, ${shadeColor(pc, 55)}, ${pc})`;
+        ex.style.borderColor = shadeColor(pc, -40);
+        ex.style.left = (offsetX + c * cellW + cellW / 2 - size / 2) + 'px';
+        ex.style.top  = (offsetY + r * cellH + cellH / 2 - size / 2) + 'px';
         area.appendChild(ex);
         setTimeout(() => ex.remove(), 700);
       }, i * 35);
@@ -3521,19 +3615,18 @@ const Game = (() => {
   function spawnComboParticles(n) {
     const area = document.getElementById('game-area');
     const rect = area.getBoundingClientRect();
-    const tier = Math.min(n - 1, 5);
     const count = 8 + n * 4;
-    const glyphs = (
-      tier <= 1 ? ['💊'] :
-      tier === 2 ? ['💖','💗'] :
-      tier === 3 ? ['⭐','✨'] :
-      tier === 4 ? ['💥','✨','⭐'] :
-      ['🌈','💖','⭐','✨','💊']
-    );
+    const skinColors = getSkinColors();
+    const palette = Object.values(skinColors);
     for (let i = 0; i < count; i++) {
+      const c = palette[Math.floor(Math.random() * palette.length)];
+      const size = Math.round(18 + Math.random() * 10 + n * 2);
       const p = document.createElement('div');
-      p.className = 'combo-particle';
-      p.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
+      p.className = 'combo-particle pill-particle';
+      p.style.width = size + 'px';
+      p.style.height = size + 'px';
+      p.style.background = `radial-gradient(circle at 30% 30%, ${shadeColor(c, 55)}, ${c})`;
+      p.style.borderColor = shadeColor(c, -40);
       const startX = rect.width / 2 + (Math.random() - 0.5) * 60;
       const startY = rect.height / 2 + (Math.random() - 0.5) * 40;
       p.style.left = startX + 'px';
@@ -3543,7 +3636,6 @@ const Game = (() => {
       p.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
       p.style.setProperty('--dy', (Math.sin(angle) * dist - 40) + 'px');
       p.style.setProperty('--rot', (Math.random() * 720 - 360) + 'deg');
-      p.style.fontSize = (16 + Math.random() * 14 + n * 2) + 'px';
       p.style.animationDuration = (0.9 + Math.random() * 0.5) + 's';
       area.appendChild(p);
       setTimeout(() => p.remove(), 1500);
@@ -3738,13 +3830,17 @@ const Game = (() => {
         actionBtn = document.createElement('button');
         actionBtn.className = 'btn-skin-equip';
         actionBtn.textContent = 'EQUIP';
-        actionBtn.onclick = () => { equipSkin(skin.id); renderShop(); };
+        actionBtn.onclick = (e) => { e.stopPropagation(); equipSkin(skin.id); renderShop(); };
       } else {
         actionBtn = document.createElement('button');
         actionBtn.className = 'btn-skin-buy';
         actionBtn.textContent = 'BUY';
-        actionBtn.onclick = () => buySkin(skin.id);
+        actionBtn.onclick = (e) => { e.stopPropagation(); buySkin(skin.id); };
       }
+
+      // Tapping the card (outside the action button) opens full preview.
+      card.style.cursor = 'pointer';
+      card.onclick = () => showSkinPreview(skin.id);
 
       card.appendChild(preview);
       card.appendChild(info);
@@ -3769,6 +3865,86 @@ const Game = (() => {
     if (!state.ownedSkins.includes(id)) return;
     state.equippedSkin = id;
     Save.save(state);
+  }
+
+  // ---- SKIN PREVIEW MODAL ----
+  const FULL_SKIN_DESC = {
+    default: 'Hospital-grade capsules with medical symbols. Safe for all patients. Standard treatment protocol approved by Klover Hospital.',
+    neon:    'High-intensity energy formula with bright colors. Emergency room exclusive for rapid patient recovery.',
+    pastel:  'Gentle therapy capsules in soft colors for sensitive patients. Pediatric-approved with calming effects.',
+    mono:    'Specialist treatment in clinical monochrome. Premium care for complex medical cases.',
+  };
+
+  let previewingSkinId = null;
+
+  function showSkinPreview(id) {
+    const skin = SKINS.find(s => s.id === id);
+    if (!skin) return;
+    previewingSkinId = id;
+    const owned = state.ownedSkins.includes(id);
+    const equipped = state.equippedSkin === id;
+
+    document.getElementById('preview-title').textContent = skin.name;
+    const samples = document.getElementById('preview-pill-samples');
+    samples.innerHTML = '';
+    skin.blobs.forEach(c => {
+      const s = document.createElement('div');
+      s.className = 'preview-sample';
+      s.style.background = `radial-gradient(circle at 30% 30%, ${shadeColor(c, 55)}, ${c})`;
+      s.style.borderColor = shadeColor(c, -40);
+      samples.appendChild(s);
+    });
+    document.getElementById('preview-description').textContent =
+      FULL_SKIN_DESC[id] || skin.desc || '';
+
+    const priceRow = document.getElementById('preview-price-row');
+    priceRow.innerHTML = '';
+    priceRow.className = 'preview-price-row' + (skin.price === 0 ? ' free' : '');
+    if (skin.price === 0) {
+      priceRow.textContent = 'Included with default issue';
+    } else {
+      priceRow.innerHTML = `<span class="coin-icon"></span><span>${skin.price.toLocaleString()} coins</span>`;
+    }
+
+    const actionBtn = document.getElementById('preview-action-btn');
+    if (equipped) {
+      actionBtn.textContent = 'Equipped';
+      actionBtn.disabled = true;
+    } else if (owned) {
+      actionBtn.textContent = 'Equip';
+      actionBtn.disabled = false;
+    } else {
+      actionBtn.textContent = skin.price <= (state.coins || 0) ? 'Purchase' : 'Not enough coins';
+      actionBtn.disabled = skin.price > (state.coins || 0);
+    }
+
+    document.getElementById('overlay-skin-preview').classList.add('active');
+  }
+
+  function closeSkinPreview() {
+    document.getElementById('overlay-skin-preview').classList.remove('active');
+    previewingSkinId = null;
+  }
+
+  function previewPrimary() {
+    if (!previewingSkinId) return;
+    const skin = SKINS.find(s => s.id === previewingSkinId);
+    if (!skin) return;
+    const owned = state.ownedSkins.includes(skin.id);
+    const equipped = state.equippedSkin === skin.id;
+    if (equipped) return;
+    if (owned) {
+      equipSkin(skin.id);
+      closeSkinPreview();
+      renderShop();
+    } else {
+      buySkin(skin.id);
+      if (state.ownedSkins.includes(skin.id)) {
+        equipSkin(skin.id);
+        closeSkinPreview();
+        renderShop();
+      }
+    }
   }
 
   // ---- TOAST ----
@@ -3805,6 +3981,9 @@ const Game = (() => {
     rotateCW: () => { if (gameRunning && !paused && currentPair) rotatePair(1); },
     rotateCCW: () => { if (gameRunning && !paused && currentPair) rotatePair(-1); },
     closeRecordScreen,
+    showSkinPreview,
+    closeSkinPreview,
+    previewPrimary,
   };
 })();
 
