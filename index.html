@@ -10,6 +10,12 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
 <style>
+@font-face {
+  font-family: 'AA-Magnum';
+  src: url('./assets/fonts/AA-Magnum.ttf') format('truetype');
+  font-display: swap;
+}
+
 :root {
   --color-bg: #0a1a3a;
   --color-primary: #e8609a;
@@ -1117,10 +1123,34 @@ html, body {
    KLOVER HOSPITAL THEME OVERRIDES
    ============================================================ */
 html, body {
-  font-family: 'Nunito', 'Barlow Condensed', sans-serif;
+  font-family: 'AA-Magnum', 'Nunito', 'Barlow Condensed', Arial, sans-serif;
   color: #1a2a4a;
   background: #d8eeff;
   padding-bottom: env(safe-area-inset-bottom, 40px);
+}
+
+/* Promote AA-Magnum across every themed element that previously pinned
+   Nunito. Kept Nunito as fallback so weight variants still look right. */
+.logo-rik, .logo-animation, .logo-tagline,
+.screen-title,
+.btn-primary, .btn-secondary, .btn-slide-next, .btn-lets-play,
+.ton-btn-small,
+.klas-bottom-bar,
+.hud-label, .hud-value, .hud-level-name, .hud-target,
+.next-label, .combo-display,
+.stat-pill, .fact-card, .fact-card b,
+.level-card-name, .level-card-meta, .id-card-label, .patient-meta-row,
+.btn-proceed, .btn-decline,
+#screen-howto .slide-text,
+#screen-settings .settings-row-label, #screen-settings .settings-version,
+#screen-shop .skin-name,
+#screen-referral .stat-value,
+#screen-loading .loading-logo,
+.modal-title, .modal-score, .modal-best,
+.combo-flash, .record-confetti, .record-row, .record-row b,
+.coin-reward, .bomb-btn,
+.rot-btn {
+  font-family: 'AA-Magnum', 'Nunito', sans-serif !important;
 }
 
 #app {
