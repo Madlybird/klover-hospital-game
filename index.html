@@ -1292,7 +1292,11 @@ html, body {
 .btn-slide-next, .btn-lets-play {
   background: #5b9de8;
   color: #fff;
-  font-family: 'Nunito', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Nunito', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: 0.2px;
+  text-transform: none;
   border: 2px solid #3a8fd4;
   box-shadow: 0 4px 14px rgba(91,157,232,0.4);
   border-radius: 14px;
@@ -1471,7 +1475,16 @@ html, body {
 .btn-decline { background: #e8f4ff; color: #3a8fd4; }
 
 /* How-to light styling */
-#screen-howto .slide-text { color: #1a2a4a; font-family: 'Nunito', sans-serif; }
+#screen-howto .slide-text {
+  color: #1a2a4a;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.5;
+  letter-spacing: 0.1px;
+  text-transform: none;
+  white-space: pre-line; /* lets \n in slide data become a real line break */
+}
 #screen-howto .slide-canvas-wrap {
   background: #fff;
   border: 2px solid #b8d4f0;
@@ -1822,7 +1835,7 @@ html, body {
       <div class="screen-title">Nurse Mai's Treatment Guide</div>
     </div>
     <div class="slide-area">
-      <div class="slide-text" id="slide-text">Blobs fall from above. Move them left and right!</div>
+      <div class="slide-text" id="slide-text">Nurse Mai's treatment guide.</div>
       <div class="slide-canvas-wrap">
         <canvas id="slide-canvas" width="200" height="130"></canvas>
       </div>
@@ -1832,7 +1845,7 @@ html, body {
         <div class="dot"></div>
         <div class="dot"></div>
       </div>
-      <button class="btn-slide-next" id="slide-btn" onclick="Game.nextSlide()">TAP TO CONTINUE</button>
+      <button class="btn-slide-next" id="slide-btn" onclick="Game.nextSlide()">Continue</button>
     </div>
   </div>
 
@@ -2328,10 +2341,10 @@ const Game = (() => {
   // Slide tutorial
   let slideIndex = 0;
   const slides = [
-    { text: '\u2764 Pills fall from above! Move them left and right!' },
-    { text: '\u2764 \u2190 \u2192 MOVE   \u2022 TAP TO ROTATE   \u2193 DROP' },
-    { text: '\u2764 Match 4+ same color pills to clear them!' },
-    { text: '\u2764 Chain reactions give huge combo bonuses. Good luck, nurse!' },
+    { text: "Nurse Mai's treatment guide.\nPills fall from above. Guide them to the patients." },
+    { text: 'Left or right to move. Tap to rotate. Down to drop.' },
+    { text: 'Match four or more pills of the same color to clear them.' },
+    { text: 'Chains of clears create healing combos. Complete treatments to help patients recover.' },
   ];
 
   // TON Connect
@@ -2463,10 +2476,10 @@ const Game = (() => {
     dots.forEach((d, i) => d.classList.toggle('active', i === slideIndex));
     const btn = document.getElementById('slide-btn');
     if (slideIndex === slides.length - 1) {
-      btn.textContent = "LET'S PLAY";
+      btn.textContent = "Begin treatment";
       btn.classList.add('btn-lets-play');
     } else {
-      btn.textContent = 'TAP TO CONTINUE';
+      btn.textContent = 'Continue';
       btn.classList.remove('btn-lets-play');
     }
     drawSlideDemo(slideIndex);
