@@ -1078,6 +1078,18 @@ html, body {
   font-family: 'Nunito', 'Barlow Condensed', sans-serif;
   color: #1a2a4a;
   background: #d8eeff;
+  padding-bottom: env(safe-area-inset-bottom, 40px);
+}
+
+#app {
+  padding-bottom: env(safe-area-inset-bottom, 30px);
+}
+
+#screen-menu {
+  padding-bottom: 90px;
+}
+#screen-howto, #screen-levels, #screen-settings, #screen-shop, #screen-referral {
+  padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px));
 }
 
 .checker-bg {
@@ -1237,11 +1249,12 @@ html, body {
 /* Bottom system bar */
 .klas-bottom-bar {
   position: absolute;
-  left: 0; right: 0; bottom: 0;
+  left: 0; right: 0;
+  bottom: env(safe-area-inset-bottom, 0px);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 18px;
+  padding: 10px 18px calc(10px + env(safe-area-inset-bottom, 0px));
   background: #fff;
   border-top: 2px solid #b8d4f0;
   font-family: 'Nunito', sans-serif;
@@ -1250,6 +1263,7 @@ html, body {
   letter-spacing: 2px;
   color: #3a8fd4;
   z-index: 8;
+  margin-bottom: 20px;
 }
 .klas-bottom-bar .klas-right {
   color: #e8609a;
