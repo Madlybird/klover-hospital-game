@@ -3591,7 +3591,7 @@ const Game = (() => {
   // ---- REFERRAL ----
   function updateReferralUI() {
     const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || 'demo';
-    const link = `https://t.me/RikAnimationBot/game?startapp=${userId}`;
+    const link = `https://t.me/kloverl_bot/game?startapp=${userId}`;
     document.getElementById('referral-link-text').textContent = link;
     document.getElementById('ref-friends').textContent = state.refFriends;
     document.getElementById('ref-coins').textContent = state.refCoins;
@@ -3605,7 +3605,7 @@ const Game = (() => {
 
   function inviteFriend() {
     const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || 'demo';
-    const link = `https://t.me/RikAnimationBot/game?startapp=${userId}`;
+    const link = `https://t.me/kloverl_bot/game?startapp=${userId}`;
     const msg = encodeURIComponent(`Play Klover Hospital pill puzzle game with me! ${link}`);
     if (window.Telegram?.WebApp) {
       Telegram.WebApp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${msg}`);
