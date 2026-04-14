@@ -1331,8 +1331,20 @@ html, body {
 
 /* Force Mai to a compact accent size on the main menu */
 .menu-mai, .mai-corner, .mai-character {
-  height: 50px !important;
+  height: 90px !important;
   width: auto !important;
+  display: block;
+  margin: 0 auto;
+  object-fit: contain;
+  image-rendering: -webkit-optimize-contrast;
+}
+
+/* Patient photo image fills the 64×64 slot cleanly */
+.patient-photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 /* Tighten the logo area so the shrunken Mai doesn't leave a gap */
@@ -1601,8 +1613,11 @@ html, body {
 .fact-card b { color: #e8609a; display: block; margin-bottom: 2px; font-size: 9px; letter-spacing: 1.5px; }
 .sidebar-mai {
   width: 52px;
+  height: auto;
   margin-top: 4px;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  object-fit: contain;
+  display: block;
 }
 .rot-buttons {
   display: flex;
@@ -1776,25 +1791,7 @@ html, body {
     </div>
 
     <div class="logo-area">
-      <svg class="menu-mai" viewBox="0 0 60 88" width="55" height="80" style="filter: drop-shadow(0 3px 10px rgba(232,96,154,0.35));">
-        <ellipse cx="30" cy="25" rx="20" ry="18" fill="#e8609a" stroke="#c04080" stroke-width="2"/>
-        <path d="M12 20 Q10 12 18 8 Q24 4 30 6 Q36 4 42 8 Q50 12 48 20 Q46 28 42 32 Q36 36 30 36 Q24 36 18 32 Q14 28 12 20Z" fill="#f080b0" stroke="#e8609a" stroke-width="1.5"/>
-        <path d="M18 12 Q22 8 30 8 Q38 8 42 12 Q40 6 30 6 Q20 6 18 12Z" fill="#fff" stroke="#333" stroke-width="2"/>
-        <path d="M30 10 C30 10 27 8 25 10 C23 12 26 15 30 16 C34 15 37 12 35 10 C33 8 30 10 30 10Z" fill="#3a8fd4"/>
-        <ellipse cx="30" cy="30" rx="13" ry="12" fill="#ffc0d0"/>
-        <ellipse cx="24" cy="28" rx="5" ry="6" fill="#fff" stroke="#333" stroke-width="2"/>
-        <ellipse cx="36" cy="28" rx="5" ry="6" fill="#fff" stroke="#333" stroke-width="2"/>
-        <ellipse cx="24" cy="30" rx="3" ry="4" fill="#f080b0"/>
-        <ellipse cx="36" cy="30" rx="3" ry="4" fill="#f080b0"/>
-        <ellipse cx="24" cy="28" rx="2" ry="2.5" fill="#fff"/>
-        <ellipse cx="36" cy="28" rx="2" ry="2.5" fill="#fff"/>
-        <ellipse cx="17" cy="32" rx="3" ry="2" fill="#f080b0" opacity="0.6"/>
-        <ellipse cx="43" cy="32" rx="3" ry="2" fill="#f080b0" opacity="0.6"/>
-        <path d="M28 36 Q30 38 32 36" stroke="#c04080" stroke-width="1.5" fill="none"/>
-        <rect x="18" y="42" width="24" height="28" rx="4" fill="#fff" stroke="#b8d4f0" stroke-width="1.5"/>
-        <path d="M18 42 L24 42 L30 48 L36 42 L42 42 L42 50 L18 50 Z" fill="#3a8fd4"/>
-        <path d="M44 56 C44 56 41.5 54 40 56 C38.5 58 41 60 44 62 C47 60 49.5 58 48 56 C46.5 54 44 56 44 56Z" fill="#f080b0"/>
-      </svg>
+      <img class="menu-mai" src="assets/character/new.png" alt="Mai" style="filter: drop-shadow(0 3px 10px rgba(232,96,154,0.35));">
       <div class="menu-title-row">
         <span class="medical-cross"></span>
         <span class="logo-rik">KLOVER HOSPITAL</span>
@@ -1849,19 +1846,7 @@ html, body {
     <div class="levels-grid">
       <div class="level-card" id="level-card-1" onclick="Game.startLevel(1)">
         <div class="patient-photo">
-          <svg viewBox="0 0 60 72" width="52" height="62">
-            <ellipse cx="30" cy="25" rx="20" ry="18" fill="#e8609a" stroke="#c04080" stroke-width="2"/>
-            <path d="M18 12 Q22 8 30 8 Q38 8 42 12 Q40 6 30 6 Q20 6 18 12Z" fill="#fff" stroke="#333" stroke-width="1.5"/>
-            <path d="M30 10 C30 10 27 8 25 10 C23 12 26 15 30 16 C34 15 37 12 35 10 C33 8 30 10 30 10Z" fill="#3a8fd4"/>
-            <ellipse cx="30" cy="30" rx="13" ry="12" fill="#ffc0d0"/>
-            <ellipse cx="24" cy="28" rx="4.5" ry="5.5" fill="#fff" stroke="#333" stroke-width="1.5"/>
-            <ellipse cx="36" cy="28" rx="4.5" ry="5.5" fill="#fff" stroke="#333" stroke-width="1.5"/>
-            <ellipse cx="24" cy="30" rx="2.5" ry="3.5" fill="#f080b0"/>
-            <ellipse cx="36" cy="30" rx="2.5" ry="3.5" fill="#f080b0"/>
-            <path d="M28 36 Q30 38 32 36" stroke="#c04080" stroke-width="1.5" fill="none"/>
-            <rect x="18" y="42" width="24" height="22" rx="3" fill="#fff" stroke="#b8d4f0" stroke-width="1.5"/>
-            <path d="M18 42 L24 42 L30 48 L36 42 L42 42 L42 50 L18 50 Z" fill="#3a8fd4"/>
-          </svg>
+          <img src="assets/character/new.png" alt="Mai" class="patient-photo-img">
         </div>
         <div class="patient-info">
           <div class="id-card-label">ID CARD</div>
@@ -1934,19 +1919,7 @@ html, body {
           <span class="bomb-progress" id="bomb-progress"></span>
         </button>
         <div class="fact-card"><b>!! FACT</b>Match 4+ same pills to clear them.</div>
-        <svg class="sidebar-mai" viewBox="0 0 60 88">
-          <ellipse cx="30" cy="25" rx="20" ry="18" fill="#e8609a" stroke="#c04080" stroke-width="2"/>
-          <path d="M18 12 Q22 8 30 8 Q38 8 42 12 Q40 6 30 6 Q20 6 18 12Z" fill="#fff" stroke="#333" stroke-width="1.5"/>
-          <path d="M30 10 C30 10 27 8 25 10 C23 12 26 15 30 16 C34 15 37 12 35 10 C33 8 30 10 30 10Z" fill="#3a8fd4"/>
-          <ellipse cx="30" cy="30" rx="13" ry="12" fill="#ffc0d0"/>
-          <ellipse cx="24" cy="28" rx="5" ry="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
-          <ellipse cx="36" cy="28" rx="5" ry="6" fill="#fff" stroke="#333" stroke-width="1.5"/>
-          <ellipse cx="24" cy="30" rx="3" ry="4" fill="#f080b0"/>
-          <ellipse cx="36" cy="30" rx="3" ry="4" fill="#f080b0"/>
-          <path d="M28 36 Q30 38 32 36" stroke="#c04080" stroke-width="1.5" fill="none"/>
-          <rect x="18" y="42" width="24" height="28" rx="4" fill="#fff" stroke="#b8d4f0" stroke-width="1.5"/>
-          <path d="M18 42 L24 42 L30 48 L36 42 L42 42 L42 50 L18 50 Z" fill="#3a8fd4"/>
-        </svg>
+        <img class="sidebar-mai" src="assets/character/new.png" alt="Mai">
       </div>
     </div>
   </div>
