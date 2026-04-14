@@ -1912,7 +1912,7 @@ const Game = (() => {
   let slideIndex = 0;
   const slides = [
     { text: '\u2764 Pills fall from above! Move them left and right!' },
-    { text: '\u2764 Tap to rotate the capsule before it lands.' },
+    { text: '\u2764 Tap to rotate clockwise. Swipe up to rotate back!' },
     { text: '\u2764 Match 4+ same color pills to clear them!' },
     { text: '\u2764 Chain reactions give huge combo bonuses. Good luck, nurse!' },
   ];
@@ -1954,6 +1954,7 @@ const Game = (() => {
     gameCanvas.style.height = canvasH + 'px';
 
     setupTouchControls();
+    setupMaiInteraction();
     checkDailyBonus();
     initTonConnect();
 
@@ -2497,6 +2498,40 @@ const Game = (() => {
   }
 
 
+  // ---- MAI INTERACTION ----
+  function setupMaiInteraction() {
+    const mai = document.querySelector('.menu-mai');
+    if (!mai) return;
+    mai.style.cursor = 'pointer';
+    mai.style.transition = 'transform 0.18s cubic-bezier(.34,1.56,.64,1)';
+    mai.addEventListener('click', () => {
+      // Bouncy pop animation
+      mai.style.transform = 'scale(1.18) rotate(-4deg)';
+      setTimeout(() => { mai.style.transform = 'scale(0.96) rotate(2deg)'; }, 140);
+      setTimeout(() => { mai.style.transform = 'scale(1) rotate(0)'; }, 280);
+      // Synth giggle: rapid ascending blips
+      const notes = [880, 1040, 980, 1175, 1100];
+      notes.forEach((f, i) => setTimeout(() => Audio.combo ? Audio.combo(0) : null, i * 70));
+      // Use direct beep via combo for cuter effect
+      try {
+        const c = new (window.AudioContext || window.webkitAudioContext)();
+        notes.forEach((f, i) => {
+          const o = c.createOscillator(), g = c.createGain();
+          o.connect(g); g.connect(c.destination);
+          o.type = 'sine'; o.frequency.value = f;
+          const t0 = c.currentTime + i * 0.07;
+          g.gain.setValueAtTime(0.0001, t0);
+          g.gain.exponentialRampToValueAtTime(0.18, t0 + 0.01);
+          g.gain.exponentialRampToValueAtTime(0.001, t0 + 0.12);
+          o.start(t0); o.stop(t0 + 0.13);
+        });
+      } catch(e) {}
+      if (window.Telegram?.WebApp?.HapticFeedback) {
+        Telegram.WebApp.HapticFeedback.impactOccurred('light');
+      }
+    });
+  }
+
   // ---- CONTROLS ----
   function setupTouchControls() {
     const canvas = document.getElementById('game-canvas');
@@ -2520,8 +2555,11 @@ const Game = (() => {
       const absDy = Math.abs(dy);
 
       if (absDx < 12 && absDy < 12 && dt < 300) {
-        // Tap = rotate
-        rotatePair();
+        // Tap = rotate clockwise
+        rotatePair(1);
+      } else if (absDy > absDx && dy < -30) {
+        // Swipe up = rotate counter-clockwise
+        rotatePair(-1);
       } else if (absDy > absDx && dy > 30) {
         // Swipe down = fast drop
         hardDrop();
@@ -2543,7 +2581,8 @@ const Game = (() => {
       if (e.key === 'ArrowLeft')                          movePair(-1);
       if (e.key === 'ArrowRight')                         movePair(1);
       if (e.key === 'ArrowDown'  || e.key === 'Enter')    hardDrop();
-      if (e.key === 'ArrowUp'    || e.key === 'z' || e.key === 'Z' || e.key === ' ') rotatePair();
+      if (e.key === 'ArrowUp'    || e.key === 'z' || e.key === 'Z' || e.key === ' ') rotatePair(1);
+      if (e.key === 'x' || e.key === 'X') rotatePair(-1);
       if (e.key === 'Escape')                             pauseGame();
     });
   }
@@ -2559,8 +2598,9 @@ const Game = (() => {
     }
   }
 
-  function rotatePair() {
-    const rotated = { ...currentPair, rotation: (currentPair.rotation + 1) % 4 };
+  function rotatePair(dir = 1) {
+    const delta = dir < 0 ? 3 : 1;
+    const rotated = { ...currentPair, rotation: (currentPair.rotation + delta) % 4 };
     if (isValidPosition(rotated)) {
       currentPair = rotated;
       Audio.rotate();
@@ -2568,8 +2608,8 @@ const Game = (() => {
       // Wall kick: try shifting
       const kick1 = { ...rotated, x: rotated.x - 1 };
       const kick2 = { ...rotated, x: rotated.x + 1 };
-      if (isValidPosition(kick1)) currentPair = kick1;
-      else if (isValidPosition(kick2)) currentPair = kick2;
+      if (isValidPosition(kick1)) { currentPair = kick1; Audio.rotate(); }
+      else if (isValidPosition(kick2)) { currentPair = kick2; Audio.rotate(); }
     }
   }
 
