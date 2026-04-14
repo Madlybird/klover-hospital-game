@@ -1493,6 +1493,62 @@ html, body {
 }
 .rot-btn:active { transform: scale(0.92); background: #3a8fd4; }
 
+.bomb-btn {
+  position: relative;
+  width: 100%;
+  background: linear-gradient(180deg, #ff7aa3 0%, #e8609a 60%, #c04080 100%);
+  color: #fff;
+  border: 2px solid #c04080;
+  border-radius: 12px;
+  padding: 8px 6px 6px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: 11px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  box-shadow: 0 3px 8px rgba(232,96,154,0.45);
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.bomb-btn .bomb-icon { font-size: 22px; line-height: 1; }
+.bomb-btn .bomb-count { font-size: 12px; opacity: 0.9; }
+.bomb-btn.holding { animation: bombShake 0.18s linear infinite; }
+.bomb-btn.empty { opacity: 0.4; cursor: not-allowed; filter: grayscale(0.6); }
+.bomb-progress {
+  position: absolute;
+  left: 0; bottom: 0;
+  height: 4px; width: 0%;
+  background: #fff;
+  transition: width 1s linear;
+  box-shadow: 0 0 6px #fff;
+}
+.bomb-btn.holding .bomb-progress { width: 100%; }
+@keyframes bombShake {
+  0%,100% { transform: translate(0,0); }
+  25% { transform: translate(-1px,1px) rotate(-1deg); }
+  50% { transform: translate(1px,-1px) rotate(1deg); }
+  75% { transform: translate(-1px,-1px); }
+}
+
+.bomb-explosion {
+  position: absolute;
+  pointer-events: none;
+  font-size: 32px;
+  z-index: 56;
+  animation: bombExplode 0.6s ease-out forwards;
+}
+@keyframes bombExplode {
+  0%   { transform: translate(-50%,-50%) scale(0.3); opacity: 1; }
+  60%  { transform: translate(-50%,-50%) scale(1.4); opacity: 1; }
+  100% { transform: translate(-50%,-50%) scale(2); opacity: 0; }
+}
+
 /* Loading screen light */
 #screen-loading .loading-logo { color: #3a8fd4; font-family: 'Nunito', sans-serif; font-weight: 900; }
 #screen-loading .loading-bar-wrap { background: #b8d4f0; }
@@ -1681,6 +1737,12 @@ html, body {
           <button class="rot-btn" id="rot-ccw" onclick="Game.rotateCCW()" aria-label="Rotate left">&#8634;</button>
           <button class="rot-btn" id="rot-cw"  onclick="Game.rotateCW()"  aria-label="Rotate right">&#8635;</button>
         </div>
+        <button id="bombButton" class="bomb-btn" aria-label="Hold to use bomb">
+          <span class="bomb-icon">&#128163;</span>
+          <span class="bomb-label">BOMB</span>
+          <span class="bomb-count" id="bomb-count">x1</span>
+          <span class="bomb-progress" id="bomb-progress"></span>
+        </button>
         <div class="fact-card"><b>!! FACT</b>Match 4+ same pills to clear them.</div>
         <svg class="sidebar-mai" viewBox="0 0 60 88">
           <ellipse cx="30" cy="25" rx="20" ry="18" fill="#e8609a" stroke="#c04080" stroke-width="2"/>
@@ -2005,6 +2067,11 @@ const Game = (() => {
   // Touch state
   let touchStartX = 0, touchStartY = 0, touchStartTime = 0, lastTapTime = 0;
 
+  // Bomb power-up
+  let bombs = 1;
+  let bombHoldTimer = null;
+  let bombHoldActive = false;
+
   // Canvas refs
   let gameCanvas, gameCtx, nextCanvas, nextCtx;
 
@@ -2036,6 +2103,7 @@ const Game = (() => {
 
     setupTouchControls();
     setupMaiInteraction();
+    setupBombButton();
     checkDailyBonus();
     initTonConnect();
 
@@ -2249,6 +2317,8 @@ const Game = (() => {
     grid = Array.from({length: ROWS}, () => Array(COLS).fill(null));
     nextPair = spawnPair();
     currentPair = spawnPair();
+    bombs = 1;
+    updateBombUI();
 
     document.getElementById('hud-level-name').textContent = lvl.name;
     document.getElementById('hud-target').textContent = 'TARGET: ' + lvl.target.toLocaleString();
@@ -2375,9 +2445,13 @@ const Game = (() => {
         score += pts;
         state.coins += Math.floor(pts / 100);
 
-        // Show combo flash
+        // Show combo flash + always burst some particles so feedback is visible
         if (chainCombo > 1) showComboFlash(chainCombo);
+        else spawnComboParticles(1);
         showScorePopup(pts);
+
+        // Reward a bomb on tier-4+ combos
+        if (chainCombo === 4) { bombs++; updateBombUI(); showToast('+1 BOMB!'); }
 
         Audio.clear();
         if (chainCombo > 1) Audio.combo(chainCombo);
@@ -2599,6 +2673,119 @@ const Game = (() => {
     }
   }
 
+
+  // ---- BOMB POWER-UP ----
+  function updateBombUI() {
+    const btn = document.getElementById('bombButton');
+    const countEl = document.getElementById('bomb-count');
+    if (!btn) return;
+    countEl.textContent = 'x' + bombs;
+    btn.classList.toggle('empty', bombs <= 0);
+  }
+
+  function setupBombButton() {
+    const btn = document.getElementById('bombButton');
+    if (!btn) return;
+    const start = (e) => {
+      e.preventDefault();
+      if (bombs <= 0 || !gameRunning || paused) return;
+      bombHoldActive = true;
+      btn.classList.add('holding');
+      bombHoldTimer = setTimeout(() => {
+        if (bombHoldActive) activateBomb();
+        cancelBombHold();
+      }, 1000);
+      if (window.Telegram?.WebApp?.HapticFeedback) {
+        Telegram.WebApp.HapticFeedback.impactOccurred('light');
+      }
+    };
+    const cancel = () => cancelBombHold();
+    btn.addEventListener('touchstart', start, { passive: false });
+    btn.addEventListener('mousedown', start);
+    btn.addEventListener('touchend', cancel);
+    btn.addEventListener('touchcancel', cancel);
+    btn.addEventListener('mouseup', cancel);
+    btn.addEventListener('mouseleave', cancel);
+  }
+
+  function cancelBombHold() {
+    bombHoldActive = false;
+    if (bombHoldTimer) { clearTimeout(bombHoldTimer); bombHoldTimer = null; }
+    const btn = document.getElementById('bombButton');
+    if (btn) btn.classList.remove('holding');
+  }
+
+  function activateBomb() {
+    if (bombs <= 0) return;
+    const filled = [];
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        if (grid[r][c] !== null) filled.push({ r, c });
+      }
+    }
+    if (filled.length === 0) return;
+    bombs--;
+    updateBombUI();
+
+    const count = Math.min(filled.length, 8 + Math.floor(Math.random() * 5));
+    // Fisher-Yates shuffle then slice
+    for (let i = filled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [filled[i], filled[j]] = [filled[j], filled[i]];
+    }
+    const targets = filled.slice(0, count);
+    const cellW = gameCanvas.width / COLS;
+    const cellH = gameCanvas.height / ROWS;
+    const area = document.getElementById('game-area');
+    const canvasRect = gameCanvas.getBoundingClientRect();
+    const areaRect = area.getBoundingClientRect();
+    const offsetX = canvasRect.left - areaRect.left;
+    const offsetY = canvasRect.top - areaRect.top;
+
+    targets.forEach(({ r, c }, i) => {
+      setTimeout(() => {
+        grid[r][c] = null;
+        const ex = document.createElement('div');
+        ex.className = 'bomb-explosion';
+        ex.textContent = '💥';
+        ex.style.left = (offsetX + c * cellW + cellW / 2) + 'px';
+        ex.style.top  = (offsetY + r * cellH + cellH / 2) + 'px';
+        area.appendChild(ex);
+        setTimeout(() => ex.remove(), 700);
+      }, i * 35);
+    });
+
+    // Big bang sound
+    try {
+      const C = window.AudioContext || window.webkitAudioContext;
+      const ctx = activateBomb._ctx || (activateBomb._ctx = new C());
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'sawtooth'; o.frequency.value = 80;
+      const t0 = ctx.currentTime;
+      o.frequency.exponentialRampToValueAtTime(30, t0 + 0.35);
+      g.gain.setValueAtTime(0.4, t0);
+      g.gain.exponentialRampToValueAtTime(0.001, t0 + 0.5);
+      o.start(t0); o.stop(t0 + 0.55);
+    } catch(e) {}
+
+    if (window.Telegram?.WebApp?.HapticFeedback) {
+      Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+    }
+
+    // Shake the screen
+    const screen = document.getElementById('screen-game');
+    screen.classList.remove('shake', 'shake-strong');
+    void screen.offsetWidth;
+    screen.classList.add('shake-strong');
+    setTimeout(() => screen.classList.remove('shake-strong'), 700);
+
+    // After explosions settle, gravity + chain
+    setTimeout(() => {
+      applyGravity();
+      processMatches();
+    }, count * 35 + 250);
+  }
 
   // ---- MAI INTERACTION ----
   function setupMaiInteraction() {
