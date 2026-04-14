@@ -2128,10 +2128,14 @@ const Sync = (() => {
   }
 
   async function saveUserOnce() {
-    if (!enabled) return;
+    const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+    console.log('[Sync] saveUserOnce: initData len=', initData.length, 'tg user=', tgUser?.id, tgUser?.username);
+    if (!enabled) {
+      console.warn('[Sync] disabled (no initData). Open the app via your Telegram bot, not a browser URL.');
+      return;
+    }
     const key = 'klover_user_saved_v1';
-    if (sessionStorage.getItem(key)) return;
-    // Parse optional start param for referral
+    if (sessionStorage.getItem(key)) { console.log('[Sync] already saved this session'); return; }
     let referredBy = null;
     try {
       const sp = window.Telegram?.WebApp?.initDataUnsafe?.start_param;
@@ -2146,8 +2150,14 @@ const Sync = (() => {
         },
         body: JSON.stringify(referredBy ? { referredBy } : {}),
       });
+      const text = await res.text();
+      let payload;
+      try { payload = JSON.parse(text); } catch { payload = text; }
+      console.log('[Sync] /api/save-user ->', res.status, payload);
       if (res.ok) sessionStorage.setItem(key, '1');
-    } catch {}
+    } catch (e) {
+      console.error('[Sync] save-user network error:', e);
+    }
   }
 
   return {
