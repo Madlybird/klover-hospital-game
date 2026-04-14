@@ -1415,6 +1415,27 @@ html, body {
   margin-top: 4px;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
 }
+.rot-buttons {
+  display: flex;
+  gap: 4px;
+  width: 100%;
+  justify-content: center;
+}
+.rot-btn {
+  flex: 1;
+  background: #5b9de8;
+  color: #fff;
+  border: 2px solid #3a8fd4;
+  border-radius: 10px;
+  padding: 8px 0;
+  font-size: 20px;
+  font-weight: 900;
+  font-family: 'Nunito', sans-serif;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(91,157,232,0.4);
+  line-height: 1;
+}
+.rot-btn:active { transform: scale(0.92); background: #3a8fd4; }
 
 /* Loading screen light */
 #screen-loading .loading-logo { color: #3a8fd4; font-family: 'Nunito', sans-serif; font-weight: 900; }
@@ -1600,6 +1621,10 @@ html, body {
         <div class="next-label">NEXT</div>
         <canvas id="next-canvas" width="60" height="72"></canvas>
         <div class="combo-display" id="combo-display"></div>
+        <div class="rot-buttons">
+          <button class="rot-btn" id="rot-ccw" onclick="Game.rotateCCW()" aria-label="Rotate left">&#8634;</button>
+          <button class="rot-btn" id="rot-cw"  onclick="Game.rotateCW()"  aria-label="Rotate right">&#8635;</button>
+        </div>
         <div class="fact-card"><b>!! FACT</b>Match 4+ same pills to clear them.</div>
         <svg class="sidebar-mai" viewBox="0 0 60 88">
           <ellipse cx="30" cy="25" rx="20" ry="18" fill="#e8609a" stroke="#c04080" stroke-width="2"/>
@@ -1912,7 +1937,7 @@ const Game = (() => {
   let slideIndex = 0;
   const slides = [
     { text: '\u2764 Pills fall from above! Move them left and right!' },
-    { text: '\u2764 Tap to rotate clockwise. Swipe up to rotate back!' },
+    { text: '\u2764 Tap = rotate \u21bb. Double-tap or swipe up = \u21ba. Use \u21bb \u21ba buttons too!' },
     { text: '\u2764 Match 4+ same color pills to clear them!' },
     { text: '\u2764 Chain reactions give huge combo bonuses. Good luck, nurse!' },
   ];
@@ -1922,7 +1947,7 @@ const Game = (() => {
   let walletAddress = null;
 
   // Touch state
-  let touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+  let touchStartX = 0, touchStartY = 0, touchStartTime = 0, lastTapTime = 0;
 
   // Canvas refs
   let gameCanvas, gameCtx, nextCanvas, nextCtx;
@@ -2555,8 +2580,15 @@ const Game = (() => {
       const absDy = Math.abs(dy);
 
       if (absDx < 12 && absDy < 12 && dt < 300) {
-        // Tap = rotate clockwise
-        rotatePair(1);
+        // Tap: detect double-tap (within 280ms) for counter-clockwise
+        const now = Date.now();
+        if (now - lastTapTime < 280) {
+          rotatePair(-1);
+          lastTapTime = 0;
+        } else {
+          rotatePair(1);
+          lastTapTime = now;
+        }
       } else if (absDy > absDx && dy < -30) {
         // Swipe up = rotate counter-clockwise
         rotatePair(-1);
@@ -2601,15 +2633,23 @@ const Game = (() => {
   function rotatePair(dir = 1) {
     const delta = dir < 0 ? 3 : 1;
     const rotated = { ...currentPair, rotation: (currentPair.rotation + delta) % 4 };
-    if (isValidPosition(rotated)) {
-      currentPair = rotated;
-      Audio.rotate();
-    } else {
-      // Wall kick: try shifting
-      const kick1 = { ...rotated, x: rotated.x - 1 };
-      const kick2 = { ...rotated, x: rotated.x + 1 };
-      if (isValidPosition(kick1)) { currentPair = kick1; Audio.rotate(); }
-      else if (isValidPosition(kick2)) { currentPair = kick2; Audio.rotate(); }
+    const kicks = [
+      rotated,
+      { ...rotated, x: rotated.x - 1 },
+      { ...rotated, x: rotated.x + 1 },
+      { ...rotated, y: rotated.y - 1 },
+      { ...rotated, x: rotated.x - 1, y: rotated.y - 1 },
+      { ...rotated, x: rotated.x + 1, y: rotated.y - 1 },
+    ];
+    for (const k of kicks) {
+      if (isValidPosition(k)) {
+        currentPair = k;
+        Audio.rotate();
+        if (window.Telegram?.WebApp?.HapticFeedback) {
+          Telegram.WebApp.HapticFeedback.selectionChanged();
+        }
+        return;
+      }
     }
   }
 
@@ -2958,6 +2998,8 @@ const Game = (() => {
     setLang,
     toggleTonConnect,
     renderShop,
+    rotateCW: () => { if (gameRunning && !paused && currentPair) rotatePair(1); },
+    rotateCCW: () => { if (gameRunning && !paused && currentPair) rotatePair(-1); },
   };
 })();
 
