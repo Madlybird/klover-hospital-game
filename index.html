@@ -1411,7 +1411,11 @@ html, body {
   justify-content: center;
   overflow: hidden;
 }
-.patient-info { flex: 1; }
+.patient-info { flex: 1 1 auto; min-width: 0; overflow: hidden; }
+.patient-info .patient-priority,
+.patient-info .patient-locked-note,
+.patient-info .level-card-name,
+.patient-info .patient-meta-row { max-width: 100%; overflow-wrap: anywhere; }
 .id-card-label {
   display: inline-flex;
   align-items: center;
@@ -1477,9 +1481,62 @@ html, body {
 /* Shop light */
 #screen-shop .skin-card { background: #fff; border-color: #b8d4f0; color: #1a2a4a; }
 #screen-shop .skin-card.equipped { border-color: #e8609a; background: #fff5fa; }
-#screen-shop .skin-name { color: #1a2a4a; font-family: 'Nunito', sans-serif; font-size: 16px; letter-spacing: 0.5px; text-transform: none; }
-#screen-shop .skin-desc { color: #6a8bab; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500; margin-top: 2px; line-height: 1.25; }
-#screen-shop .skin-price { color: #e8609a; margin-top: 4px; }
+#screen-shop { padding: 16px; box-sizing: border-box; }
+#screen-shop .skin-card {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 14px;
+  gap: 12px;
+}
+#screen-shop .skin-info {
+  flex: 1 1 auto;
+  min-width: 0;         /* critical: lets flex child shrink so ellipsis works */
+  overflow: hidden;
+}
+#screen-shop .skin-preview { flex: 0 0 auto; }
+#screen-shop .skin-name {
+  color: #1a2a4a;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Nunito', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  text-transform: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+#screen-shop .skin-desc {
+  color: #6a8bab;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Nunito', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  margin-top: 2px;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+#screen-shop .skin-price {
+  color: #e8609a;
+  margin-top: 4px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+#screen-shop .btn-skin-buy,
+#screen-shop .btn-skin-equip,
+#screen-shop .btn-skin-equipped { flex: 0 0 auto; white-space: nowrap; }
+
+@media (max-width: 380px) {
+  #screen-shop .skin-card { padding: 12px; gap: 10px; }
+  #screen-shop .skin-name { font-size: 14px; }
+  #screen-shop .skin-desc { font-size: 10.5px; }
+}
 #screen-shop .shop-coins { color: #e8609a; }
 
 /* Referral light */
