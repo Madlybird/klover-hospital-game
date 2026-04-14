@@ -2419,11 +2419,21 @@ const Game = (() => {
     // Current pair
     if (currentPair) {
       const cells = getPairCells(currentPair);
-      for (const cell of cells) {
+      cells.forEach((cell, i) => {
         if (cell.y >= 0) {
           drawBlob(ctx, cell.x * cellW, cell.y * cellH, cellW, cellH, skinColors[cell.c] || cell.c);
+          // Mark c1 (main pill) with a small white dot so rotation is always visible
+          if (i === 0) {
+            ctx.beginPath();
+            ctx.arc(cell.x * cellW + cellW * 0.5, cell.y * cellH + cellH * 0.5, Math.min(cellW, cellH) * 0.12, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255,255,255,0.85)';
+            ctx.fill();
+            ctx.lineWidth = 1.5;
+            ctx.strokeStyle = 'rgba(0,0,0,0.4)';
+            ctx.stroke();
+          }
         }
-      }
+      });
       // Ghost (drop preview)
       drawGhost(ctx, cellW, cellH, skinColors);
     }
@@ -2647,6 +2657,12 @@ const Game = (() => {
         Audio.rotate();
         if (window.Telegram?.WebApp?.HapticFeedback) {
           Telegram.WebApp.HapticFeedback.selectionChanged();
+        }
+        // Visible flash so each rotation reads on screen
+        if (gameCanvas) {
+          gameCanvas.style.transition = 'box-shadow 0.05s';
+          gameCanvas.style.boxShadow = '0 0 0 3px #e8609a';
+          setTimeout(() => { gameCanvas.style.boxShadow = ''; }, 110);
         }
         return;
       }
