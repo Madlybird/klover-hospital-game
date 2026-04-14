@@ -2127,8 +2127,32 @@ const Sync = (() => {
     } catch { return null; }
   }
 
+  async function saveUserOnce() {
+    if (!enabled) return;
+    const key = 'klover_user_saved_v1';
+    if (sessionStorage.getItem(key)) return;
+    // Parse optional start param for referral
+    let referredBy = null;
+    try {
+      const sp = window.Telegram?.WebApp?.initDataUnsafe?.start_param;
+      if (sp && /^\d+$/.test(sp)) referredBy = Number(sp);
+    } catch {}
+    try {
+      const res = await fetch('/api/save-user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'telegram-init-data': initData,
+        },
+        body: JSON.stringify(referredBy ? { referredBy } : {}),
+      });
+      if (res.ok) sessionStorage.setItem(key, '1');
+    } catch {}
+  }
+
   return {
     enabled,
+    saveUserOnce,
     async fetchRemote() { return call('GET'); },
     queue(patch) {
       if (!enabled) return;
@@ -3138,6 +3162,7 @@ const Game = (() => {
 
   async function hydrateFromRemote() {
     if (!Sync.enabled) return;
+    Sync.saveUserOnce();
     const data = await Sync.fetchRemote();
     if (!data?.user) return;
     const u = data.user;

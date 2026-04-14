@@ -142,6 +142,22 @@ alter table public.users enable row level security;
 - `POST /api/user` body `{ coins?, highScore?, referredBy? }` → upserts.
   `high_score` is always `max(db, client)`; `coins` trust the client
   (capped at 10M) so skin purchases can decrement.
+- `POST /api/save-user` → minimal first-visit capture for future
+  broadcasts. Upserts `telegram_id`, `username`, and (if the columns
+  exist) `first_name`, `last_name`, `language_code`. Called once per
+  session from the client.
+
+### Optional columns for broadcast personalization
+
+```sql
+alter table public.users
+  add column if not exists first_name    varchar(64),
+  add column if not exists last_name     varchar(64),
+  add column if not exists language_code varchar(8);
+```
+
+Not required — `save-user` auto-falls back to the minimal row if these
+columns aren't present.
 
 ## Version
 
