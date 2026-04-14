@@ -401,16 +401,26 @@ html, body {
 
 .hud-lives {
   display: flex;
-  gap: 4px;
+  gap: 3px;
   align-items: center;
+  position: relative;
+  z-index: 30;
 }
 
 .heart-icon {
-  font-size: 20px;
-  filter: drop-shadow(0 0 4px rgba(237,0,140,0.6));
+  font-size: 18px;
+  color: #e8609a;
+  filter: drop-shadow(0 0 4px rgba(232,96,154,0.7));
+  line-height: 1;
 }
 
-.heart-icon.lost { filter: none; opacity: 0.25; }
+.heart-icon.lost { filter: none; opacity: 0.25; color: #6a8bab; }
+
+/* Small screens: keep hearts compact but unmistakable */
+@media (max-width: 380px) {
+  .hud-lives { gap: 2px; }
+  .heart-icon { font-size: 16px; }
+}
 
 .game-area {
   display: flex;
@@ -1301,10 +1311,12 @@ html, body {
 
 /* Screen titles */
 .screen-title {
-  font-family: 'Nunito', sans-serif;
-  font-weight: 900;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Nunito', sans-serif;
+  font-weight: 800;
   color: #3a8fd4;
-  letter-spacing: 2px;
+  letter-spacing: 0.3px;
+  text-transform: none;
+  font-size: 22px;
 }
 
 /* Mai corner character on menu */
@@ -1333,6 +1345,40 @@ html, body {
 .klas-bottom-bar .klas-right {
   color: #e8609a;
   cursor: pointer;
+}
+
+.patient-subtitle {
+  width: 100%;
+  text-align: center;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Nunito', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  color: #6a8bab;
+  margin: -6px 0 8px;
+  letter-spacing: 0.2px;
+}
+.patient-priority {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  color: #c04080;
+  background: #fff0f5;
+  border-left: 3px solid #e8609a;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin: 4px 0 6px;
+  letter-spacing: 0.4px;
+}
+.patient-locked-note {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Nunito', sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  color: #6a8bab;
+  background: #eef5fc;
+  border-left: 3px solid #b8d4f0;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin: 4px 0 6px;
 }
 
 /* Patient ID card */
@@ -1431,8 +1477,9 @@ html, body {
 /* Shop light */
 #screen-shop .skin-card { background: #fff; border-color: #b8d4f0; color: #1a2a4a; }
 #screen-shop .skin-card.equipped { border-color: #e8609a; background: #fff5fa; }
-#screen-shop .skin-name { color: #1a2a4a; font-family: 'Nunito', sans-serif; }
-#screen-shop .skin-price { color: #e8609a; }
+#screen-shop .skin-name { color: #1a2a4a; font-family: 'Nunito', sans-serif; font-size: 16px; letter-spacing: 0.5px; text-transform: none; }
+#screen-shop .skin-desc { color: #6a8bab; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500; margin-top: 2px; line-height: 1.25; }
+#screen-shop .skin-price { color: #e8609a; margin-top: 4px; }
 #screen-shop .shop-coins { color: #e8609a; }
 
 /* Referral light */
@@ -1718,7 +1765,7 @@ html, body {
   <div id="screen-howto" class="screen">
     <div class="howto-header">
       <button class="btn-back" onclick="Game.showScreen('menu')">&#8592;</button>
-      <div class="screen-title">HOW TO PLAY</div>
+      <div class="screen-title">Nurse Mai's Treatment Guide</div>
     </div>
     <div class="slide-area">
       <div class="slide-text" id="slide-text">Blobs fall from above. Move them left and right!</div>
@@ -1739,8 +1786,9 @@ html, body {
   <div id="screen-levels" class="screen">
     <div class="howto-header">
       <button class="btn-back" onclick="Game.showScreen('menu')">&#8592;</button>
-      <div class="screen-title">&#9829; PLEASE PICK A PATIENT...</div>
+      <div class="screen-title">Patient assignment</div>
     </div>
+    <div class="patient-subtitle">Select your patient for today's treatment:</div>
     <div class="levels-grid">
       <div class="level-card" id="level-card-1" onclick="Game.startLevel(1)">
         <div class="patient-photo">
@@ -1761,13 +1809,13 @@ html, body {
         <div class="patient-info">
           <div class="id-card-label">ID CARD</div>
           <div class="level-card-name">MAI</div>
-          <div class="patient-meta-row">NAME <b>_______</b></div>
+          <div class="patient-priority">PRIORITY PATIENT &middot; Requires immediate care</div>
           <div class="patient-meta-row">DIFFICULTY <b>&bull;</b></div>
           <div class="patient-meta-row">KLASS_ID <b>0900009</b></div>
         </div>
         <div class="patient-actions">
-          <button class="btn-proceed" onclick="event.stopPropagation();Game.startLevel(1)">PROCEED</button>
-          <button class="btn-decline" onclick="event.stopPropagation();Game.showScreen('menu')">DECLINE</button>
+          <button class="btn-proceed" onclick="event.stopPropagation();Game.startLevel(1)">Begin treatment</button>
+          <button class="btn-decline" onclick="event.stopPropagation();Game.showScreen('menu')">Review case</button>
         </div>
       </div>
       <div class="level-card locked" id="level-card-2" onclick="Game.startLevel(2)">
@@ -1780,8 +1828,8 @@ html, body {
         </div>
         <div class="patient-info">
           <div class="id-card-label">ID CARD</div>
-          <div class="level-card-name">???</div>
-          <div class="patient-meta-row">NAME <b>_______</b></div>
+          <div class="level-card-name">CLASSIFIED</div>
+          <div class="patient-locked-note">PATIENT FILE LOCKED &middot; Complete previous treatments</div>
           <div class="patient-meta-row">DIFFICULTY <b>&bull;&bull;&bull;</b></div>
           <div class="patient-meta-row">KLASS_ID <b>0900010</b></div>
         </div>
@@ -1796,12 +1844,12 @@ html, body {
   <div id="screen-game" class="screen">
     <div class="game-hud">
       <div class="hud-score">
-        <div class="hud-label">SCORE</div>
+        <div class="hud-label">VITALS</div>
         <div class="hud-value" id="hud-score">0</div>
       </div>
       <div class="hud-center">
         <div class="hud-level-name" id="hud-level-name">MAI</div>
-        <div class="hud-target" id="hud-target">TARGET: 5,000</div>
+        <div class="hud-target" id="hud-target">RECOVERY: 5,000</div>
         <div style="display:flex;gap:4px;margin-top:3px;">
           <span class="stat-pill psy">PSY &#9829;5/5</span>
           <span class="stat-pill int">INT +5/5</span>
@@ -1815,7 +1863,7 @@ html, body {
     <div class="game-area" id="game-area">
       <canvas id="game-canvas" width="252" height="504"></canvas>
       <div class="game-sidebar">
-        <div class="next-label">NEXT</div>
+        <div class="next-label">NEXT DOSE</div>
         <canvas id="next-canvas" width="60" height="72"></canvas>
         <div class="combo-display" id="combo-display"></div>
         <div class="rot-buttons">
@@ -1850,7 +1898,7 @@ html, body {
   <div id="screen-referral" class="screen">
     <div class="referral-top">
       <button class="btn-back" onclick="Game.showScreen('menu')">&#8592;</button>
-      <div class="screen-title">REFERRALS</div>
+      <div class="screen-title">Patient records</div>
       <div style="width:40px;"></div>
     </div>
     <div class="referral-stats">
@@ -1878,7 +1926,7 @@ html, body {
   <div id="screen-settings" class="screen">
     <div class="howto-header">
       <button class="btn-back" onclick="Game.showScreen('menu')">&#8592;</button>
-      <div class="screen-title">SETTINGS</div>
+      <div class="screen-title">Settings</div>
     </div>
     <div class="settings-list">
       <div class="settings-row">
@@ -1915,7 +1963,7 @@ html, body {
   <div id="screen-shop" class="screen">
     <div class="howto-header">
       <button class="btn-back" onclick="Game.showScreen('menu')">&#8592;</button>
-      <div class="screen-title">PILL SHOP</div>
+      <div class="screen-title">Medicine cabinet</div>
     </div>
     <div class="shop-coins">
       <span class="coin-icon" style="width:20px;height:20px;"></span>
@@ -2001,10 +2049,10 @@ const LEVELS = [
 ];
 
 const SKINS = [
-  { id:'default', name:'DEFAULT',  price:0,    blobs:['#e8609a','#4a8fd4','#2aaa88','#f0c030','#9060cc'] },
-  { id:'neon',    name:'NEON',     price:1000, blobs:['#FF00FF','#00FFFF','#00FF80','#FFFF00','#FF6600'] },
-  { id:'pastel',  name:'PASTEL',   price:2000, blobs:['#FFB3D9','#B3D9FF','#FFE5B3','#D9FFB3','#E5B3FF'] },
-  { id:'mono',    name:'MONO',     price:3000, blobs:['#FFFFFF','#CCCCCC','#999999','#666666','#333333'] },
+  { id:'default', name:'STANDARD ISSUE', desc:'Hospital-grade capsules. Safe for all patients.', price:0,    blobs:['#e8609a','#4a8fd4','#2aaa88','#f0c030','#9060cc'] },
+  { id:'neon',    name:'ER STIMULANTS',  desc:'High-intensity formula. Emergency room only.', price:1000, blobs:['#FF00FF','#00FFFF','#00FF80','#FFFF00','#FF6600'] },
+  { id:'pastel',  name:'PEDIATRIC MILD', desc:'Gentle dosage for sensitive patients.',       price:2000, blobs:['#FFB3D9','#B3D9FF','#FFE5B3','#D9FFB3','#E5B3FF'] },
+  { id:'mono',    name:'PLACEBO SET',    desc:'For clinical trials. Effect may vary.',       price:3000, blobs:['#FFFFFF','#CCCCCC','#999999','#666666','#333333'] },
 ];
 
 // ============================================================
@@ -2531,7 +2579,7 @@ const Game = (() => {
     updateBombUI();
 
     document.getElementById('hud-level-name').textContent = lvl.name;
-    document.getElementById('hud-target').textContent = 'TARGET: ' + lvl.target.toLocaleString();
+    document.getElementById('hud-target').textContent = 'RECOVERY: ' + lvl.target.toLocaleString();
     updateHUD();
 
     showScreen('game');
@@ -2879,7 +2927,7 @@ const Game = (() => {
     }
     const comboEl = document.getElementById('combo-display');
     if (combo > 1) {
-      comboEl.textContent = 'COMBO x' + combo;
+      comboEl.textContent = 'CHAIN x' + combo;
     }
   }
 
@@ -3583,6 +3631,7 @@ const Game = (() => {
       const info = document.createElement('div');
       info.className = 'skin-info';
       info.innerHTML = `<div class="skin-name">${skin.name}</div>
+        ${skin.desc ? `<div class="skin-desc">${skin.desc}</div>` : ''}
         <div class="skin-price">${skin.id === 'default' ? 'FREE' : skin.price.toLocaleString() + ' coins'}</div>`;
 
       let actionBtn;
