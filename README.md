@@ -156,6 +156,39 @@ alter table public.users
   add column if not exists language_code varchar(8);
 ```
 
+### Bot welcome webhook
+
+`api/telegram-webhook.js` replies to `/start [id]` with the Klover Hospital
+preview photo + a `Start treatment` Mini App button. The referral id is
+forwarded to the Mini App as `?startapp=<id>` so `Game.detectReferral()`
+credits the referrer on the next Level 1 completion.
+
+Env vars it uses (Vercel):
+
+| Name | Value |
+|---|---|
+| `TELEGRAM_BOT_TOKEN` | already set (also used by `/api/user`) |
+| `PUBLIC_URL` | `https://<your-vercel-domain>` — sets the photo + Mini App URLs. Optional; falls back to the request host. |
+| `TELEGRAM_WEBHOOK_SECRET` | optional. If set, `setWebhook` must use the same value as `secret_token`. |
+
+Preview image: add `assets/preview.png` (portrait PNG, ~1024×1024 or 16:9)
+to the repo. If the file is missing, the handler falls back to a plain
+`sendMessage`.
+
+Point Telegram at the webhook once, replacing `<TOKEN>` and `<HOST>`:
+
+```
+curl -X POST "https://api.telegram.org/bot<TOKEN>/setWebhook" \
+  -d url=https://<HOST>/api/telegram-webhook \
+  -d secret_token=<same value as TELEGRAM_WEBHOOK_SECRET, optional>
+```
+
+Sanity check (browser or curl):
+
+```
+GET https://<HOST>/api/telegram-webhook  →  { ok: true, tokenSet: true, publicUrl: "..." }
+```
+
 ### Required column for referral crediting
 
 `/api/referral-complete` needs a boolean flag so the +500 bonus fires
