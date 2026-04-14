@@ -156,6 +156,16 @@ alter table public.users
   add column if not exists language_code varchar(8);
 ```
 
+### Required column for referral crediting
+
+`/api/referral-complete` needs a boolean flag so the +500 bonus fires
+at most once per referred player:
+
+```sql
+alter table public.users
+  add column if not exists level1_complete boolean default false;
+```
+
 Not required — `save-user` auto-falls back to the minimal row if these
 columns aren't present.
 

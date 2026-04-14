@@ -1252,25 +1252,31 @@ html, body {
 .medical-cross::before { left: 9px; top: 3px; width: 4px; height: 16px; }
 .medical-cross::after { top: 9px; left: 3px; height: 4px; width: 16px; }
 
-/* Buttons: blue w/ white text */
+/* Buttons: blue w/ white text, sentence-case hospital dialogue */
 .btn-primary {
   background: #5b9de8;
   color: #fff;
   font-family: 'Nunito', sans-serif;
-  font-weight: 800;
+  font-weight: 700;
+  font-size: 16px;
   border: 2px solid #3a8fd4;
   box-shadow: 0 4px 14px rgba(91,157,232,0.35);
   border-radius: 14px;
-  letter-spacing: 1.5px;
+  letter-spacing: 0.3px;
+  text-transform: none;
+  padding: 14px 16px;
 }
 .btn-secondary {
   background: #fff;
   color: #3a8fd4;
   font-family: 'Nunito', sans-serif;
-  font-weight: 800;
+  font-weight: 600;
+  font-size: 15px;
   border: 2px solid #5b9de8;
   border-radius: 14px;
-  letter-spacing: 1.5px;
+  letter-spacing: 0.3px;
+  text-transform: none;
+  padding: 12px 16px;
 }
 .btn-secondary:active { background: #e8f4ff; }
 .btn-slide-next, .btn-lets-play {
@@ -1694,11 +1700,11 @@ html, body {
     </div>
 
     <div class="menu-buttons">
-      <button class="btn-primary" onclick="Game.goToLevels()">&#9829; PLAY</button>
-      <button class="btn-secondary" onclick="Game.showScreen('howto')">? HOW TO PLAY</button>
-      <button class="btn-secondary" onclick="Game.showScreen('referral')">&#9825; REFERRALS</button>
-      <button class="btn-secondary" onclick="Game.showScreen('shop')">&#8853; PILL SHOP</button>
-      <button class="btn-secondary" onclick="Game.showScreen('settings')">&#9881; SETTINGS</button>
+      <button class="btn-primary" onclick="Game.goToLevels()">Ready for your treatment?</button>
+      <button class="btn-secondary" onclick="Game.showScreen('howto')">How to take your medicine</button>
+      <button class="btn-secondary" onclick="Game.showScreen('referral')">Patient records</button>
+      <button class="btn-secondary" onclick="Game.showScreen('shop')">Medicine cabinet</button>
+      <button class="btn-secondary" onclick="Game.showScreen('settings')">Settings</button>
     </div>
 
     <div class="klas-bottom-bar">
@@ -1865,7 +1871,7 @@ html, body {
       <button class="btn-primary" onclick="Game.inviteFriend()">INVITE FRIEND</button>
       <button class="btn-secondary" onclick="Game.showScreen('menu')">BACK TO MENU</button>
     </div>
-    <div class="referral-reward-note">+500 coins per friend who completes Level 1</div>
+    <div class="referral-reward-note">+500 coins when a friend completes Level 1</div>
   </div>
 
   <!-- SETTINGS -->
@@ -3022,6 +3028,9 @@ const Game = (() => {
       if (window.Telegram?.WebApp?.HapticFeedback) {
         Telegram.WebApp.HapticFeedback.impactOccurred('light');
       }
+      if (navigator.vibrate) {
+        try { navigator.vibrate(200); } catch {}
+      }
     });
   }
 
@@ -3242,11 +3251,22 @@ const Game = (() => {
     stopGame();
     Audio.levelUp();
 
+    const firstLevel1 = (currentLevel === 1 && !state.level1complete);
     if (currentLevel === 1) {
       state.level1complete = true;
       LEVELS[1].unlocked = true;
     } else if (currentLevel === 2) {
       state.level2complete = true;
+    }
+    if (firstLevel1) {
+      // Fire-and-forget: server flags the user and credits referrer +500.
+      fetch('/api/referral-complete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'telegram-init-data': window.Telegram?.WebApp?.initData || '',
+        },
+      }).then(r => r.json()).then(d => console.log('[referral]', d)).catch(() => {});
     }
 
     state.coins += Math.floor(score / 100);
