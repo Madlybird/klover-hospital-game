@@ -2275,10 +2275,12 @@ const Game = (() => {
     lastTime = now;
 
     if (!paused) {
-      fallTimer += dt;
-      if (fallTimer >= fallSpeed) {
-        fallTimer = 0;
-        dropStep();
+      if (currentPair) {
+        fallTimer += dt;
+        if (fallTimer >= fallSpeed) {
+          fallTimer = 0;
+          dropStep();
+        }
       }
       render();
     }
@@ -2313,6 +2315,7 @@ const Game = (() => {
 
   // ---- DROP STEP ----
   function dropStep() {
+    if (!currentPair) return;
     const moved = { ...currentPair, y: currentPair.y + 1 };
     if (isValidPosition(moved)) {
       currentPair = moved;
@@ -2322,15 +2325,23 @@ const Game = (() => {
   }
 
   function placePair() {
+    if (!currentPair) return;
     const cells = getPairCells(currentPair);
+    // Game over check — any cell above the board means stack overflow
     for (const cell of cells) {
       if (cell.y < 0) {
-        // Game over — blob at top
+        currentPair = null;
         triggerGameOver();
         return;
       }
+    }
+    for (const cell of cells) {
       grid[cell.y][cell.x] = cell.c;
     }
+    // Clear the pair BEFORE the deferred chain resolution so the
+    // game loop and any input cannot place/move it again.
+    currentPair = null;
+    fallTimer = 0;
     Audio.land();
     applyGravity();
     processMatches();
@@ -2679,6 +2690,7 @@ const Game = (() => {
   }
 
   function movePair(dir) {
+    if (!currentPair) return;
     const moved = { ...currentPair, x: currentPair.x + dir };
     if (isValidPosition(moved)) {
       currentPair = moved;
@@ -2690,6 +2702,7 @@ const Game = (() => {
   }
 
   function rotatePair(dir = 1) {
+    if (!currentPair) return;
     const delta = dir < 0 ? 3 : 1;
     const rotated = { ...currentPair, rotation: (currentPair.rotation + delta) % 4 };
     const kicks = [
@@ -2719,13 +2732,13 @@ const Game = (() => {
   }
 
   function hardDrop() {
+    if (!currentPair) return;
     while (true) {
       const moved = { ...currentPair, y: currentPair.y + 1 };
       if (isValidPosition(moved)) currentPair = moved;
       else break;
     }
-    fallTimer = fallSpeed; // force immediate place
-    dropStep();
+    placePair();
   }
 
   // ---- GAME EVENTS ----
