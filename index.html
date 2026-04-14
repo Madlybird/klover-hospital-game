@@ -1712,7 +1712,48 @@ html, body {
   -webkit-user-select: none;
   -webkit-touch-callout: none;
 }
-.bomb-btn .bomb-icon { font-size: 22px; line-height: 1; }
+/* Pure-CSS bomb icon — matches the round-pill visual language */
+.bomb-btn .bomb-icon {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  margin-top: 4px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 30%, #ffb6b6 0%, #ff6b6b 45%, #c8102e 100%);
+  border: 2px solid #7a0d1e;
+  box-shadow: inset -2px -2px 3px rgba(0,0,0,0.35), 0 2px 4px rgba(0,0,0,0.25);
+}
+/* Fuse */
+.bomb-btn .bomb-icon::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -7px;
+  transform: translateX(-50%) rotate(-12deg);
+  width: 3px;
+  height: 8px;
+  background: linear-gradient(to bottom, #8BC34A, #558b2f);
+  border-radius: 2px;
+  box-shadow: 0 0 4px rgba(255,180,40,0.9);
+}
+/* Spark at the tip */
+.bomb-btn .bomb-icon::after {
+  content: "";
+  position: absolute;
+  left: calc(50% + 1px);
+  top: -10px;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  background: radial-gradient(circle, #fff 0%, #ffd166 60%, transparent 70%);
+  border-radius: 50%;
+  animation: bombSpark 0.6s ease-in-out infinite alternate;
+}
+@keyframes bombSpark {
+  from { opacity: 0.6; transform: translateX(-50%) scale(0.85); }
+  to   { opacity: 1;   transform: translateX(-50%) scale(1.15); }
+}
+.bomb-btn.empty .bomb-icon::after { animation: none; opacity: 0.4; }
 .bomb-btn .bomb-count { font-size: 12px; opacity: 0.9; }
 .bomb-btn.holding { animation: bombShake 0.18s linear infinite; }
 .bomb-btn.empty { opacity: 0.4; cursor: not-allowed; filter: grayscale(0.6); }
@@ -2019,7 +2060,7 @@ html, body {
           <button class="rot-btn" id="rot-cw"  onclick="Game.rotateCW()"  aria-label="Rotate right">&#8635;</button>
         </div>
         <button id="bombButton" class="bomb-btn" aria-label="Hold to use bomb">
-          <span class="bomb-icon">&#128163;</span>
+          <span class="bomb-icon" aria-hidden="true"></span>
           <span class="bomb-label">BOMB</span>
           <span class="bomb-count" id="bomb-count">x1</span>
           <span class="bomb-progress" id="bomb-progress"></span>
