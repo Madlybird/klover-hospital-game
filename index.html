@@ -2193,9 +2193,9 @@ html, body {
 // t.me/<bot>/<short>?startapp=... fails.
 // ------------------------------------------------------------------
 const BOT_USERNAME = 'kloverl_bot';
-const APP_SHORT_NAME = 'game';
+const BOT_URL = `https://t.me/${BOT_USERNAME}?start=`;
 function buildReferralLink(userId) {
-  const link = `https://t.me/${BOT_USERNAME}/${APP_SHORT_NAME}?startapp=${userId}`;
+  const link = BOT_URL + userId;
   console.log('[referral] generated link =', link);
   return link;
 }
