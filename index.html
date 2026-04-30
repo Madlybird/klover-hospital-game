@@ -1888,6 +1888,103 @@ html, body {
 .preview-price-row.free { background: #e8f4ff; border-color: #5b9de8; color: #3a8fd4; }
 .preview-price-row .coin-icon { background: #f0c030; box-shadow: 0 0 6px #f0c030; width: 14px; height: 14px; }
 
+/* Level 2 character logo under the title */
+.level-card-character {
+  display: block;
+  margin: 6px auto 8px;
+  width: 84px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(58,143,212,0.35));
+  animation: lvl2charFloat 2.6s ease-in-out infinite;
+}
+@keyframes lvl2charFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-3px); }
+}
+
+/* Storyline-unlock overlay for Level 2 completion.
+   Inherits .overlay base (flex centring, opacity transition). */
+.storyline-overlay {
+  z-index: 200;
+  background: radial-gradient(circle at center, rgba(232,96,154,0.35), rgba(10,26,58,0.75) 70%);
+}
+.storyline-card {
+  position: relative;
+  background: linear-gradient(160deg, #ffffff 0%, #fff0f5 100%);
+  border: 3px solid #e8609a;
+  border-radius: 22px;
+  padding: 28px 36px;
+  text-align: center;
+  box-shadow: 0 14px 40px rgba(232,96,154,0.5), 0 0 0 6px rgba(255,255,255,0.06);
+  max-width: 320px;
+  animation: storylinePop 0.55s cubic-bezier(.34,1.56,.64,1);
+}
+.storyline-spark {
+  position: absolute;
+  inset: -20px;
+  border-radius: 30px;
+  background: conic-gradient(from 0deg, transparent, rgba(240,192,48,0.6), transparent 30%, rgba(232,96,154,0.6), transparent 60%, rgba(91,157,232,0.6), transparent 90%);
+  filter: blur(14px);
+  z-index: -1;
+  animation: storylineSpin 3s linear infinite;
+}
+.storyline-title {
+  font-family: 'Nunito', sans-serif;
+  font-size: 30px;
+  font-weight: 900;
+  color: #e8609a;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.storyline-text {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a2a4a;
+  line-height: 1.35;
+}
+@keyframes storylineFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes storylinePop {
+  0%   { transform: scale(0.4) rotate(-6deg); opacity: 0; }
+  60%  { transform: scale(1.06) rotate(2deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+@keyframes storylineSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* Falling pills emitted on main-character tap */
+.falling-pill {
+  position: fixed;
+  width: 22px;
+  height: 30px;
+  border-radius: 999px;
+  pointer-events: none;
+  z-index: 150;
+  box-shadow: inset -3px -4px 0 rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.18);
+  animation: pillFall 1.4s cubic-bezier(.5,.05,.7,1) forwards;
+  will-change: transform, opacity;
+}
+.falling-pill::after {
+  content: '';
+  position: absolute;
+  top: 4px; left: 5px;
+  width: 8px; height: 8px;
+  background: rgba(255,255,255,0.55);
+  border-radius: 50%;
+  filter: blur(0.5px);
+}
+@keyframes pillFall {
+  0%   { transform: translate(0, -40px) rotate(0deg); opacity: 0; }
+  10%  { opacity: 1; }
+  85%  { opacity: 1; }
+  100% { transform: translate(var(--pill-dx, 0), var(--pill-dy, 320px)) rotate(var(--pill-rot, 540deg)); opacity: 0; }
+}
+
 .bomb-explosion {
   position: absolute;
   pointer-events: none;
@@ -1944,20 +2041,20 @@ html, body {
         <span class="logo-rik">KLOVER HOSPITAL</span>
         <span class="medical-cross"></span>
       </div>
-      <div class="logo-tagline">PILL PUZZLE GAME</div>
+      <div class="logo-tagline" data-i18n="tagline">PILL PUZZLE GAME</div>
     </div>
 
     <div class="menu-buttons">
-      <button class="btn-primary" onclick="Game.goToLevels()">Ready for your treatment?</button>
-      <button class="btn-secondary" onclick="Game.showScreen('howto')">How to take your medicine</button>
-      <button class="btn-secondary" onclick="Game.showScreen('referral')">Patient records</button>
-      <button class="btn-secondary" onclick="Game.showScreen('shop')">Medicine cabinet</button>
-      <button class="btn-secondary" onclick="Game.showScreen('settings')">Settings</button>
+      <button class="btn-primary" onclick="Game.goToLevels()" data-i18n="menu_play">Ready for your treatment?</button>
+      <button class="btn-secondary" onclick="Game.showScreen('howto')" data-i18n="menu_howto">How to take your medicine</button>
+      <button class="btn-secondary" onclick="Game.showScreen('referral')" data-i18n="menu_referral">Patient records</button>
+      <button class="btn-secondary" onclick="Game.showScreen('shop')" data-i18n="menu_shop">Medicine cabinet</button>
+      <button class="btn-secondary" onclick="Game.showScreen('settings')" data-i18n="menu_settings">Settings</button>
     </div>
 
     <div class="klas-bottom-bar">
       <span>KLAS SYSTEM v2.0</span>
-      <span class="klas-right" onclick="Game.toggleTonConnect()">&#9673; CONNECT</span>
+      <span class="klas-right" onclick="Game.toggleTonConnect()" data-i18n="connect">&#9673; CONNECT</span>
     </div>
 
   </div>
@@ -1966,7 +2063,7 @@ html, body {
   <div id="screen-howto" class="screen">
     <div class="howto-header">
       <button class="btn-back" onclick="Game.showScreen('menu')">&#8592;</button>
-      <div class="screen-title howto-title">Nurse Mai's treatment guide</div>
+      <div class="screen-title howto-title" data-i18n="howto_title">Nurse Mai's treatment guide</div>
     </div>
     <div class="slide-area">
       <div class="slide-text" id="slide-text">Nurse Mai's treatment guide.</div>
@@ -1987,9 +2084,9 @@ html, body {
   <div id="screen-levels" class="screen">
     <div class="howto-header">
       <button class="btn-back" onclick="Game.showScreen('menu')">&#8592;</button>
-      <div class="screen-title">Patient assignment</div>
+      <div class="screen-title" data-i18n="levels_title">Patient assignment</div>
     </div>
-    <div class="patient-subtitle">Select your patient for today's treatment:</div>
+    <div class="patient-subtitle" data-i18n="levels_subtitle">Select your patient for today's treatment:</div>
     <div class="levels-grid">
       <div class="level-card" id="level-card-1" onclick="Game.startLevel(1)">
         <div class="patient-photo">
@@ -1998,17 +2095,17 @@ html, body {
         <div class="patient-info">
           <div class="id-card-label">ID CARD</div>
           <div class="level-card-name">MAI</div>
-          <div class="patient-priority">PRIORITY PATIENT &middot; Requires immediate care</div>
-          <div class="patient-meta-row">DIFFICULTY <b>&bull;</b></div>
+          <div class="patient-priority" data-i18n="lvl1_priority">PRIORITY PATIENT &middot; Requires immediate care</div>
+          <div class="patient-meta-row" data-i18n-prefix="difficulty">DIFFICULTY <b>&bull;</b></div>
           <div class="patient-meta-row">KLASS_ID <b>0900009</b></div>
         </div>
         <div class="patient-actions">
-          <button class="btn-proceed" onclick="event.stopPropagation();Game.startLevel(1)">Begin treatment</button>
-          <button class="btn-decline" onclick="event.stopPropagation();Game.showScreen('menu')">Review case</button>
+          <button class="btn-proceed" onclick="event.stopPropagation();Game.startLevel(1)" data-i18n="begin_treatment">Begin treatment</button>
+          <button class="btn-decline" onclick="event.stopPropagation();Game.showScreen('menu')" data-i18n="review_case">Review case</button>
         </div>
       </div>
       <div class="level-card locked" id="level-card-2" onclick="Game.startLevel(2)">
-        <div class="patient-photo" style="opacity:0.5">
+        <div class="patient-photo" id="level2-photo" style="opacity:0.5">
           <svg viewBox="0 0 60 72" width="52" height="62">
             <ellipse cx="30" cy="25" rx="20" ry="18" fill="#b8b8b8" stroke="#808080" stroke-width="2"/>
             <ellipse cx="30" cy="30" rx="13" ry="12" fill="#e0e0e0"/>
@@ -2017,13 +2114,14 @@ html, body {
         </div>
         <div class="patient-info">
           <div class="id-card-label">ID CARD</div>
-          <div class="level-card-name">CLASSIFIED</div>
-          <div class="patient-locked-note">PATIENT FILE LOCKED &middot; Complete previous treatments</div>
+          <div class="level-card-name" id="level2-name" data-i18n="lvl2_name_locked">CLASSIFIED</div>
+          <img id="level2-character" class="level-card-character" src="assets/character/image 268.png" alt="Ward 2" style="display:none;">
+          <div class="patient-locked-note" id="level2-note" data-i18n="lvl2_locked_note">PATIENT FILE LOCKED &middot; Complete previous treatments</div>
           <div class="patient-meta-row">DIFFICULTY <b>&bull;&bull;&bull;</b></div>
           <div class="patient-meta-row">KLASS_ID <b>0900010</b></div>
         </div>
         <div class="patient-actions">
-          <div class="level-card-badge badge-locked" id="level-badge-2">&#128274; LOCKED</div>
+          <div class="level-card-badge badge-locked" id="level-badge-2" data-i18n="locked">&#128274; LOCKED</div>
         </div>
       </div>
     </div>
@@ -2033,7 +2131,7 @@ html, body {
   <div id="screen-game" class="screen">
     <div class="game-hud">
       <div class="hud-score">
-        <div class="hud-label">VITALS</div>
+        <div class="hud-label" data-i18n="hud_vitals">VITALS</div>
         <div class="hud-value" id="hud-score">0</div>
       </div>
       <div class="hud-center">
@@ -2052,7 +2150,7 @@ html, body {
     <div class="game-area" id="game-area">
       <canvas id="game-canvas" width="252" height="504"></canvas>
       <div class="game-sidebar">
-        <div class="next-label">NEXT DOSE</div>
+        <div class="next-label" data-i18n="next_dose">NEXT DOSE</div>
         <canvas id="next-canvas" width="60" height="72"></canvas>
         <div class="combo-display" id="combo-display"></div>
         <div class="rot-buttons">
@@ -2061,11 +2159,11 @@ html, body {
         </div>
         <button id="bombButton" class="bomb-btn" aria-label="Hold to use bomb">
           <span class="bomb-icon" aria-hidden="true"></span>
-          <span class="bomb-label">BOMB</span>
+          <span class="bomb-label" data-i18n="bomb">BOMB</span>
           <span class="bomb-count" id="bomb-count">x1</span>
           <span class="bomb-progress" id="bomb-progress"></span>
         </button>
-        <div class="fact-card"><b>!! FACT</b>Match 4+ same pills to clear them.</div>
+        <div class="fact-card"><b data-i18n="fact_label">!! FACT</b><span data-i18n="fact_text">Match 4+ same pills to clear them.</span></div>
         <img class="sidebar-mai" src="assets/character/new.png" alt="Mai">
       </div>
     </div>
@@ -2075,41 +2173,41 @@ html, body {
   <div id="screen-referral" class="screen">
     <div class="referral-top">
       <button class="btn-back" onclick="Game.showScreen('menu')">&#8592;</button>
-      <div class="screen-title">Patient records</div>
+      <div class="screen-title" data-i18n="menu_referral">Patient records</div>
       <div style="width:40px;"></div>
     </div>
     <div class="referral-stats">
       <div class="stat-box">
         <span class="stat-value" id="ref-friends">0</span>
-        <span class="stat-label">Friends</span>
+        <span class="stat-label" data-i18n="ref_friends">Friends</span>
       </div>
       <div class="stat-box">
         <span class="stat-value" id="ref-coins">0</span>
-        <span class="stat-label">Coins Earned</span>
+        <span class="stat-label" data-i18n="ref_coins">Coins Earned</span>
       </div>
     </div>
     <div class="referral-link-box">
       <div class="referral-link-text" id="referral-link-text">Loading...</div>
-      <button class="btn-copy" onclick="Game.copyReferralLink()">COPY</button>
+      <button class="btn-copy" onclick="Game.copyReferralLink()" data-i18n="copy">COPY</button>
     </div>
     <div class="referral-buttons">
-      <button class="btn-primary" onclick="Game.inviteFriend()">INVITE FRIEND</button>
-      <button class="btn-secondary" onclick="Game.showScreen('menu')">BACK TO MENU</button>
+      <button class="btn-primary" onclick="Game.inviteFriend()" data-i18n="invite_friend">INVITE FRIEND</button>
+      <button class="btn-secondary" onclick="Game.showScreen('menu')" data-i18n="back_to_menu">BACK TO MENU</button>
     </div>
-    <div class="referral-reward-note">+500 coins when a friend completes Level 1</div>
+    <div class="referral-reward-note" data-i18n="ref_reward_note">+500 coins when a friend completes Level 1</div>
   </div>
 
   <!-- SETTINGS -->
   <div id="screen-settings" class="screen">
     <div class="howto-header">
       <button class="btn-back" onclick="Game.showScreen('menu')">&#8592;</button>
-      <div class="screen-title">Settings</div>
+      <div class="screen-title" data-i18n="menu_settings">Settings</div>
     </div>
     <div class="settings-list">
       <div class="settings-row">
         <div>
-          <div class="settings-row-label">Sound Effects</div>
-          <div class="settings-row-sub">Game sounds and music</div>
+          <div class="settings-row-label" data-i18n="sound_label">Sound Effects</div>
+          <div class="settings-row-sub" data-i18n="sound_sub">Game sounds and music</div>
         </div>
         <label class="toggle">
           <input type="checkbox" id="sound-toggle" checked onchange="Game.toggleSound(this.checked)">
@@ -2118,7 +2216,7 @@ html, body {
       </div>
       <div class="settings-row">
         <div>
-          <div class="settings-row-label">Language</div>
+          <div class="settings-row-label" data-i18n="language">Language</div>
         </div>
         <div class="lang-toggle">
           <button class="lang-btn active" id="lang-en" onclick="Game.setLang('en')">EN</button>
@@ -2127,10 +2225,10 @@ html, body {
       </div>
       <div class="settings-row">
         <div>
-          <div class="settings-row-label">TON Wallet</div>
-          <div class="settings-row-sub" id="wallet-sub">Not connected</div>
+          <div class="settings-row-label" data-i18n="ton_wallet">TON Wallet</div>
+          <div class="settings-row-sub" id="wallet-sub" data-i18n="not_connected">Not connected</div>
         </div>
-        <button class="ton-btn-small" id="settings-ton-btn" onclick="Game.toggleTonConnect()">CONNECT</button>
+        <button class="ton-btn-small" id="settings-ton-btn" onclick="Game.toggleTonConnect()" data-i18n="connect_short">CONNECT</button>
       </div>
     </div>
     <div class="settings-version">KLAS SYSTEM v2.0 &nbsp;|&nbsp; KLOVER HOSPITAL</div>
@@ -2140,11 +2238,11 @@ html, body {
   <div id="screen-shop" class="screen">
     <div class="howto-header">
       <button class="btn-back" onclick="Game.showScreen('menu')">&#8592;</button>
-      <div class="screen-title">Medicine cabinet</div>
+      <div class="screen-title" data-i18n="menu_shop">Medicine cabinet</div>
     </div>
     <div class="shop-coins">
       <span class="coin-icon" style="width:20px;height:20px;"></span>
-      <span id="shop-coins">0</span> coins
+      <span id="shop-coins">0</span> <span data-i18n="coins">coins</span>
     </div>
     <div class="shop-grid" id="shop-grid"></div>
   </div>
@@ -2154,10 +2252,10 @@ html, body {
   <!-- Pause -->
   <div class="overlay" id="overlay-pause">
     <div class="modal">
-      <div class="modal-title">PAUSED</div>
+      <div class="modal-title" data-i18n="paused">PAUSED</div>
       <div class="modal-buttons">
-        <button class="btn-primary" onclick="Game.resumeGame()">RESUME</button>
-        <button class="btn-secondary" onclick="Game.quitToMenu()">QUIT TO MENU</button>
+        <button class="btn-primary" onclick="Game.resumeGame()" data-i18n="resume">RESUME</button>
+        <button class="btn-secondary" onclick="Game.quitToMenu()" data-i18n="quit_to_menu">QUIT TO MENU</button>
       </div>
     </div>
   </div>
@@ -2166,24 +2264,33 @@ html, body {
   <div class="overlay" id="overlay-complete">
     <div class="modal">
       <div class="fireworks" id="fireworks-container"></div>
-      <div class="modal-title">LEVEL COMPLETE!</div>
+      <div class="modal-title" data-i18n="level_complete">LEVEL COMPLETE!</div>
       <div class="modal-score" id="complete-score">Score: 0</div>
       <div class="modal-buttons">
-        <button class="btn-primary" id="btn-next-level" onclick="Game.nextLevel()">NEXT LEVEL</button>
-        <button class="btn-secondary" onclick="Game.shareResult()">SHARE RESULT</button>
+        <button class="btn-primary" id="btn-next-level" onclick="Game.nextLevel()" data-i18n="next_level">NEXT LEVEL</button>
+        <button class="btn-secondary" onclick="Game.shareResult()" data-i18n="share_result">SHARE RESULT</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Storyline Unlock (Level 2 finish) -->
+  <div class="overlay storyline-overlay" id="overlay-storyline">
+    <div class="storyline-card">
+      <div class="storyline-spark"></div>
+      <div class="storyline-title" data-i18n="storyline_title">Congrats!</div>
+      <div class="storyline-text" data-i18n="storyline_text">New storyline about to unlock!</div>
     </div>
   </div>
 
   <!-- Game Over -->
   <div class="overlay" id="overlay-gameover">
     <div class="modal">
-      <div class="modal-title">GAME OVER</div>
+      <div class="modal-title" data-i18n="game_over">GAME OVER</div>
       <div class="modal-score" id="gameover-score">Score: 0</div>
       <div class="modal-best" id="gameover-best">Best: 0</div>
       <div class="modal-buttons">
-        <button class="btn-primary" onclick="Game.restartLevel()">TRY AGAIN</button>
-        <button class="btn-secondary" onclick="Game.quitToMenu()">MENU</button>
+        <button class="btn-primary" onclick="Game.restartLevel()" data-i18n="try_again">TRY AGAIN</button>
+        <button class="btn-secondary" onclick="Game.quitToMenu()" data-i18n="menu">MENU</button>
       </div>
     </div>
   </div>
@@ -2256,6 +2363,173 @@ const LEVELS = [
   { id:1, name:'MAI',     target:5000,  lives:3, speed:800,  unlocked: true  },
   { id:2, name:'WARD 2',  target:12000, lives:2, speed:560,  unlocked: false },
 ];
+
+// ============================================================
+// LOCALIZATION
+// ============================================================
+const I18N = {
+  en: {
+    tagline: 'PILL PUZZLE GAME',
+    menu_play: 'Ready for your treatment?',
+    menu_howto: 'How to take your medicine',
+    menu_referral: 'Patient records',
+    menu_shop: 'Medicine cabinet',
+    menu_settings: 'Settings',
+    connect: '◉ CONNECT',
+    connect_wallet: 'CONNECT WALLET',
+    connect_short: 'CONNECT',
+    disconnect: 'DISCONNECT',
+    not_connected: 'Not connected',
+    howto_title: "Nurse Mai's treatment guide",
+    levels_title: 'Patient assignment',
+    levels_subtitle: "Select your patient for today's treatment:",
+    lvl1_priority: 'PRIORITY PATIENT · Requires immediate care',
+    begin_treatment: 'Begin treatment',
+    review_case: 'Review case',
+    lvl2_name_locked: 'CLASSIFIED',
+    lvl2_name_unlocked: 'WARD 2',
+    lvl2_locked_note: 'PATIENT FILE LOCKED · Complete previous treatments',
+    lvl2_unlocked_note: 'PRIORITY PATIENT · Advanced care unit',
+    locked: '🔒 LOCKED',
+    play: 'PLAY',
+    complete: 'COMPLETE',
+    hud_vitals: 'VITALS',
+    next_dose: 'NEXT DOSE',
+    bomb: 'BOMB',
+    fact_label: '!! FACT',
+    fact_text: 'Match 4+ same pills to clear them.',
+    paused: 'PAUSED',
+    resume: 'RESUME',
+    quit_to_menu: 'QUIT TO MENU',
+    level_complete: 'LEVEL COMPLETE!',
+    next_level: 'NEXT LEVEL',
+    share_result: 'SHARE RESULT',
+    all_levels_done: 'ALL LEVELS DONE!',
+    game_over: 'GAME OVER',
+    try_again: 'TRY AGAIN',
+    menu: 'MENU',
+    storyline_title: 'Congrats!',
+    storyline_text: 'New storyline about to unlock!',
+    sound_label: 'Sound Effects',
+    sound_sub: 'Game sounds and music',
+    language: 'Language',
+    ton_wallet: 'TON Wallet',
+    coins: 'coins',
+    ref_friends: 'Friends',
+    ref_coins: 'Coins Earned',
+    copy: 'COPY',
+    invite_friend: 'INVITE FRIEND',
+    back_to_menu: 'BACK TO MENU',
+    ref_reward_note: '+500 coins when a friend completes Level 1',
+    slide_1: "Nurse Mai's treatment guide.",
+    slide_2: 'Left/Right to move. Tap to rotate. Down to drop.',
+    slide_3: 'Match four or more pills of the same color to clear them.',
+    slide_4: 'Chain reactions create powerful healing effects.',
+    continue_btn: 'Continue',
+    daily_bonus: '+100 DAILY BONUS COINS!',
+    link_copied: 'LINK COPIED!',
+    recovery_label: 'RECOVERY',
+    chain_label: 'CHAIN',
+    score_label: 'Score',
+    best_label: 'Best',
+    target_label: 'Target',
+    bomb_plus: '+1 BOMB!',
+    complete_lvl1_first: 'Complete Level 1 first!',
+    ton_unavailable: 'TON Connect unavailable',
+    not_enough_coins: 'Not enough coins!',
+    skin_unlocked: 'SKIN UNLOCKED!',
+    welcome_invited: 'Welcome! You were invited by a friend.',
+    equipped_btn: 'EQUIPPED',
+    equip_btn: 'EQUIP',
+    buy_btn: 'BUY',
+    equipped_word: 'Equipped',
+    equip_word: 'Equip',
+    included_default: 'Included with default issue',
+  },
+  ru: {
+    tagline: 'ИГРА-ГОЛОВОЛОМКА С ТАБЛЕТКАМИ',
+    menu_play: 'Готовы к лечению?',
+    menu_howto: 'Как принимать лекарство',
+    menu_referral: 'Карта пациента',
+    menu_shop: 'Аптечка',
+    menu_settings: 'Настройки',
+    connect: '◉ ПОДКЛЮЧИТЬ',
+    connect_wallet: 'ПОДКЛЮЧИТЬ КОШЕЛЁК',
+    connect_short: 'ПОДКЛЮЧИТЬ',
+    disconnect: 'ОТКЛЮЧИТЬ',
+    not_connected: 'Не подключен',
+    howto_title: 'Гид от медсестры Май',
+    levels_title: 'Назначение пациента',
+    levels_subtitle: 'Выберите пациента на сегодня:',
+    lvl1_priority: 'ВАЖНЫЙ ПАЦИЕНТ · Требуется срочный уход',
+    begin_treatment: 'Начать лечение',
+    review_case: 'Обзор дела',
+    lvl2_name_locked: 'СЕКРЕТНО',
+    lvl2_name_unlocked: 'ПАЛАТА 2',
+    lvl2_locked_note: 'ФАЙЛ ЗАКРЫТ · Завершите предыдущие уровни',
+    lvl2_unlocked_note: 'ВАЖНЫЙ ПАЦИЕНТ · Отделение интенсивной терапии',
+    locked: '🔒 ЗАКРЫТО',
+    play: 'ИГРАТЬ',
+    complete: 'ПРОЙДЕНО',
+    hud_vitals: 'ПОКАЗАТЕЛИ',
+    next_dose: 'СЛЕД. ДОЗА',
+    bomb: 'БОМБА',
+    fact_label: '!! ФАКТ',
+    fact_text: 'Соберите 4+ одинаковых таблеток, чтобы очистить их.',
+    paused: 'ПАУЗА',
+    resume: 'ПРОДОЛЖИТЬ',
+    quit_to_menu: 'В МЕНЮ',
+    level_complete: 'УРОВЕНЬ ПРОЙДЕН!',
+    next_level: 'СЛЕДУЮЩИЙ УРОВЕНЬ',
+    share_result: 'ПОДЕЛИТЬСЯ',
+    all_levels_done: 'ВСЕ УРОВНИ ПРОЙДЕНЫ!',
+    game_over: 'КОНЕЦ ИГРЫ',
+    try_again: 'ЕЩЁ РАЗ',
+    menu: 'МЕНЮ',
+    storyline_title: 'Поздравляем!',
+    storyline_text: 'Новая сюжетная линия скоро откроется!',
+    sound_label: 'Звуковые эффекты',
+    sound_sub: 'Звуки и музыка игры',
+    language: 'Язык',
+    ton_wallet: 'TON-кошелёк',
+    coins: 'монет',
+    ref_friends: 'Друзей',
+    ref_coins: 'Монет получено',
+    copy: 'КОПИРОВАТЬ',
+    invite_friend: 'ПРИГЛАСИТЬ ДРУГА',
+    back_to_menu: 'НАЗАД В МЕНЮ',
+    ref_reward_note: '+500 монет, когда друг проходит Уровень 1',
+    slide_1: 'Гид от медсестры Май.',
+    slide_2: 'Влево/Вправо — двигать. Нажмите — поворот. Вниз — падение.',
+    slide_3: 'Соберите 4 или больше таблеток одного цвета.',
+    slide_4: 'Цепные реакции создают мощный лечебный эффект.',
+    continue_btn: 'Далее',
+    daily_bonus: '+100 МОНЕТ ЕЖЕДНЕВНОГО БОНУСА!',
+    link_copied: 'ССЫЛКА СКОПИРОВАНА!',
+    recovery_label: 'ВЫЗДОРОВЛЕНИЕ',
+    chain_label: 'ЦЕПЬ',
+    score_label: 'Счёт',
+    best_label: 'Лучший',
+    target_label: 'Цель',
+    bomb_plus: '+1 БОМБА!',
+    complete_lvl1_first: 'Сначала пройдите Уровень 1!',
+    ton_unavailable: 'TON Connect недоступен',
+    not_enough_coins: 'Недостаточно монет!',
+    skin_unlocked: 'СКИН РАЗБЛОКИРОВАН!',
+    welcome_invited: 'Добро пожаловать! Вас пригласил друг.',
+    equipped_btn: 'НАДЕТО',
+    equip_btn: 'НАДЕТЬ',
+    buy_btn: 'КУПИТЬ',
+    equipped_word: 'Надето',
+    equip_word: 'Надеть',
+    included_default: 'Входит в стандартный набор',
+  },
+};
+
+function tr(key, lang) {
+  const L = lang || (window.__currentLang || 'en');
+  return (I18N[L] && I18N[L][key]) || (I18N.en[key] || key);
+}
 
 const SKINS = [
   { id:'default', name:'STANDARD ISSUE', desc:'Hospital-grade capsules. Safe for all patients.', price:0,    blobs:['#e8609a','#4a8fd4','#2aaa88','#f0c030','#9060cc'] },
@@ -2562,6 +2836,11 @@ const Game = (() => {
 
   // ---- INIT ----
   function init() {
+    // Apply persisted language before any screen renders so the user sees
+    // their last-chosen locale on first paint.
+    window.__currentLang = state.lang || 'en';
+    applyLang();
+
     gameCanvas = document.getElementById('game-canvas');
     gameCtx = gameCanvas.getContext('2d');
     nextCanvas = document.getElementById('next-canvas');
@@ -2615,7 +2894,7 @@ const Game = (() => {
       state.coins += 100;
       pushProgress();
       Save.save(state);
-      setTimeout(() => showToast('+100 DAILY BONUS COINS!'), 1600);
+      setTimeout(() => showToast(tr('daily_bonus')), 1600);
     }
   }
 
@@ -2643,21 +2922,42 @@ const Game = (() => {
     if (walletAddress) {
       btn.textContent = walletAddress.slice(0,6) + '...' + walletAddress.slice(-4);
     } else {
-      btn.textContent = 'CONNECT WALLET';
+      btn.textContent = tr('connect_wallet');
     }
   }
 
   function updateLevelsUI() {
     const l2card = document.getElementById('level-card-2');
     const l2badge = document.getElementById('level-badge-2');
+    const l2name = document.getElementById('level2-name');
+    const l2note = document.getElementById('level2-note');
+    const l2photo = document.getElementById('level2-photo');
+    const l2char = document.getElementById('level2-character');
     if (state.level1complete) {
       l2card.classList.remove('locked');
-      l2badge.textContent = state.level2complete ? 'COMPLETE' : 'PLAY';
+      l2badge.textContent = state.level2complete ? tr('complete') : tr('play');
       l2badge.className = 'level-card-badge ' + (state.level2complete ? 'badge-complete' : 'badge-play');
+      // Reveal real ward identity + character logo once unlocked.
+      if (l2name) l2name.textContent = tr('lvl2_name_unlocked');
+      if (l2note) {
+        l2note.textContent = tr('lvl2_unlocked_note');
+        l2note.className = 'patient-priority';
+      }
+      if (l2photo) {
+        l2photo.style.opacity = '1';
+        l2photo.innerHTML = '<img src="assets/character/image 268.png" alt="Ward 2" class="patient-photo-img">';
+      }
+      if (l2char) l2char.style.display = 'block';
+    } else {
+      // Locked state — keep i18n in sync with current language.
+      if (l2badge) l2badge.textContent = tr('locked');
+      if (l2name) l2name.textContent = tr('lvl2_name_locked');
+      if (l2note) l2note.textContent = tr('lvl2_locked_note');
+      if (l2char) l2char.style.display = 'none';
     }
     const l1badge = document.getElementById('level-badge-1');
-    if (state.level1complete) {
-      l1badge.textContent = 'COMPLETE';
+    if (l1badge && state.level1complete) {
+      l1badge.textContent = tr('complete');
       l1badge.className = 'level-card-badge badge-complete';
     }
   }
@@ -2670,10 +2970,10 @@ const Game = (() => {
     dots.forEach((d, i) => d.classList.toggle('active', i === slideIndex));
     const btn = document.getElementById('slide-btn');
     if (slideIndex === slides.length - 1) {
-      btn.textContent = "Begin treatment";
+      btn.textContent = tr('begin_treatment');
       btn.classList.add('btn-lets-play');
     } else {
-      btn.textContent = 'Continue';
+      btn.textContent = tr('continue_btn');
       btn.classList.remove('btn-lets-play');
     }
     drawSlideDemo(slideIndex);
@@ -2800,7 +3100,7 @@ const Game = (() => {
     const lvl = LEVELS.find(l => l.id === levelId);
     if (!lvl) return;
     if (!lvl.unlocked && !state.level1complete && levelId === 2) {
-      showToast('Complete Level 1 first!');
+      showToast(tr('complete_lvl1_first'));
       return;
     }
     currentLevel = levelId;
@@ -2816,7 +3116,7 @@ const Game = (() => {
     updateBombUI();
 
     document.getElementById('hud-level-name').textContent = lvl.name;
-    document.getElementById('hud-target').textContent = 'RECOVERY: ' + lvl.target.toLocaleString();
+    document.getElementById('hud-target').textContent = tr('recovery_label') + ': ' + lvl.target.toLocaleString();
     updateHUD();
 
     showScreen('game');
@@ -2946,7 +3246,7 @@ const Game = (() => {
         showScorePopup(pts);
 
         // Reward a bomb on tier-4+ combos
-        if (chainCombo === 4) { bombs++; updateBombUI(); showToast('+1 BOMB!'); }
+        if (chainCombo === 4) { bombs++; updateBombUI(); showToast(tr('bomb_plus')); }
 
         Audio.clear();
         if (chainCombo > 1) Audio.combo(chainCombo);
@@ -3194,7 +3494,7 @@ const Game = (() => {
     }
     const comboEl = document.getElementById('combo-display');
     if (combo > 1) {
-      comboEl.textContent = 'CHAIN x' + combo;
+      comboEl.textContent = tr('chain_label') + ' x' + combo;
     }
   }
 
@@ -3353,7 +3653,36 @@ const Game = (() => {
       if (navigator.vibrate) {
         try { navigator.vibrate(200); } catch {}
       }
+      // Drop a little shower of colorful pills around the character.
+      dropPillsAroundMai(mai);
     });
+  }
+
+  function dropPillsAroundMai(mai) {
+    const rect = mai.getBoundingClientRect();
+    const palette = [COLORS.pink, COLORS.blue, COLORS.white, COLORS.yellow, COLORS.purple];
+    const count = 5 + Math.floor(Math.random() * 4); // 5..8
+    for (let i = 0; i < count; i++) {
+      const pill = document.createElement('div');
+      pill.className = 'falling-pill';
+      const color = palette[Math.floor(Math.random() * palette.length)];
+      pill.style.background = color;
+      // Spread horizontally across the character's footprint, biased to centre
+      const startX = rect.left + rect.width * (0.05 + Math.random() * 0.9);
+      const startY = rect.top - 30;
+      pill.style.left = startX + 'px';
+      pill.style.top  = startY + 'px';
+      // Drift sideways a bit; fall well past the character
+      const dx = (Math.random() - 0.5) * 80;
+      const dy = rect.height + 220 + Math.random() * 60;
+      const rot = (Math.random() - 0.5) * 1080;
+      pill.style.setProperty('--pill-dx', dx + 'px');
+      pill.style.setProperty('--pill-dy', dy + 'px');
+      pill.style.setProperty('--pill-rot', rot + 'deg');
+      pill.style.animationDelay = (i * 60) + 'ms';
+      document.body.appendChild(pill);
+      setTimeout(() => pill.remove(), 1700 + i * 60);
+    }
   }
 
   // ---- CONTROLS ----
@@ -3489,9 +3818,9 @@ const Game = (() => {
     lives--;
     const record = checkHighScore(score);
     Save.save(state);
-    document.getElementById('gameover-score').textContent = 'Score: ' + score.toLocaleString();
+    document.getElementById('gameover-score').textContent = tr('score_label') + ': ' + score.toLocaleString();
     document.getElementById('gameover-best').textContent =
-      'Best: ' + (state.highScores[currentLevel] || 0).toLocaleString();
+      tr('best_label') + ': ' + (state.highScores[currentLevel] || 0).toLocaleString();
     if (window.Telegram?.WebApp?.HapticFeedback) {
       Telegram.WebApp.HapticFeedback.notificationOccurred('error');
     }
@@ -3598,14 +3927,14 @@ const Game = (() => {
     pushProgress();
 
     document.getElementById('complete-score').textContent =
-      'Score: ' + score.toLocaleString() + ' / Target: ' + LEVELS.find(l=>l.id===currentLevel).target.toLocaleString();
+      tr('score_label') + ': ' + score.toLocaleString() + ' / ' + tr('target_label') + ': ' + LEVELS.find(l=>l.id===currentLevel).target.toLocaleString();
 
     const btnNext = document.getElementById('btn-next-level');
     if (currentLevel >= LEVELS.length) {
-      btnNext.textContent = 'ALL LEVELS DONE!';
+      btnNext.textContent = tr('all_levels_done');
       btnNext.onclick = () => quitToMenu();
     } else {
-      btnNext.textContent = 'NEXT LEVEL';
+      btnNext.textContent = tr('next_level');
     }
 
     spawnFireworks();
@@ -3617,6 +3946,22 @@ const Game = (() => {
     } else {
       document.getElementById('overlay-complete').classList.add('active');
     }
+    // Level 2 finishes the current storyline — celebrate with a teaser
+    // overlay that auto-dismisses so it doesn't block the existing
+    // complete modal underneath.
+    if (currentLevel === 2) {
+      setTimeout(showStorylineUnlock, 800);
+    }
+  }
+
+  function showStorylineUnlock() {
+    const overlay = document.getElementById('overlay-storyline');
+    if (!overlay) return;
+    overlay.classList.add('active');
+    if (window.Telegram?.WebApp?.HapticFeedback) {
+      try { Telegram.WebApp.HapticFeedback.notificationOccurred('success'); } catch {}
+    }
+    setTimeout(() => overlay.classList.remove('active'), 3500);
   }
 
   function restartLevel() {
@@ -3778,8 +4123,8 @@ const Game = (() => {
 
   function copyReferralLink() {
     const text = document.getElementById('referral-link-text').textContent;
-    navigator.clipboard?.writeText(text).then(() => showToast('LINK COPIED!'))
-      .catch(() => showToast('LINK COPIED!'));
+    navigator.clipboard?.writeText(text).then(() => showToast(tr('link_copied')))
+      .catch(() => showToast(tr('link_copied')));
   }
 
   function inviteFriend() {
@@ -3826,10 +4171,10 @@ const Game = (() => {
     const settingsBtn = document.getElementById('settings-ton-btn');
     if (walletAddress) {
       walletSub.textContent = walletAddress.slice(0,8) + '...' + walletAddress.slice(-6);
-      settingsBtn.textContent = 'DISCONNECT';
+      settingsBtn.textContent = tr('disconnect');
     } else {
-      walletSub.textContent = 'Not connected';
-      settingsBtn.textContent = 'CONNECT';
+      walletSub.textContent = tr('not_connected');
+      settingsBtn.textContent = tr('connect_short');
     }
   }
 
@@ -3840,10 +4185,48 @@ const Game = (() => {
   }
 
   function setLang(lang) {
+    if (lang !== 'en' && lang !== 'ru') lang = 'en';
     state.lang = lang;
+    window.__currentLang = lang;
     Save.save(state);
-    document.getElementById('lang-en').classList.toggle('active', lang === 'en');
-    document.getElementById('lang-ru').classList.toggle('active', lang === 'ru');
+    document.documentElement.setAttribute('lang', lang);
+    const en = document.getElementById('lang-en');
+    const ru = document.getElementById('lang-ru');
+    if (en) en.classList.toggle('active', lang === 'en');
+    if (ru) ru.classList.toggle('active', lang === 'ru');
+    applyLang();
+  }
+
+  function applyLang() {
+    const lang = window.__currentLang || state.lang || 'en';
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      const txt = tr(key, lang);
+      // Skip elements whose user-visible content is composed dynamically
+      // (e.g., the level 2 name is rewritten by updateLevelsUI based on
+      // unlock state — we let that function pick the right translation).
+      if (el.id === 'level2-name' || el.id === 'level2-note' || el.id === 'level-badge-2') return;
+      el.textContent = txt;
+    });
+    // Re-render dynamic screens that bake translated strings into JS-built UI.
+    if (currentScreen === 'levels') updateLevelsUI();
+    if (currentScreen === 'menu') updateMenuUI();
+    if (currentScreen === 'settings') updateSettingsUI();
+    if (currentScreen === 'howto') renderSlide();
+    if (currentScreen === 'shop') renderShop();
+    // In-game HUD strings are written by JS each frame/event — refresh the
+    // ones that aren't (level name + recovery target) so a mid-session
+    // language flip is immediate.
+    const hudTarget = document.getElementById('hud-target');
+    if (hudTarget && typeof currentLevel === 'number') {
+      const lvl = LEVELS.find(l => l.id === currentLevel);
+      if (lvl) hudTarget.textContent = tr('recovery_label') + ': ' + lvl.target.toLocaleString();
+    }
+    // Tutorial slide labels live in the slides array, refresh that too.
+    slides[0].text = tr('slide_1', lang);
+    slides[1].text = tr('slide_2', lang);
+    slides[2].text = tr('slide_3', lang);
+    slides[3].text = tr('slide_4', lang);
   }
 
   // ---- TON CONNECT ----
@@ -3869,7 +4252,7 @@ const Game = (() => {
   }
 
   async function toggleTonConnect() {
-    if (!tonUI) { showToast('TON Connect unavailable'); return; }
+    if (!tonUI) { showToast(tr('ton_unavailable')); return; }
     if (walletAddress) {
       await tonUI.disconnect();
       walletAddress = null;
@@ -3921,16 +4304,16 @@ const Game = (() => {
       if (equipped) {
         actionBtn = document.createElement('button');
         actionBtn.className = 'btn-skin-equipped';
-        actionBtn.textContent = 'EQUIPPED';
+        actionBtn.textContent = tr('equipped_btn');
       } else if (owned) {
         actionBtn = document.createElement('button');
         actionBtn.className = 'btn-skin-equip';
-        actionBtn.textContent = 'EQUIP';
+        actionBtn.textContent = tr('equip_btn');
         actionBtn.onclick = (e) => { e.stopPropagation(); equipSkin(skin.id); renderShop(); };
       } else {
         actionBtn = document.createElement('button');
         actionBtn.className = 'btn-skin-buy';
-        actionBtn.textContent = 'BUY';
+        actionBtn.textContent = tr('buy_btn');
         actionBtn.onclick = (e) => { e.stopPropagation(); buySkin(skin.id); };
       }
 
@@ -3948,13 +4331,13 @@ const Game = (() => {
   function buySkin(id) {
     const skin = SKINS.find(s => s.id === id);
     if (!skin || state.ownedSkins.includes(id)) return;
-    if (state.coins < skin.price) { showToast('Not enough coins!'); return; }
+    if (state.coins < skin.price) { showToast(tr('not_enough_coins')); return; }
     state.coins -= skin.price;
     state.ownedSkins.push(id);
     Save.save(state);
     pushProgress();
     renderShop();
-    showToast(skin.name + ' SKIN UNLOCKED!');
+    showToast(skin.name + ' ' + tr('skin_unlocked'));
   }
 
   function equipSkin(id) {
@@ -3997,20 +4380,20 @@ const Game = (() => {
     priceRow.innerHTML = '';
     priceRow.className = 'preview-price-row' + (skin.price === 0 ? ' free' : '');
     if (skin.price === 0) {
-      priceRow.textContent = 'Included with default issue';
+      priceRow.textContent = tr('included_default');
     } else {
-      priceRow.innerHTML = `<span class="coin-icon"></span><span>${skin.price.toLocaleString()} coins</span>`;
+      priceRow.innerHTML = `<span class="coin-icon"></span><span>${skin.price.toLocaleString()} ${tr('coins')}</span>`;
     }
 
     const actionBtn = document.getElementById('preview-action-btn');
     if (equipped) {
-      actionBtn.textContent = 'Equipped';
+      actionBtn.textContent = tr('equipped_word');
       actionBtn.disabled = true;
     } else if (owned) {
-      actionBtn.textContent = 'Equip';
+      actionBtn.textContent = tr('equip_word');
       actionBtn.disabled = false;
     } else {
-      actionBtn.textContent = skin.price <= (state.coins || 0) ? 'Purchase' : 'Not enough coins';
+      actionBtn.textContent = skin.price <= (state.coins || 0) ? tr('buy_btn') : tr('not_enough_coins');
       actionBtn.disabled = skin.price > (state.coins || 0);
     }
 
@@ -4048,7 +4431,7 @@ const Game = (() => {
       if (localStorage.getItem('klover_referral_pending') !== '1') return;
       // Defer until loading screen dismisses to the menu.
       setTimeout(() => {
-        showToast('Welcome! You were invited by a friend.');
+        showToast(tr('welcome_invited'));
         localStorage.removeItem('klover_referral_pending');
       }, 1600);
     } catch {}
