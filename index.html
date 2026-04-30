@@ -2105,18 +2105,14 @@ html, body {
         </div>
       </div>
       <div class="level-card locked" id="level-card-2" onclick="Game.startLevel(2)">
-        <div class="patient-photo" id="level2-photo" style="opacity:0.5">
-          <svg viewBox="0 0 60 72" width="52" height="62">
-            <ellipse cx="30" cy="25" rx="20" ry="18" fill="#b8b8b8" stroke="#808080" stroke-width="2"/>
-            <ellipse cx="30" cy="30" rx="13" ry="12" fill="#e0e0e0"/>
-            <text x="30" y="50" text-anchor="middle" font-size="18" fill="#808080" font-weight="900">?</text>
-          </svg>
+        <div class="patient-photo" id="level2-photo">
+          <img src="assets/character/image 268.png" alt="Ward 2" class="patient-photo-img">
         </div>
         <div class="patient-info">
           <div class="id-card-label">ID CARD</div>
-          <div class="level-card-name" id="level2-name" data-i18n="lvl2_name_locked">CLASSIFIED</div>
-          <img id="level2-character" class="level-card-character" src="assets/character/image 268.png" alt="Ward 2" style="display:none;">
-          <div class="patient-locked-note" id="level2-note" data-i18n="lvl2_locked_note">PATIENT FILE LOCKED &middot; Complete previous treatments</div>
+          <div class="level-card-name" id="level2-name">WARD 2</div>
+          <img id="level2-character" class="level-card-character" src="assets/character/image 268.png" alt="Ward 2">
+          <div class="patient-locked-note" id="level2-note" data-i18n="lvl2_locked_note">Complete level 1 to unlock</div>
           <div class="patient-meta-row">DIFFICULTY <b>&bull;&bull;&bull;</b></div>
           <div class="patient-meta-row">KLASS_ID <b>0900010</b></div>
         </div>
@@ -2388,7 +2384,7 @@ const I18N = {
     review_case: 'Review case',
     lvl2_name_locked: 'CLASSIFIED',
     lvl2_name_unlocked: 'WARD 2',
-    lvl2_locked_note: 'PATIENT FILE LOCKED · Complete previous treatments',
+    lvl2_locked_note: 'Complete level 1 to unlock',
     lvl2_unlocked_note: 'PRIORITY PATIENT · Advanced care unit',
     locked: '🔒 LOCKED',
     play: 'PLAY',
@@ -2466,7 +2462,7 @@ const I18N = {
     review_case: 'Обзор дела',
     lvl2_name_locked: 'СЕКРЕТНО',
     lvl2_name_unlocked: 'ПАЛАТА 2',
-    lvl2_locked_note: 'ФАЙЛ ЗАКРЫТ · Завершите предыдущие уровни',
+    lvl2_locked_note: 'Пройдите уровень 1, чтобы открыть',
     lvl2_unlocked_note: 'ВАЖНЫЙ ПАЦИЕНТ · Отделение интенсивной терапии',
     locked: '🔒 ЗАКРЫТО',
     play: 'ИГРАТЬ',
@@ -2929,31 +2925,21 @@ const Game = (() => {
   function updateLevelsUI() {
     const l2card = document.getElementById('level-card-2');
     const l2badge = document.getElementById('level-badge-2');
-    const l2name = document.getElementById('level2-name');
     const l2note = document.getElementById('level2-note');
-    const l2photo = document.getElementById('level2-photo');
-    const l2char = document.getElementById('level2-character');
     if (state.level1complete) {
       l2card.classList.remove('locked');
       l2badge.textContent = state.level2complete ? tr('complete') : tr('play');
       l2badge.className = 'level-card-badge ' + (state.level2complete ? 'badge-complete' : 'badge-play');
-      // Reveal real ward identity + character logo once unlocked.
-      if (l2name) l2name.textContent = tr('lvl2_name_unlocked');
       if (l2note) {
         l2note.textContent = tr('lvl2_unlocked_note');
         l2note.className = 'patient-priority';
       }
-      if (l2photo) {
-        l2photo.style.opacity = '1';
-        l2photo.innerHTML = '<img src="assets/character/image 268.png" alt="Ward 2" class="patient-photo-img">';
-      }
-      if (l2char) l2char.style.display = 'block';
     } else {
-      // Locked state — keep i18n in sync with current language.
       if (l2badge) l2badge.textContent = tr('locked');
-      if (l2name) l2name.textContent = tr('lvl2_name_locked');
-      if (l2note) l2note.textContent = tr('lvl2_locked_note');
-      if (l2char) l2char.style.display = 'none';
+      if (l2note) {
+        l2note.textContent = tr('lvl2_locked_note');
+        l2note.className = 'patient-locked-note';
+      }
     }
     const l1badge = document.getElementById('level-badge-1');
     if (l1badge && state.level1complete) {
