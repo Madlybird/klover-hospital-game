@@ -1888,21 +1888,6 @@ html, body {
 .preview-price-row.free { background: #e8f4ff; border-color: #5b9de8; color: #3a8fd4; }
 .preview-price-row .coin-icon { background: #f0c030; box-shadow: 0 0 6px #f0c030; width: 14px; height: 14px; }
 
-/* Level 2 character logo under the title */
-.level-card-character {
-  display: block;
-  margin: 6px auto 8px;
-  width: 84px;
-  height: auto;
-  object-fit: contain;
-  filter: drop-shadow(0 2px 6px rgba(58,143,212,0.35));
-  animation: lvl2charFloat 2.6s ease-in-out infinite;
-}
-@keyframes lvl2charFloat {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-3px); }
-}
-
 /* Storyline-unlock overlay for Level 2 completion.
    Inherits .overlay base (flex centring, opacity transition). */
 .storyline-overlay {
@@ -2110,8 +2095,7 @@ html, body {
         </div>
         <div class="patient-info">
           <div class="id-card-label">ID CARD</div>
-          <div class="level-card-name" id="level2-name">WARD 2</div>
-          <img id="level2-character" class="level-card-character" src="assets/character/image 268.png" alt="Ward 2">
+          <div class="level-card-name" id="level2-name">VI</div>
           <div class="patient-locked-note" id="level2-note" data-i18n="lvl2_locked_note">Complete level 1 to unlock</div>
           <div class="patient-meta-row">DIFFICULTY <b>&bull;&bull;&bull;</b></div>
           <div class="patient-meta-row">KLASS_ID <b>0900010</b></div>
@@ -2357,7 +2341,7 @@ const COLOR_KEYS = Object.keys(COLORS);
 
 const LEVELS = [
   { id:1, name:'MAI',     target:5000,  lives:3, speed:800,  unlocked: true  },
-  { id:2, name:'WARD 2',  target:12000, lives:2, speed:560,  unlocked: false },
+  { id:2, name:'VI',      target:12000, lives:2, speed:560,  unlocked: false },
 ];
 
 // ============================================================
@@ -2382,8 +2366,6 @@ const I18N = {
     lvl1_priority: 'PRIORITY PATIENT · Requires immediate care',
     begin_treatment: 'Begin treatment',
     review_case: 'Review case',
-    lvl2_name_locked: 'CLASSIFIED',
-    lvl2_name_unlocked: 'WARD 2',
     lvl2_locked_note: 'Complete level 1 to unlock',
     lvl2_unlocked_note: 'PRIORITY PATIENT · Advanced care unit',
     locked: '🔒 LOCKED',
@@ -2460,8 +2442,6 @@ const I18N = {
     lvl1_priority: 'ВАЖНЫЙ ПАЦИЕНТ · Требуется срочный уход',
     begin_treatment: 'Начать лечение',
     review_case: 'Обзор дела',
-    lvl2_name_locked: 'СЕКРЕТНО',
-    lvl2_name_unlocked: 'ПАЛАТА 2',
     lvl2_locked_note: 'Пройдите уровень 1, чтобы открыть',
     lvl2_unlocked_note: 'ВАЖНЫЙ ПАЦИЕНТ · Отделение интенсивной терапии',
     locked: '🔒 ЗАКРЫТО',
