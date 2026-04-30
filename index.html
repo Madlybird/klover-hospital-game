@@ -1942,6 +1942,114 @@ html, body {
   to { transform: rotate(360deg); }
 }
 
+/* Wallet-gate overlay — RIKANII Genesis stickers holders only */
+.wallet-gate-overlay {
+  z-index: 180;
+  background: rgba(10,26,58,0.78);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.wallet-gate-modal {
+  position: relative;
+  background: linear-gradient(160deg, #ffffff 0%, #eaf4ff 100%);
+  border: 2px solid #b8d4f0;
+  border-radius: 22px;
+  padding: 24px 26px 22px;
+  width: min(86vw, 340px);
+  text-align: center;
+  color: #1a2a4a;
+  box-shadow: 0 18px 44px rgba(58,143,212,0.35), 0 0 0 6px rgba(255,255,255,0.05);
+  animation: storylinePop 0.5s cubic-bezier(.34,1.56,.64,1);
+}
+.wallet-gate-close {
+  position: absolute;
+  top: 8px; right: 10px;
+  width: 28px; height: 28px;
+  border: none;
+  background: transparent;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
+  color: #6a8bab;
+  cursor: pointer;
+  border-radius: 8px;
+}
+.wallet-gate-close:hover { background: rgba(91,157,232,0.12); color: #3a8fd4; }
+.gate-header h3 {
+  font-family: 'Nunito', sans-serif;
+  font-size: 22px;
+  font-weight: 900;
+  color: #3a8fd4;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+.gate-content { font-family: 'Inter', sans-serif; }
+.gate-content p {
+  font-weight: 600;
+  font-size: 14px;
+  color: #1a2a4a;
+  line-height: 1.4;
+}
+.gate-content .gate-strong {
+  font-weight: 800;
+  font-size: 15px;
+  color: #c04080;
+  margin: 4px 0 8px;
+}
+.gate-character {
+  display: block;
+  margin: 8px auto 4px;
+  width: 96px;
+  height: auto;
+  filter: drop-shadow(0 4px 10px rgba(232,96,154,0.35));
+}
+.gate-content .small-text {
+  font-size: 12px;
+  font-weight: 500;
+  color: #6a8bab;
+  margin-top: 6px;
+}
+.gate-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+.connect-wallet-btn {
+  background: linear-gradient(180deg, #5b9de8, #3a8fd4);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 16px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #2a7ec0, 0 6px 12px rgba(58,143,212,0.35);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+.connect-wallet-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #2a7ec0, 0 3px 6px rgba(58,143,212,0.35);
+}
+.cancel-gate-btn {
+  background: #fff;
+  color: #6a8bab;
+  border: 2px solid #cfe0f2;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+}
+.cancel-gate-btn:hover { background: #eaf4ff; color: #3a8fd4; }
+.gate-coming { display: none; }
+.wallet-gate-modal.is-coming .gate-default { display: none; }
+.wallet-gate-modal.is-coming .gate-coming { display: block; }
+.wallet-gate-modal.is-coming .connect-wallet-btn { display: none; }
+
 /* Falling pills emitted on main-character tap */
 .falling-pill {
   position: fixed;
@@ -2030,8 +2138,8 @@ html, body {
     </div>
 
     <div class="menu-buttons">
-      <button class="btn-primary" onclick="Game.goToLevels()" data-i18n="menu_play">Ready for your treatment?</button>
-      <button class="btn-secondary" onclick="Game.showScreen('howto')" data-i18n="menu_howto">How to take your medicine</button>
+      <button class="btn-primary" onclick="Game.requireWalletGate('levels')" data-i18n="menu_play">Ready for your treatment?</button>
+      <button class="btn-secondary" onclick="Game.requireWalletGate('howto')" data-i18n="menu_howto">How to take your medicine</button>
       <button class="btn-secondary" onclick="Game.showScreen('referral')" data-i18n="menu_referral">Patient records</button>
       <button class="btn-secondary" onclick="Game.showScreen('shop')" data-i18n="menu_shop">Medicine cabinet</button>
       <button class="btn-secondary" onclick="Game.showScreen('settings')" data-i18n="menu_settings">Settings</button>
@@ -2253,6 +2361,32 @@ html, body {
     </div>
   </div>
 
+  <!-- Wallet Gate (premium sections) -->
+  <div class="overlay wallet-gate-overlay" id="overlay-wallet-gate">
+    <div class="wallet-gate-modal" id="wallet-gate-modal">
+      <button class="wallet-gate-close" onclick="Game.closeWalletGate()" aria-label="Close">×</button>
+      <div class="gate-header">
+        <h3 data-i18n="gate_title">🪽 Premium Access</h3>
+      </div>
+      <div class="gate-content" id="wallet-gate-content">
+        <div class="gate-default">
+          <p data-i18n="gate_access">Access only for</p>
+          <p class="gate-strong" data-i18n="gate_holders">RIKANII Genesis stickers holders</p>
+          <img src="assets/character/image 268.png" alt="" class="gate-character">
+        </div>
+        <div class="gate-coming">
+          <p data-i18n="gate_coming_title">🚧 Wallet verification</p>
+          <p class="gate-strong" data-i18n="gate_coming_subtitle">Coming soon!</p>
+          <p class="small-text" data-i18n="gate_coming_note">NFT collection address needed</p>
+        </div>
+      </div>
+      <div class="gate-buttons">
+        <button onclick="Game.connectWalletGate()" class="connect-wallet-btn" data-i18n="gate_connect">🔗 Connect Wallet</button>
+        <button onclick="Game.closeWalletGate()" class="cancel-gate-btn" data-i18n="gate_cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Storyline Unlock (Level 2 finish) -->
   <div class="overlay storyline-overlay" id="overlay-storyline">
     <div class="storyline-card">
@@ -2423,6 +2557,14 @@ const I18N = {
     equipped_word: 'Equipped',
     equip_word: 'Equip',
     included_default: 'Included with default issue',
+    gate_title: '🪽 Premium Access',
+    gate_access: 'Access only for',
+    gate_holders: 'RIKANII Genesis stickers holders',
+    gate_connect: '🔗 Connect Wallet',
+    gate_cancel: 'Cancel',
+    gate_coming_title: '🚧 Wallet verification',
+    gate_coming_subtitle: 'Coming soon!',
+    gate_coming_note: 'NFT collection address needed',
   },
   ru: {
     tagline: 'ИГРА-ГОЛОВОЛОМКА С ТАБЛЕТКАМИ',
@@ -2499,6 +2641,14 @@ const I18N = {
     equipped_word: 'Надето',
     equip_word: 'Надеть',
     included_default: 'Входит в стандартный набор',
+    gate_title: '🪽 Премиум-доступ',
+    gate_access: 'Доступ только для',
+    gate_holders: 'держателей стикеров RIKANII Genesis',
+    gate_connect: '🔗 Подключить кошелёк',
+    gate_cancel: 'Отмена',
+    gate_coming_title: '🚧 Проверка кошелька',
+    gate_coming_subtitle: 'Скоро!',
+    gate_coming_note: 'Нужен адрес NFT-коллекции',
   },
 };
 
@@ -4231,6 +4381,45 @@ const Game = (() => {
     if (currentScreen === 'settings') updateSettingsUI();
   }
 
+  // ---- WALLET GATE ----
+  // Gate "Levels" and "How to" behind RIKANII Genesis stickers ownership.
+  // The NFT verification is stubbed for now (collection address not yet
+  // known); when it lands, set state.nftVerified after a successful check
+  // and the early-return below will let verified players skip the modal.
+  let pendingGateAction = null;
+
+  function requireWalletGate(target) {
+    if (state && state.nftVerified) {
+      runGateAction(target);
+      return;
+    }
+    pendingGateAction = target;
+    const modal = document.getElementById('wallet-gate-modal');
+    if (modal) modal.classList.remove('is-coming');
+    document.getElementById('overlay-wallet-gate').classList.add('active');
+  }
+
+  function closeWalletGate() {
+    document.getElementById('overlay-wallet-gate').classList.remove('active');
+    const modal = document.getElementById('wallet-gate-modal');
+    if (modal) modal.classList.remove('is-coming');
+    pendingGateAction = null;
+  }
+
+  function connectWalletGate() {
+    // Placeholder — surface the "coming soon" body inside the modal.
+    // TODO: replace with TonConnect modal + RIKANII Genesis stickers
+    // ownership check via TonAPI once the collection address is known.
+    console.log('[gate] Connect Wallet pressed — NFT verification stubbed');
+    const modal = document.getElementById('wallet-gate-modal');
+    if (modal) modal.classList.add('is-coming');
+  }
+
+  function runGateAction(target) {
+    if (target === 'levels') goToLevels();
+    else if (target === 'howto') showScreen('howto');
+  }
+
   // Stub for future on-chain rewards
   async function onChainReward(walletAddress, coins) {
     console.log('[TON] onChainReward', walletAddress, coins);
@@ -4440,6 +4629,9 @@ const Game = (() => {
     showSkinPreview,
     closeSkinPreview,
     previewPrimary,
+    requireWalletGate,
+    closeWalletGate,
+    connectWalletGate,
   };
 })();
 
