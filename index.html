@@ -2381,7 +2381,7 @@ html, body {
         </div>
       </div>
       <div class="gate-buttons">
-        <button onclick="Game.connectWalletGate()" class="connect-wallet-btn" data-i18n="gate_connect">🔗 Connect Wallet</button>
+        <button onclick="Game.connectWalletGate()" class="connect-wallet-btn" data-i18n="gate_connect">✓ Confirm</button>
         <button onclick="Game.closeWalletGate()" class="cancel-gate-btn" data-i18n="gate_cancel">Cancel</button>
       </div>
     </div>
@@ -2557,14 +2557,14 @@ const I18N = {
     equipped_word: 'Equipped',
     equip_word: 'Equip',
     included_default: 'Included with default issue',
-    gate_title: '🪽 Premium Access',
+    gate_title: '🪽 Beta Access',
     gate_access: 'Access only for',
-    gate_holders: 'RIKANII Genesis stickers holders',
-    gate_connect: '🔗 Connect Wallet',
+    gate_holders: 'authorized testers',
+    gate_connect: '✓ Confirm',
     gate_cancel: 'Cancel',
-    gate_coming_title: '🚧 Wallet verification',
-    gate_coming_subtitle: 'Coming soon!',
-    gate_coming_note: 'NFT collection address needed',
+    gate_coming_title: '🚫 Access denied',
+    gate_coming_subtitle: 'Not authorized',
+    gate_coming_note: 'Your account is not on the allowlist',
   },
   ru: {
     tagline: 'ИГРА-ГОЛОВОЛОМКА С ТАБЛЕТКАМИ',
@@ -2641,14 +2641,14 @@ const I18N = {
     equipped_word: 'Надето',
     equip_word: 'Надеть',
     included_default: 'Входит в стандартный набор',
-    gate_title: '🪽 Премиум-доступ',
+    gate_title: '🪽 Бета-доступ',
     gate_access: 'Доступ только для',
-    gate_holders: 'держателей стикеров RIKANII Genesis',
-    gate_connect: '🔗 Подключить кошелёк',
+    gate_holders: 'авторизованных тестеров',
+    gate_connect: '✓ Подтвердить',
     gate_cancel: 'Отмена',
-    gate_coming_title: '🚧 Проверка кошелька',
-    gate_coming_subtitle: 'Скоро!',
-    gate_coming_note: 'Нужен адрес NFT-коллекции',
+    gate_coming_title: '🚫 Доступ запрещён',
+    gate_coming_subtitle: 'Не авторизован',
+    gate_coming_note: 'Ваш аккаунт не в списке доступа',
   },
 };
 
@@ -4381,18 +4381,12 @@ const Game = (() => {
     if (currentScreen === 'settings') updateSettingsUI();
   }
 
-  // ---- WALLET GATE ----
-  // Gate "Levels" and "How to" behind RIKANII Genesis stickers ownership.
-  // The NFT verification is stubbed for now (collection address not yet
-  // known); when it lands, set state.nftVerified after a successful check
-  // and the early-return below will let verified players skip the modal.
+  // ---- ACCESS GATE ----
+  // Beta gate: only an explicit Telegram-ID allowlist may proceed.
+  const GATE_ALLOWED_TG_IDS = [881282443];
   let pendingGateAction = null;
 
   function requireWalletGate(target) {
-    if (state && state.nftVerified) {
-      runGateAction(target);
-      return;
-    }
     pendingGateAction = target;
     const modal = document.getElementById('wallet-gate-modal');
     if (modal) modal.classList.remove('is-coming');
@@ -4407,10 +4401,13 @@ const Game = (() => {
   }
 
   function connectWalletGate() {
-    // Placeholder — surface the "coming soon" body inside the modal.
-    // TODO: replace with TonConnect modal + RIKANII Genesis stickers
-    // ownership check via TonAPI once the collection address is known.
-    console.log('[gate] Connect Wallet pressed — NFT verification stubbed');
+    const tgId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+    if (GATE_ALLOWED_TG_IDS.includes(tgId)) {
+      const action = pendingGateAction;
+      closeWalletGate();
+      runGateAction(action);
+      return;
+    }
     const modal = document.getElementById('wallet-gate-modal');
     if (modal) modal.classList.add('is-coming');
   }
