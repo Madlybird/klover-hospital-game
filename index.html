@@ -2444,15 +2444,10 @@ html, body {
 }
 .lore-pill {
   position: absolute;
-  width: 58px;
-  height: 58px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.55);
-  background: radial-gradient(circle at 32% 30%, var(--pill-light, #fff) 0%, var(--pill-base, #e8609a) 72%);
-  box-shadow:
-    0 0 14px var(--pill-base, #e8609a),
-    0 0 28px rgba(255,255,255,0.15),
-    inset 0 4px 8px rgba(255,255,255,0.35);
+  background-color: #e8609a;
   touch-action: manipulation;
   cursor: pointer;
   user-select: none;
@@ -2462,35 +2457,15 @@ html, body {
   align-items: center;
   justify-content: center;
 }
-.lore-pill::before {
-  content: '';
-  position: absolute;
-  top: 12%;
-  left: 18%;
-  width: 38%;
-  height: 24%;
-  background: rgba(255,255,255,0.55);
-  border-radius: 50%;
-  transform: rotate(-18deg);
-  pointer-events: none;
-  filter: blur(0.5px);
-}
-.lore-pill::after {
-  content: '';
-  position: absolute;
-  inset: -7px;
-  border-radius: 50%;
-  pointer-events: none;
-  box-shadow: 0 0 0 2px rgba(255,255,255,0);
-  animation: lore-pill-ring 1.8s ease-in-out infinite;
-}
 .lore-pill-heart {
-  width: 58%;
-  height: 58%;
+  width: 62%;
+  height: 62%;
   position: relative;
   z-index: 1;
   pointer-events: none;
+  display: block;
 }
+.lore-pill-heart path { fill: #ffffff !important; }
 .lore-pill.hit {
   animation: lore-pill-hit 0.30s ease-out forwards !important;
   pointer-events: none;
@@ -5895,21 +5870,21 @@ const Lore = (() => {
     const rect = zone.getBoundingClientRect();
     const w = rect.width || window.innerWidth;
     const h = rect.height || window.innerHeight;
-    const size = 58;
+    const size = 60;
     const padX = 16, padTop = 120, padBot = 90;
     const x = padX + Math.random() * Math.max(20, w - 2 * padX - size);
     const y = padTop + Math.random() * Math.max(20, h - padTop - padBot - size);
     const pal = PILL_PALETTE[Math.floor(Math.random() * PILL_PALETTE.length)];
     const pill = document.createElement('div');
     pill.className = 'lore-pill';
-    pill.style.cssText =
-      '--pill-base:' + pal.base + ';' +
-      '--pill-light:' + pal.light + ';' +
-      '--pill-dark:' + pal.dark + ';' +
-      'left:' + x + 'px;top:' + y + 'px;';
+    pill.style.left = x + 'px';
+    pill.style.top = y + 'px';
+    pill.style.backgroundColor = pal.base;
+    pill.style.backgroundImage = 'radial-gradient(circle at 32% 30%, ' + pal.light + ' 0%, ' + pal.base + ' 78%)';
+    pill.style.boxShadow = '0 0 16px ' + pal.base + ', 0 0 32px rgba(255,255,255,0.18)';
     pill.innerHTML =
       '<svg class="lore-pill-heart" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">' +
-        '<path d="M16 28 C 32 18, 27 4, 16 12 C 5 4, 0 18, 16 28 Z" fill="#fff"/>' +
+        '<path d="M16 28 C 32 18, 27 4, 16 12 C 5 4, 0 18, 16 28 Z" fill="#ffffff" style="fill:#ffffff"/>' +
       '</svg>';
     zone.appendChild(pill);
     livePills++;
