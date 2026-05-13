@@ -2445,7 +2445,6 @@ html, body {
   height: 58%;
   position: relative;
   z-index: 1;
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.35));
   pointer-events: none;
 }
 .lore-pill.hit {
@@ -5381,11 +5380,11 @@ const Lore = (() => {
         'from their deepest emotional wounds.'
       ],
       crawl: [
-        "The clinic's special division — KLAS —<br>creates simulation worlds<br>built from patients' own memories.",
-        'Inside these worlds,<br>patients must relive and overcome<br>their most traumatic events.',
-        'Mai and Vi, our chief medics,<br>will accompany you<br>through every session.',
-        'Every pill, every choice,<br>brings the patient closer to recovery —<br>or to losing themselves entirely.',
-        'Your reflexes, your focus,<br>and your heart<br>will decide their fate.',
+        "The clinic's special division — KLAS — creates simulation worlds built from patients' own memories.",
+        'Inside these worlds, patients must relive and overcome their most traumatic events.',
+        'Mai and Vi, our chief medics, will accompany you through every session.',
+        'Every pill, every choice brings the patient closer to recovery — or to losing themselves entirely.',
+        'Your reflexes, your focus, and your heart will decide their fate.',
         'The journey begins now.'
       ],
       swipe_inst: 'Tap the pills!',
@@ -5407,11 +5406,11 @@ const Lore = (() => {
         'от самых глубоких душевных ран.'
       ],
       crawl: [
-        'Особое подразделение клиники — KLAS —<br>создаёт миры-симуляции<br>на основе воспоминаний пациентов.',
-        'Внутри этих миров<br>пациенты должны заново пережить<br>и преодолеть свои травмы.',
-        'Май и Ви, наши главные медики,<br>будут рядом<br>на каждом сеансе.',
-        'Каждая таблетка, каждый выбор<br>приближает пациента к выздоровлению —<br>или к полной потере себя.',
-        'Твои рефлексы, твоё внимание<br>и твоё сердце<br>решат их судьбу.',
+        'Особое подразделение клиники — KLAS — создаёт миры-симуляции на основе воспоминаний пациентов.',
+        'Внутри этих миров пациенты должны заново пережить и преодолеть свои травмы.',
+        'Май и Ви, наши главные медики, будут рядом на каждом сеансе.',
+        'Каждая таблетка, каждый выбор приближает пациента к выздоровлению — или к полной потере себя.',
+        'Твои рефлексы, твоё внимание и твоё сердце решат их судьбу.',
         'Погружение начинается.'
       ],
       swipe_inst: 'Тапай таблетки!',
@@ -5966,7 +5965,7 @@ const Lore = (() => {
     });
   }
 
-  return { start, replay, reset, isAdmin, seen };
+  return { start, replay, reset, isAdmin, seen, finishNow };
 })();
 window.Lore = Lore;
 
