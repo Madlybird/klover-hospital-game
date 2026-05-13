@@ -2923,7 +2923,7 @@ html, body {
       <div class="lore-pink-bg"></div>
       <div class="lore-swipe-instruction" id="lore-swipe-inst" data-lore-i18n="swipe_inst"></div>
       <div class="lore-score" id="lore-score">0</div>
-      <div class="lore-timer" id="lore-swipe-timer">20</div>
+      <div class="lore-timer" id="lore-swipe-timer">10</div>
       <div class="lore-pill-zone" id="lore-pill-zone"></div>
     </div>
 
@@ -5614,11 +5614,11 @@ const Lore = (() => {
     const zone = document.getElementById('lore-pill-zone');
     zone.innerHTML = '';
     livePills = 0;
-    let remaining = 20;
+    let remaining = 10;
     let score = 0;
     const timerEl = document.getElementById('lore-swipe-timer');
     const scoreEl = document.getElementById('lore-score');
-    timerEl.textContent = '20';
+    timerEl.textContent = '10';
     if (scoreEl) scoreEl.textContent = '0';
     const inst = document.getElementById('lore-swipe-inst');
     inst.classList.remove('fade');
