@@ -2104,6 +2104,470 @@ html, body {
 .modal-title { color: #3a8fd4; font-family: 'Nunito', sans-serif; }
 .modal-score { color: #e8609a; font-family: 'Nunito', sans-serif; }
 .overlay { background: rgba(10,26,58,0.6); }
+
+/* ============================================================
+   LORE INTRO
+   ============================================================ */
+#screen-lore {
+  background: #000;
+  font-family: Georgia, 'Times New Roman', Arial, serif;
+  z-index: 60;
+  align-items: stretch;
+  padding: 0;
+}
+#screen-lore .lore-scene {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+#screen-lore .lore-scene.active {
+  display: flex;
+  opacity: 1;
+}
+.lore-skip {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 100;
+  background: rgba(0,0,0,0.55);
+  border: 1px solid #378ADD;
+  color: #EBF5FF;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-family: Georgia, serif;
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  line-height: 1.1;
+  letter-spacing: 0.5px;
+}
+.lore-skip:hover { background: rgba(237,0,140,0.45); }
+.lore-dots {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 100;
+}
+.lore-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(235,245,255,0.25);
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.lore-dot.active { background: #ED008C; box-shadow: 0 0 8px #ED008C; }
+
+/* Scene 1 — hospital */
+.lore-scene1-bg {
+  position: absolute; inset: 0;
+  background: #000 url("assets/story/1.jpg") center/cover no-repeat;
+}
+.lore-scene1-bg::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(10,26,58,0.75) 100%);
+}
+.lore-lightning {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  animation: lore-flash 4.5s infinite;
+  z-index: 2;
+}
+.lore-lightning::before, .lore-lightning::after {
+  content: '';
+  position: absolute;
+  left: 55%; top: -5%;
+  width: 2px; height: 60%;
+  background: linear-gradient(180deg, #fff 0%, #378ADD 60%, transparent 100%);
+  transform-origin: top;
+  opacity: 0;
+  filter: blur(0.5px) drop-shadow(0 0 10px #378ADD) drop-shadow(0 0 20px #185FA5);
+  animation: lore-arc 4.5s infinite;
+}
+.lore-lightning::after {
+  left: 28%;
+  width: 1.5px;
+  animation-delay: 2.2s;
+  transform: rotate(7deg);
+  filter: blur(0.5px) drop-shadow(0 0 10px #5b9de8);
+}
+@keyframes lore-flash {
+  0%, 8%, 11%, 32%, 34%, 100% { background: rgba(255,255,255,0); }
+  9%, 33% { background: rgba(255,255,255,0.65); }
+  10% { background: rgba(255,255,255,0.85); }
+}
+@keyframes lore-arc {
+  0%, 7%, 13%, 100% { opacity: 0; transform: scaleY(0); }
+  9% { opacity: 1; transform: scaleY(1) rotate(-3deg); }
+  10% { opacity: 0.8; transform: scaleY(1) rotate(2deg); }
+  11% { opacity: 0; transform: scaleY(1) rotate(-3deg); }
+}
+.lore-tap-hint {
+  position: absolute;
+  top: 64px;
+  left: 0; right: 0;
+  text-align: center;
+  color: #EBF5FF;
+  font-size: 14px;
+  z-index: 5;
+  pointer-events: none;
+  animation: lore-pulse 1.4s ease-in-out infinite;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+  transition: opacity 0.6s;
+}
+.lore-tap-hint > div { line-height: 1.3; letter-spacing: 1px; }
+.lore-tap-hint > div + div { color: #F4C0D1; font-size: 12px; margin-top: 2px; }
+@keyframes lore-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(0.96); }
+  50% { opacity: 1; transform: scale(1); }
+}
+.lore-scene1-text {
+  position: relative;
+  z-index: 5;
+  color: #EBF5FF;
+  font-family: Georgia, serif;
+  font-size: 20px;
+  line-height: 1.5;
+  padding: 0 28px;
+  max-width: 560px;
+  text-shadow: 0 2px 14px rgba(0,0,0,0.85);
+}
+.lore-scene1-text .lore-line {
+  margin-bottom: 14px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.lore-scene1-text .lore-line.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+.lore-scene1-text .lore-line .lore-ru {
+  display: block;
+  font-size: 15px;
+  color: #F4C0D1;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+/* Scene 2 — Star Wars crawl */
+.lore-crawl-wrap {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  perspective: 360px;
+  overflow: hidden;
+}
+.lore-crawl {
+  position: absolute;
+  bottom: -110%;
+  left: 50%;
+  width: 88%;
+  max-width: 460px;
+  transform: translateX(-50%) rotateX(28deg);
+  transform-origin: 50% 100%;
+  color: #ED008C;
+  font-family: Georgia, serif;
+  font-size: 22px;
+  font-weight: bold;
+  line-height: 1.55;
+  text-align: center;
+  text-shadow: 0 0 14px rgba(237,0,140,0.5);
+}
+.lore-crawl.run { animation: lore-crawl-anim 22s linear forwards; }
+.lore-crawl p { margin-bottom: 26px; }
+.lore-crawl .lore-crawl-ru {
+  color: #F4C0D1;
+  font-size: 18px;
+  font-style: italic;
+  text-shadow: 0 0 10px rgba(244,192,209,0.4);
+}
+@keyframes lore-crawl-anim {
+  0%   { bottom: -110%; }
+  100% { bottom: 130%; }
+}
+
+/* Scene 3 — pill swipe */
+.lore-pink-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #ED008C 0%, #F4C0D1 100%);
+}
+.lore-swipe-instruction {
+  position: absolute;
+  top: 64px; left: 0; right: 0;
+  color: #fff;
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+  z-index: 6;
+  text-shadow: 0 2px 8px rgba(24,95,165,0.55);
+  transition: opacity 0.7s;
+  pointer-events: none;
+}
+.lore-swipe-instruction > div + div { font-size: 16px; margin-top: 4px; opacity: 0.95; }
+.lore-swipe-instruction.fade { opacity: 0; }
+.lore-timer {
+  position: absolute;
+  top: 14px;
+  right: 86px;
+  color: #fff;
+  font-size: 22px;
+  font-weight: bold;
+  background: rgba(24,95,165,0.75);
+  border: 2px solid #185FA5;
+  border-radius: 14px;
+  padding: 2px 12px;
+  z-index: 90;
+  font-family: Georgia, serif;
+  min-width: 44px;
+  text-align: center;
+}
+.lore-pill-zone {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  overflow: hidden;
+}
+.lore-pill {
+  position: absolute;
+  width: 72px;
+  height: 32px;
+  border-radius: 22px;
+  display: flex;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.35), inset 0 -4px 8px rgba(0,0,0,0.22), inset 0 4px 8px rgba(255,255,255,0.5);
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+}
+.lore-pill > span { flex: 1; height: 100%; }
+.lore-staff {
+  position: absolute;
+  left: 0; right: 0;
+  bottom: -100%;
+  z-index: 7;
+  display: flex;
+  justify-content: center;
+  transition: bottom 0.8s ease-out;
+  pointer-events: none;
+}
+.lore-staff.show { bottom: 0; }
+.lore-staff img {
+  width: 92%;
+  max-width: 380px;
+  border-radius: 18px 18px 0 0;
+  display: block;
+  box-shadow: 0 -8px 24px rgba(24,95,165,0.4);
+}
+.lore-staff-text {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 88%;
+  max-width: 340px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.85);
+  text-align: center;
+  background: rgba(24,95,165,0.7);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 12px;
+  padding: 8px 12px;
+  opacity: 0;
+  transition: opacity 1s 0.3s;
+  line-height: 1.35;
+}
+.lore-staff-text > div + div { color: #F4C0D1; font-size: 12px; font-style: italic; margin-top: 3px; }
+.lore-staff.show .lore-staff-text { opacity: 1; }
+
+/* Scene 5 — gauge */
+.lore-scene5-bg {
+  position: absolute; inset: 0;
+  background: #000 url("assets/story/3.JPG") center/cover no-repeat;
+}
+.lore-scene5-bg::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(10,26,58,0.45) 0%, rgba(10,26,58,0.88) 100%);
+}
+.lore-gauge-instruction {
+  position: relative;
+  z-index: 5;
+  color: #EBF5FF;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.75);
+  margin-bottom: 22px;
+  padding: 0 20px;
+  margin-top: 60px;
+}
+.lore-gauge-instruction > div + div { color: #F4C0D1; font-size: 14px; margin-top: 4px; font-style: italic; }
+.lore-gauge-wrap {
+  position: relative;
+  z-index: 5;
+  width: 78%;
+  max-width: 320px;
+  height: 28px;
+  background: rgba(0,0,0,0.55);
+  border: 2px solid #378ADD;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 22px;
+  box-shadow: 0 0 18px rgba(55,138,221,0.4), inset 0 2px 4px rgba(0,0,0,0.5);
+}
+.lore-gauge-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #185FA5 0%, #378ADD 55%, #ED008C 100%);
+  transition: width 0.1s linear;
+  box-shadow: 0 0 16px rgba(237,0,140,0.65);
+}
+.lore-gauge-percent {
+  position: absolute;
+  inset: 0;
+  text-align: center;
+  line-height: 28px;
+  color: #fff;
+  font-weight: bold;
+  font-size: 13px;
+  text-shadow: 0 1px 3px #000;
+  letter-spacing: 1px;
+}
+.lore-tap-btn {
+  position: relative;
+  z-index: 5;
+  background: radial-gradient(circle at 35% 30%, #ff4fb0, #ED008C 65%);
+  color: #fff;
+  border: 3px solid #F4C0D1;
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  font-size: 22px;
+  font-weight: bold;
+  font-family: Georgia, serif;
+  letter-spacing: 1px;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(237,0,140,0.55), inset 0 -8px 12px rgba(0,0,0,0.25), inset 0 6px 10px rgba(255,255,255,0.35);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.07s ease-out;
+}
+.lore-tap-btn:active { transform: scale(0.92); }
+.lore-tap-btn > span { display: block; }
+.lore-tap-btn > span + span { font-size: 14px; opacity: 0.85; }
+
+/* Scene 6A / 6B — result */
+#screen-lore [data-lore-scene="6a"],
+#screen-lore [data-lore-scene="6b"] {
+  background: linear-gradient(180deg, #EBF5FF 0%, #F4C0D1 100%);
+  padding: 30px 20px;
+  justify-content: center;
+}
+.lore-result-img {
+  max-width: 72%;
+  max-height: 44%;
+  border-radius: 16px;
+  box-shadow: 0 12px 36px rgba(24,95,165,0.4);
+  margin-bottom: 20px;
+  object-fit: cover;
+}
+.lore-result-text {
+  color: #185FA5;
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  font-family: Georgia, serif;
+  text-align: center;
+  line-height: 1.4;
+  padding: 0 8px;
+}
+.lore-result-text > div + div {
+  color: #ED008C;
+  font-size: 16px;
+  margin-top: 4px;
+  font-style: italic;
+}
+.lore-bubble {
+  background: #fff;
+  border: 2px solid #ED008C;
+  border-radius: 16px;
+  padding: 12px 18px;
+  max-width: 86%;
+  position: relative;
+  font-family: Georgia, serif;
+  font-size: 16px;
+  color: #185FA5;
+  text-align: center;
+  box-shadow: 0 6px 16px rgba(237,0,140,0.2);
+}
+.lore-bubble > div + div {
+  color: #ED008C;
+  font-size: 14px;
+  margin-top: 4px;
+  font-style: italic;
+}
+.lore-bubble::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border-left: 2px solid #ED008C;
+  border-top: 2px solid #ED008C;
+}
+.lore-confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 8;
+}
+.lore-conf-piece {
+  position: absolute;
+  width: 18px;
+  height: 9px;
+  border-radius: 6px;
+  box-shadow: inset 0 -2px 4px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.4);
+  animation: lore-conf-fall 2.6s linear forwards;
+}
+@keyframes lore-conf-fall {
+  0%   { transform: translateY(-30px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0.3; }
+}
+
+/* Admin reset button in settings */
+#admin-lore-reset-row { display: none; }
+#admin-lore-reset-row.show { display: flex; }
+
+@media (max-width: 380px) {
+  .lore-scene1-text { font-size: 17px; }
+  .lore-scene1-text .lore-line .lore-ru { font-size: 13px; }
+  .lore-crawl { font-size: 18px; }
+  .lore-crawl .lore-crawl-ru { font-size: 15px; }
+  .lore-tap-btn { width: 140px; height: 140px; font-size: 19px; }
+  .lore-result-text { font-size: 17px; }
+  .lore-bubble { font-size: 14px; }
+}
 </style>
 </head>
 <body>
@@ -2318,6 +2782,13 @@ html, body {
         </div>
         <button class="ton-btn-small" id="settings-ton-btn" onclick="Game.toggleTonConnect()" data-i18n="connect_short">CONNECT</button>
       </div>
+      <div class="settings-row" id="admin-lore-reset-row">
+        <div>
+          <div class="settings-row-label">Reset lore intro</div>
+          <div class="settings-row-sub">Admin only — replays the lore on next "Begin treatment"</div>
+        </div>
+        <button class="ton-btn-small" onclick="Lore.reset()">RESET</button>
+      </div>
     </div>
     <div class="settings-version">KLAS SYSTEM v2.0 &nbsp;|&nbsp; KLOVER HOSPITAL</div>
   </div>
@@ -2333,6 +2804,104 @@ html, body {
       <span id="shop-coins">0</span> <span data-i18n="coins">coins</span>
     </div>
     <div class="shop-grid" id="shop-grid"></div>
+  </div>
+
+  <!-- LORE INTRO -->
+  <div id="screen-lore" class="screen">
+    <button class="lore-skip" onclick="Lore.skip()">
+      <span>Skip</span>
+      <span>Пропустить</span>
+    </button>
+
+    <div class="lore-scene" data-lore-scene="1">
+      <div class="lore-scene1-bg"></div>
+      <div class="lore-lightning"></div>
+      <div class="lore-tap-hint" id="lore-s1-hint">
+        <div>Tap the screen</div>
+        <div>Нажимай на экран</div>
+      </div>
+      <div class="lore-scene1-text" id="lore-s1-lines"></div>
+    </div>
+
+    <div class="lore-scene" data-lore-scene="2">
+      <div class="lore-crawl-wrap">
+        <div class="lore-crawl" id="lore-crawl">
+          <p>The clinic's special division — KLAS —<br>creates simulation worlds<br>built from patients' own memories.</p>
+          <p>Inside these worlds,<br>patients must relive and overcome<br>their most traumatic events.</p>
+          <p>The journey begins now.</p>
+          <p class="lore-crawl-ru">Особое подразделение клиники — KLAS —<br>создаёт миры-симуляции<br>на основе воспоминаний пациентов.</p>
+          <p class="lore-crawl-ru">Внутри этих миров<br>пациенты должны заново пережить<br>и преодолеть свои травмы.</p>
+          <p class="lore-crawl-ru">Погружение начинается.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="lore-scene" data-lore-scene="3">
+      <div class="lore-pink-bg"></div>
+      <div class="lore-swipe-instruction" id="lore-swipe-inst">
+        <div>Swipe the pills away! →</div>
+        <div>Смахивай таблетки! →</div>
+      </div>
+      <div class="lore-timer" id="lore-swipe-timer">15</div>
+      <div class="lore-pill-zone" id="lore-pill-zone"></div>
+      <div class="lore-staff" id="lore-staff">
+        <img src="assets/story/2.jpg" alt="Mai & Vi">
+        <div class="lore-staff-text">
+          <div>Our caring medical staff will guide you through the simulation.</div>
+          <div>Наш заботливый медицинский персонал поможет вам пройти симуляцию.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lore-scene" data-lore-scene="5">
+      <div class="lore-scene5-bg"></div>
+      <div class="lore-timer" id="lore-gauge-timer">10</div>
+      <div class="lore-gauge-instruction">
+        <div>Tap rapidly to reach maximum!</div>
+        <div>Тапай быстро — достигни максимума!</div>
+      </div>
+      <div class="lore-gauge-wrap">
+        <div class="lore-gauge-fill" id="lore-gauge-fill"></div>
+        <div class="lore-gauge-percent" id="lore-gauge-percent">0%</div>
+      </div>
+      <button class="lore-tap-btn" id="lore-tap-btn">
+        <span>TAP!</span>
+        <span>ТАП!</span>
+      </button>
+    </div>
+
+    <div class="lore-scene" data-lore-scene="6a">
+      <img class="lore-result-img" src="assets/story/5.PNG" alt="Mai happy">
+      <div class="lore-result-text">
+        <div>Outstanding work! Simulation ready.</div>
+        <div>Отличная работа! Симуляция готова.</div>
+      </div>
+      <div class="lore-bubble">
+        <div>"I knew you could do it!"</div>
+        <div>«Я знала, что ты справишься!»</div>
+      </div>
+      <div class="lore-confetti" id="lore-confetti"></div>
+    </div>
+
+    <div class="lore-scene" data-lore-scene="6b">
+      <img class="lore-result-img" src="assets/story/4.JPG" alt="Mai worried">
+      <div class="lore-result-text">
+        <div>Hey... can you hear me?</div>
+        <div>Эй... ты меня слышишь?</div>
+      </div>
+      <div class="lore-bubble">
+        <div>"We need to try again. Focus!"</div>
+        <div>«Нам нужно попробовать снова. Сосредоточься!»</div>
+      </div>
+    </div>
+
+    <div class="lore-dots">
+      <span class="lore-dot" data-dot="1"></span>
+      <span class="lore-dot" data-dot="2"></span>
+      <span class="lore-dot" data-dot="3"></span>
+      <span class="lore-dot" data-dot="5"></span>
+      <span class="lore-dot" data-dot="6"></span>
+    </div>
   </div>
 
   <!-- OVERLAYS -->
@@ -3213,6 +3782,10 @@ const Game = (() => {
   }
 
   function startLevel(levelId) {
+    if (levelId === 1 && window.Lore && !window.Lore.seen()) {
+      window.Lore.start(() => startLevel(levelId));
+      return;
+    }
     const lvl = LEVELS.find(l => l.id === levelId);
     if (!lvl) return;
     if (!lvl.unlocked && !state.level1complete && levelId === 2) {
@@ -4276,6 +4849,8 @@ const Game = (() => {
   // ---- SETTINGS ----
   function updateSettingsUI() {
     document.getElementById('sound-toggle').checked = state.sound;
+    const adminRow = document.getElementById('admin-lore-reset-row');
+    if (adminRow) adminRow.classList.toggle('show', window.Lore && window.Lore.isAdmin());
     const langEn = document.getElementById('lang-en');
     const langRu = document.getElementById('lang-ru');
     if (state.lang === 'ru') {
@@ -4631,6 +5206,326 @@ const Game = (() => {
     connectWalletGate,
   };
 })();
+
+// ============================================================
+// LORE INTRO MODULE
+// ============================================================
+const Lore = (() => {
+  const KEY = 'klover_lore_seen';
+  const ADMIN_TG_ID = 264154297;
+  const S1_EN = [
+    "In the near future...",
+    "...there is a clinic called KLover.",
+    "A place that helps patients heal",
+    "from their deepest emotional wounds."
+  ];
+  const S1_RU = [
+    "В недалёком будущем...",
+    "...существует клиника KLover.",
+    "Место, которое помогает пациентам исцелиться",
+    "от самых глубоких душевных ран."
+  ];
+  const PILL_COLORS = ['#ED008C', '#F4C0D1', '#185FA5', '#378ADD', '#EBF5FF', '#f0c030'];
+
+  let onComplete = null;
+  let s1Step = 0;
+  let s1Lock = false;
+  let timers = [];
+  let listeners = [];
+  let gaugeVal = 0;
+
+  function clearTimers() {
+    timers.forEach(t => { try { clearTimeout(t); clearInterval(t); } catch {} });
+    timers = [];
+  }
+  function on(el, ev, fn, opts) {
+    el.addEventListener(ev, fn, opts);
+    listeners.push([el, ev, fn, opts]);
+  }
+  function clearListeners() {
+    listeners.forEach(([el, ev, fn, opts]) => {
+      try { el.removeEventListener(ev, fn, opts); } catch {}
+    });
+    listeners = [];
+  }
+  function haptic(type) {
+    try { window.Telegram.WebApp.HapticFeedback.impactOccurred(type || 'light'); } catch {}
+  }
+
+  function showScene(name) {
+    const root = document.getElementById('screen-lore');
+    if (!root) return;
+    root.querySelectorAll('.lore-scene').forEach(s => s.classList.remove('active'));
+    const el = root.querySelector('[data-lore-scene="' + name + '"]');
+    if (el) el.classList.add('active');
+    const dotMap = { '1':'1', '2':'2', '3':'3', '5':'5', '6a':'6', '6b':'6' };
+    const want = dotMap[name];
+    root.querySelectorAll('.lore-dot').forEach(d => {
+      d.classList.toggle('active', d.dataset.dot === want);
+    });
+  }
+
+  function start(cb) {
+    onComplete = cb;
+    clearTimers();
+    clearListeners();
+    document.querySelectorAll('.screen').forEach(s => {
+      if (s.id !== 'screen-lore') s.classList.remove('active');
+    });
+    document.getElementById('screen-lore').classList.add('active');
+    runScene1();
+  }
+
+  function finish() {
+    clearTimers();
+    clearListeners();
+    try { localStorage.setItem(KEY, '1'); } catch {}
+    const root = document.getElementById('screen-lore');
+    if (root) {
+      root.classList.remove('active');
+      root.querySelectorAll('.lore-scene').forEach(s => s.classList.remove('active'));
+    }
+    const cb = onComplete;
+    onComplete = null;
+    if (cb) cb();
+  }
+
+  function skip() { finish(); }
+
+  // ---- Scene 1 ----
+  function runScene1() {
+    clearListeners();
+    clearTimers();
+    showScene('1');
+    s1Step = 0;
+    s1Lock = false;
+    const wrap = document.getElementById('lore-s1-lines');
+    wrap.innerHTML = S1_EN.map((en, i) =>
+      '<div class="lore-line" data-step="' + i + '">' +
+        en +
+        '<span class="lore-ru">' + S1_RU[i] + '</span>' +
+      '</div>'
+    ).join('');
+    const hint = document.getElementById('lore-s1-hint');
+    if (hint) hint.style.opacity = '';
+    const scene = document.querySelector('#screen-lore [data-lore-scene="1"]');
+    on(scene, 'click', s1Tap);
+  }
+  function s1Tap() {
+    if (s1Lock) return;
+    s1Lock = true;
+    setTimeout(() => { s1Lock = false; }, 220);
+    haptic('light');
+    if (s1Step < S1_EN.length) {
+      const line = document.querySelector('#lore-s1-lines [data-step="' + s1Step + '"]');
+      if (line) line.classList.add('show');
+      s1Step++;
+      const hint = document.getElementById('lore-s1-hint');
+      if (hint && s1Step === 1) hint.style.opacity = '0';
+    } else {
+      runScene2();
+    }
+  }
+
+  // ---- Scene 2 ----
+  function runScene2() {
+    clearListeners();
+    clearTimers();
+    showScene('2');
+    const crawl = document.getElementById('lore-crawl');
+    crawl.classList.remove('run');
+    void crawl.offsetWidth;
+    crawl.classList.add('run');
+    const scene = document.querySelector('#screen-lore [data-lore-scene="2"]');
+    const advance = () => { clearListeners(); clearTimers(); runScene3(); };
+    on(scene, 'click', advance);
+    timers.push(setTimeout(advance, 22000));
+  }
+
+  // ---- Scene 3 + 4 ----
+  function runScene3() {
+    clearListeners();
+    clearTimers();
+    showScene('3');
+    const zone = document.getElementById('lore-pill-zone');
+    zone.innerHTML = '';
+    let remaining = 15;
+    const timerEl = document.getElementById('lore-swipe-timer');
+    timerEl.textContent = '15';
+    const inst = document.getElementById('lore-swipe-inst');
+    inst.classList.remove('fade');
+    timers.push(setTimeout(() => inst.classList.add('fade'), 3000));
+    document.getElementById('lore-staff').classList.remove('show');
+
+    for (let i = 0; i < 10; i++) {
+      timers.push(setTimeout(() => spawnPill(zone), 600 + i * 1100));
+    }
+    const tick = setInterval(() => {
+      remaining -= 1;
+      timerEl.textContent = String(remaining);
+      if (remaining === 8) {
+        document.getElementById('lore-staff').classList.add('show');
+      }
+      if (remaining <= 0) {
+        clearInterval(tick);
+        runScene5();
+      }
+    }, 1000);
+    timers.push(tick);
+  }
+
+  function spawnPill(zone) {
+    if (!zone || !zone.isConnected) return;
+    const rect = zone.getBoundingClientRect();
+    const w = rect.width || window.innerWidth;
+    const h = rect.height || window.innerHeight;
+    const top = 110 + Math.random() * Math.max(60, h - 320);
+    const pill = document.createElement('div');
+    pill.className = 'lore-pill';
+    const c1 = PILL_COLORS[Math.floor(Math.random() * PILL_COLORS.length)];
+    let c2 = PILL_COLORS[Math.floor(Math.random() * PILL_COLORS.length)];
+    if (c2 === c1) c2 = PILL_COLORS[(PILL_COLORS.indexOf(c1) + 1) % PILL_COLORS.length];
+    pill.innerHTML = '<span style="background:' + c1 + '"></span><span style="background:' + c2 + '"></span>';
+    pill.style.left = (w + 40) + 'px';
+    pill.style.top = top + 'px';
+    zone.appendChild(pill);
+
+    const startTime = performance.now();
+    const speed = 60 + Math.random() * 30;
+    function step(now) {
+      if (!pill.isConnected) return;
+      if (pill.dataset.swiped === '1') return;
+      const dt = (now - startTime) / 1000;
+      const x = w + 40 - dt * speed;
+      pill.style.left = x + 'px';
+      if (x < -120) { pill.remove(); return; }
+      requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+
+    let startX = null;
+    const startSwipe = (clientX) => { startX = clientX; };
+    const moveSwipe = (clientX) => {
+      if (startX == null) return;
+      const dx = clientX - startX;
+      if (dx < -30) swipeAway();
+    };
+    const swipeAway = () => {
+      if (pill.dataset.swiped === '1') return;
+      pill.dataset.swiped = '1';
+      pill.style.transition = 'transform 0.35s, opacity 0.35s';
+      pill.style.transform = 'translateX(-260px) rotate(-22deg)';
+      pill.style.opacity = '0';
+      haptic('medium');
+      setTimeout(() => pill.remove(), 380);
+    };
+    pill.addEventListener('pointerdown', e => startSwipe(e.clientX));
+    pill.addEventListener('pointermove', e => moveSwipe(e.clientX));
+    pill.addEventListener('pointerup', () => { startX = null; });
+    pill.addEventListener('touchstart', e => { if (e.touches[0]) startSwipe(e.touches[0].clientX); }, { passive: true });
+    pill.addEventListener('touchmove', e => { if (e.touches[0]) moveSwipe(e.touches[0].clientX); }, { passive: true });
+    pill.addEventListener('touchend', () => { startX = null; });
+    pill.addEventListener('click', swipeAway);
+  }
+
+  // ---- Scene 5 (gauge) ----
+  function runScene5() {
+    clearListeners();
+    clearTimers();
+    showScene('5');
+    gaugeVal = 0;
+    let remaining = 10;
+    const fill = document.getElementById('lore-gauge-fill');
+    const pct = document.getElementById('lore-gauge-percent');
+    const timerEl = document.getElementById('lore-gauge-timer');
+    fill.style.width = '0%';
+    pct.textContent = '0%';
+    timerEl.textContent = '10';
+    const btn = document.getElementById('lore-tap-btn');
+
+    const onTap = (e) => {
+      e.preventDefault();
+      gaugeVal = Math.min(100, gaugeVal + 4.5);
+      fill.style.width = gaugeVal + '%';
+      pct.textContent = Math.round(gaugeVal) + '%';
+      haptic('light');
+    };
+    on(btn, 'click', onTap);
+    on(btn, 'touchstart', onTap, { passive: false });
+
+    const drain = setInterval(() => {
+      gaugeVal = Math.max(0, gaugeVal - 1.6);
+      fill.style.width = gaugeVal + '%';
+      pct.textContent = Math.round(gaugeVal) + '%';
+    }, 100);
+    timers.push(drain);
+
+    const tick = setInterval(() => {
+      remaining -= 1;
+      timerEl.textContent = String(remaining);
+      if (remaining <= 0) {
+        clearInterval(tick);
+        clearInterval(drain);
+        if (gaugeVal >= 80) runScene6A();
+        else runScene6B();
+      }
+    }, 1000);
+    timers.push(tick);
+  }
+
+  // ---- Scene 6A ----
+  function runScene6A() {
+    clearListeners();
+    clearTimers();
+    showScene('6a');
+    haptic('heavy');
+    const wrap = document.getElementById('lore-confetti');
+    wrap.innerHTML = '';
+    for (let i = 0; i < 50; i++) {
+      const p = document.createElement('div');
+      p.className = 'lore-conf-piece';
+      p.style.left = (Math.random() * 100) + '%';
+      p.style.top = (-Math.random() * 80) + 'px';
+      p.style.background = PILL_COLORS[Math.floor(Math.random() * PILL_COLORS.length)];
+      p.style.animationDelay = (Math.random() * 1.4) + 's';
+      p.style.animationDuration = (1.8 + Math.random() * 1.4) + 's';
+      wrap.appendChild(p);
+    }
+    timers.push(setTimeout(finish, 3000));
+  }
+
+  // ---- Scene 6B ----
+  function runScene6B() {
+    clearListeners();
+    clearTimers();
+    showScene('6b');
+    haptic('medium');
+    timers.push(setTimeout(runScene5, 2000));
+  }
+
+  function isAdmin() {
+    try {
+      const id = window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user && window.Telegram.WebApp.initDataUnsafe.user.id;
+      return id === ADMIN_TG_ID;
+    } catch { return false; }
+  }
+  function reset() {
+    try { localStorage.removeItem(KEY); } catch {}
+    try {
+      const el = document.createElement('div');
+      el.className = 'toast';
+      el.textContent = 'Lore reset — replays on next Begin treatment';
+      document.getElementById('app').appendChild(el);
+      setTimeout(() => el.remove(), 3000);
+    } catch {}
+  }
+  function seen() {
+    try { return localStorage.getItem(KEY) === '1'; } catch { return false; }
+  }
+
+  return { start, skip, reset, isAdmin, seen };
+})();
+window.Lore = Lore;
 
 // ============================================================
 // TELEGRAM WEB APP INIT
