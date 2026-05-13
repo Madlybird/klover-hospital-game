@@ -238,6 +238,22 @@ html, body {
   margin-bottom: 20px;
 }
 
+.btn-story {
+  background: rgba(237,0,140,0.18);
+  border: 1px solid rgba(237,0,140,0.55);
+  color: #ED008C;
+  border-radius: 14px;
+  padding: 6px 12px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.btn-story:hover { background: rgba(237,0,140,0.35); }
+
 .btn-back {
   background: transparent;
   border: 2px solid rgba(252,252,252,0.2);
@@ -2131,26 +2147,6 @@ html, body {
   display: flex;
   opacity: 1;
 }
-.lore-skip {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  z-index: 100;
-  background: rgba(0,0,0,0.55);
-  border: 1px solid #378ADD;
-  color: #EBF5FF;
-  padding: 6px 12px;
-  border-radius: 16px;
-  font-family: Georgia, serif;
-  font-size: 11px;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  line-height: 1.1;
-  letter-spacing: 0.5px;
-}
-.lore-skip:hover { background: rgba(237,0,140,0.45); }
 .lore-dots {
   position: absolute;
   bottom: 14px;
@@ -2255,13 +2251,6 @@ html, body {
   opacity: 1;
   transform: translateY(0);
 }
-.lore-scene1-text .lore-line .lore-ru {
-  display: block;
-  font-size: 15px;
-  color: #F4C0D1;
-  margin-top: 4px;
-  font-style: italic;
-}
 
 /* Scene 2 — Star Wars crawl */
 .lore-crawl-wrap {
@@ -2355,46 +2344,50 @@ html, body {
   user-select: none;
 }
 .lore-pill > span { flex: 1; height: 100%; }
-.lore-staff {
+
+/* Scene 4 — fullscreen image + caption */
+#screen-lore [data-lore-scene="4"] { background: #000; padding: 0; }
+.lore-fullscreen-img {
   position: absolute;
-  left: 0; right: 0;
-  bottom: -100%;
-  z-index: 7;
-  display: flex;
-  justify-content: center;
-  transition: bottom 0.8s ease-out;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+.lore-fullscreen-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(10,26,58,0.85) 100%);
   pointer-events: none;
 }
-.lore-staff.show { bottom: 0; }
-.lore-staff img {
-  width: 92%;
-  max-width: 380px;
-  border-radius: 18px 18px 0 0;
-  display: block;
-  box-shadow: 0 -8px 24px rgba(24,95,165,0.4);
-}
-.lore-staff-text {
+.lore-fullscreen-text {
   position: absolute;
-  top: 14px;
+  bottom: 60px;
   left: 50%;
   transform: translateX(-50%);
-  width: 88%;
-  max-width: 340px;
+  width: 90%;
+  max-width: 420px;
+  z-index: 5;
   color: #fff;
-  font-size: 14px;
+  font-size: 18px;
   font-weight: bold;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.85);
   text-align: center;
-  background: rgba(24,95,165,0.7);
-  border: 1px solid rgba(255,255,255,0.3);
-  border-radius: 12px;
-  padding: 8px 12px;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.95);
+  background: rgba(24,95,165,0.55);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 14px;
+  padding: 14px 18px;
+  font-family: Georgia, serif;
+  line-height: 1.45;
   opacity: 0;
-  transition: opacity 1s 0.3s;
-  line-height: 1.35;
+  animation: lore-fade-up 0.9s ease-out 0.2s forwards;
 }
-.lore-staff-text > div + div { color: #F4C0D1; font-size: 12px; font-style: italic; margin-top: 3px; }
-.lore-staff.show .lore-staff-text { opacity: 1; }
+@keyframes lore-fade-up {
+  from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
 
 /* Scene 5 — gauge */
 .lore-scene5-bg {
@@ -2641,7 +2634,8 @@ html, body {
   <div id="screen-levels" class="screen">
     <div class="howto-header">
       <button class="btn-back" onclick="Game.showScreen('menu')">&#8592;</button>
-      <div class="screen-title" data-i18n="levels_title">Patient assignment</div>
+      <div class="screen-title" data-i18n="levels_title" style="flex:1">Patient assignment</div>
+      <button class="btn-story" onclick="Lore.replay()" data-i18n="story_btn" title="Replay intro">Story</button>
     </div>
     <div class="patient-subtitle" data-i18n="levels_subtitle">Select your patient for today's treatment:</div>
     <div class="levels-grid">
@@ -2808,97 +2802,66 @@ html, body {
 
   <!-- LORE INTRO -->
   <div id="screen-lore" class="screen">
-    <button class="lore-skip" onclick="Lore.skip()">
-      <span>Skip</span>
-      <span>Пропустить</span>
-    </button>
 
     <div class="lore-scene" data-lore-scene="1">
       <div class="lore-scene1-bg"></div>
       <div class="lore-lightning"></div>
       <div class="lore-tap-hint" id="lore-s1-hint">
-        <div>Tap the screen</div>
-        <div>Нажимай на экран</div>
+        <div data-lore-i18n="tap_screen"></div>
       </div>
       <div class="lore-scene1-text" id="lore-s1-lines"></div>
     </div>
 
     <div class="lore-scene" data-lore-scene="2">
       <div class="lore-crawl-wrap">
-        <div class="lore-crawl" id="lore-crawl">
-          <p>The clinic's special division — KLAS —<br>creates simulation worlds<br>built from patients' own memories.</p>
-          <p>Inside these worlds,<br>patients must relive and overcome<br>their most traumatic events.</p>
-          <p>The journey begins now.</p>
-          <p class="lore-crawl-ru">Особое подразделение клиники — KLAS —<br>создаёт миры-симуляции<br>на основе воспоминаний пациентов.</p>
-          <p class="lore-crawl-ru">Внутри этих миров<br>пациенты должны заново пережить<br>и преодолеть свои травмы.</p>
-          <p class="lore-crawl-ru">Погружение начинается.</p>
-        </div>
+        <div class="lore-crawl" id="lore-crawl"></div>
       </div>
     </div>
 
     <div class="lore-scene" data-lore-scene="3">
       <div class="lore-pink-bg"></div>
-      <div class="lore-swipe-instruction" id="lore-swipe-inst">
-        <div>Swipe the pills away! →</div>
-        <div>Смахивай таблетки! →</div>
-      </div>
-      <div class="lore-timer" id="lore-swipe-timer">15</div>
+      <div class="lore-swipe-instruction" id="lore-swipe-inst" data-lore-i18n="swipe_inst"></div>
+      <div class="lore-timer" id="lore-swipe-timer">20</div>
       <div class="lore-pill-zone" id="lore-pill-zone"></div>
-      <div class="lore-staff" id="lore-staff">
-        <img src="assets/story/2.jpg" alt="Mai & Vi">
-        <div class="lore-staff-text">
-          <div>Our caring medical staff will guide you through the simulation.</div>
-          <div>Наш заботливый медицинский персонал поможет вам пройти симуляцию.</div>
-        </div>
-      </div>
+    </div>
+
+    <div class="lore-scene" data-lore-scene="4">
+      <img class="lore-fullscreen-img" src="assets/story/2.jpg" alt="Mai & Vi">
+      <div class="lore-fullscreen-overlay"></div>
+      <div class="lore-fullscreen-text" data-lore-i18n="staff_caption"></div>
     </div>
 
     <div class="lore-scene" data-lore-scene="5">
       <div class="lore-scene5-bg"></div>
       <div class="lore-timer" id="lore-gauge-timer">10</div>
-      <div class="lore-gauge-instruction">
-        <div>Tap rapidly to reach maximum!</div>
-        <div>Тапай быстро — достигни максимума!</div>
-      </div>
+      <div class="lore-gauge-instruction" data-lore-i18n="gauge_inst"></div>
       <div class="lore-gauge-wrap">
         <div class="lore-gauge-fill" id="lore-gauge-fill"></div>
         <div class="lore-gauge-percent" id="lore-gauge-percent">0%</div>
       </div>
       <button class="lore-tap-btn" id="lore-tap-btn">
-        <span>TAP!</span>
-        <span>ТАП!</span>
+        <span data-lore-i18n="tap_btn"></span>
       </button>
     </div>
 
     <div class="lore-scene" data-lore-scene="6a">
       <img class="lore-result-img" src="assets/story/5.PNG" alt="Mai happy">
-      <div class="lore-result-text">
-        <div>Outstanding work! Simulation ready.</div>
-        <div>Отличная работа! Симуляция готова.</div>
-      </div>
-      <div class="lore-bubble">
-        <div>"I knew you could do it!"</div>
-        <div>«Я знала, что ты справишься!»</div>
-      </div>
+      <div class="lore-result-text" data-lore-i18n="success_text"></div>
+      <div class="lore-bubble" data-lore-i18n="success_bubble"></div>
       <div class="lore-confetti" id="lore-confetti"></div>
     </div>
 
     <div class="lore-scene" data-lore-scene="6b">
       <img class="lore-result-img" src="assets/story/4.JPG" alt="Mai worried">
-      <div class="lore-result-text">
-        <div>Hey... can you hear me?</div>
-        <div>Эй... ты меня слышишь?</div>
-      </div>
-      <div class="lore-bubble">
-        <div>"We need to try again. Focus!"</div>
-        <div>«Нам нужно попробовать снова. Сосредоточься!»</div>
-      </div>
+      <div class="lore-result-text" data-lore-i18n="fail_text"></div>
+      <div class="lore-bubble" data-lore-i18n="fail_bubble"></div>
     </div>
 
     <div class="lore-dots">
       <span class="lore-dot" data-dot="1"></span>
       <span class="lore-dot" data-dot="2"></span>
       <span class="lore-dot" data-dot="3"></span>
+      <span class="lore-dot" data-dot="4"></span>
       <span class="lore-dot" data-dot="5"></span>
       <span class="lore-dot" data-dot="6"></span>
     </div>
@@ -3066,6 +3029,7 @@ const I18N = {
     howto_title: "Nurse Mai's treatment guide",
     levels_title: 'Patient assignment',
     levels_subtitle: "Select your patient for today's treatment:",
+    story_btn: 'Story',
     lvl1_priority: 'PRIORITY PATIENT · Requires immediate care',
     begin_treatment: 'Begin treatment',
     review_case: 'Review case',
@@ -3150,6 +3114,7 @@ const I18N = {
     howto_title: 'Гид от медсестры Май',
     levels_title: 'Назначение пациента',
     levels_subtitle: 'Выберите пациента на сегодня:',
+    story_btn: 'История',
     lvl1_priority: 'ВАЖНЫЙ ПАЦИЕНТ · Требуется срочный уход',
     begin_treatment: 'Начать лечение',
     review_case: 'Обзор дела',
@@ -5213,23 +5178,193 @@ const Game = (() => {
 const Lore = (() => {
   const KEY = 'klover_lore_seen';
   const ADMIN_TG_ID = 264154297;
-  const S1_EN = [
-    "In the near future...",
-    "...there is a clinic called KLover.",
-    "A place that helps patients heal",
-    "from their deepest emotional wounds."
-  ];
-  const S1_RU = [
-    "В недалёком будущем...",
-    "...существует клиника KLover.",
-    "Место, которое помогает пациентам исцелиться",
-    "от самых глубоких душевных ран."
-  ];
   const PILL_COLORS = ['#ED008C', '#F4C0D1', '#185FA5', '#378ADD', '#EBF5FF', '#f0c030'];
+  const SCENE1_LIGHTNING_MS = 20000;
+  const SCENE4_AUTO_MS = 5000;
+
+  const L = {
+    en: {
+      tap_screen: 'Tap the screen',
+      s1: [
+        'In the near future...',
+        '...there is a clinic called KLover.',
+        'A place that helps patients heal',
+        'from their deepest emotional wounds.'
+      ],
+      crawl: [
+        "The clinic's special division — KLAS —<br>creates simulation worlds<br>built from patients' own memories.",
+        'Inside these worlds,<br>patients must relive and overcome<br>their most traumatic events.',
+        'The journey begins now.'
+      ],
+      swipe_inst: 'Swipe the pills away! →',
+      staff_caption: 'Our caring medical staff will guide you through the simulation.',
+      gauge_inst: 'Tap rapidly to reach maximum!',
+      tap_btn: 'TAP!',
+      success_text: 'Outstanding work! Simulation ready.',
+      success_bubble: '"I knew you could do it!"',
+      fail_text: 'Hey... can you hear me?',
+      fail_bubble: '"We need to try again. Focus!"'
+    },
+    ru: {
+      tap_screen: 'Нажимай на экран',
+      s1: [
+        'В недалёком будущем...',
+        '...существует клиника KLover.',
+        'Место, которое помогает пациентам исцелиться',
+        'от самых глубоких душевных ран.'
+      ],
+      crawl: [
+        'Особое подразделение клиники — KLAS —<br>создаёт миры-симуляции<br>на основе воспоминаний пациентов.',
+        'Внутри этих миров<br>пациенты должны заново пережить<br>и преодолеть свои травмы.',
+        'Погружение начинается.'
+      ],
+      swipe_inst: 'Смахивай таблетки! →',
+      staff_caption: 'Наш заботливый медицинский персонал поможет вам пройти симуляцию.',
+      gauge_inst: 'Тапай быстро — достигни максимума!',
+      tap_btn: 'ТАП!',
+      success_text: 'Отличная работа! Симуляция готова.',
+      success_bubble: '«Я знала, что ты справишься!»',
+      fail_text: 'Эй... ты меня слышишь?',
+      fail_bubble: '«Нам нужно попробовать снова. Сосредоточься!»'
+    }
+  };
+  function getLang() { return (window.__currentLang === 'ru') ? 'ru' : 'en'; }
+  function tr(k) { return L[getLang()][k]; }
+  function applyI18n() {
+    const root = document.getElementById('screen-lore');
+    if (!root) return;
+    root.querySelectorAll('[data-lore-i18n]').forEach(el => {
+      const k = el.getAttribute('data-lore-i18n');
+      const v = tr(k);
+      if (v !== undefined) el.innerHTML = v;
+    });
+  }
+
+  // ---- Music + tap SFX ----
+  const Music = (() => {
+    let ctx = null;
+    let masterGain = null;
+    let live = false;
+    function ensureCtx() {
+      if (ctx) return ctx;
+      const C = window.AudioContext || window.webkitAudioContext;
+      if (!C) return null;
+      ctx = new C();
+      return ctx;
+    }
+    function start() {
+      try {
+        stop();
+        const c = ensureCtx();
+        if (!c) return;
+        if (c.state === 'suspended') c.resume();
+        masterGain = c.createGain();
+        masterGain.gain.setValueAtTime(0, c.currentTime);
+        masterGain.gain.linearRampToValueAtTime(0.10, c.currentTime + 2.5);
+        masterGain.connect(c.destination);
+
+        const lp = c.createBiquadFilter();
+        lp.type = 'lowpass';
+        lp.frequency.value = 700;
+        lp.Q.value = 0.6;
+        lp.connect(masterGain);
+
+        const o1 = c.createOscillator();
+        o1.type = 'sine';
+        o1.frequency.value = 110;
+        o1.connect(lp);
+        o1.start();
+
+        const o2 = c.createOscillator();
+        o2.type = 'triangle';
+        o2.frequency.value = 164.81;
+        o2.detune.value = -5;
+        const g2 = c.createGain();
+        g2.gain.value = 0.55;
+        o2.connect(g2); g2.connect(lp);
+        o2.start();
+
+        const o3 = c.createOscillator();
+        o3.type = 'sine';
+        o3.frequency.value = 220;
+        const g3 = c.createGain();
+        g3.gain.value = 0.25;
+        o3.connect(g3); g3.connect(lp);
+        o3.start();
+
+        const lfo = c.createOscillator();
+        lfo.type = 'sine';
+        lfo.frequency.value = 0.06;
+        const lfoG = c.createGain();
+        lfoG.gain.value = 300;
+        lfo.connect(lfoG); lfoG.connect(lp.frequency);
+        lfo.start();
+
+        live = true;
+      } catch (e) {}
+    }
+    function stop() {
+      if (!ctx) return;
+      try {
+        if (masterGain) {
+          masterGain.gain.cancelScheduledValues(ctx.currentTime);
+          masterGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.7);
+        }
+        const c = ctx;
+        setTimeout(() => { try { c.close(); } catch (e) {} }, 900);
+      } catch (e) {}
+      ctx = null;
+      masterGain = null;
+      live = false;
+    }
+    function tapSfx() {
+      try {
+        const c = ctx || ensureCtx();
+        if (!c) return;
+        if (c.state === 'suspended') c.resume();
+        const osc = c.createOscillator();
+        const g = c.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, c.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(440, c.currentTime + 0.08);
+        g.gain.setValueAtTime(0.18, c.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.14);
+        osc.connect(g); g.connect(c.destination);
+        osc.start();
+        osc.stop(c.currentTime + 0.15);
+      } catch (e) {}
+    }
+    function chord(freqs, dur) {
+      try {
+        const c = ctx || ensureCtx();
+        if (!c) return;
+        freqs.forEach((f, i) => {
+          const osc = c.createOscillator();
+          const g = c.createGain();
+          osc.type = 'triangle';
+          osc.frequency.value = f;
+          g.gain.setValueAtTime(0.0, c.currentTime);
+          g.gain.linearRampToValueAtTime(0.12, c.currentTime + 0.04);
+          g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + dur);
+          osc.connect(g); g.connect(c.destination);
+          osc.start(c.currentTime + i * 0.05);
+          osc.stop(c.currentTime + dur + 0.05);
+        });
+      } catch (e) {}
+    }
+    return { start, stop, tapSfx, chord, get live() { return live; } };
+  })();
+
+  function tap(strength) {
+    try { window.Telegram.WebApp.HapticFeedback.impactOccurred(strength || 'medium'); } catch (e) {}
+    try { if (navigator.vibrate) navigator.vibrate(strength === 'heavy' ? 60 : strength === 'light' ? 15 : 30); } catch (e) {}
+    Music.tapSfx();
+  }
 
   let onComplete = null;
   let s1Step = 0;
   let s1Lock = false;
+  let s1ReadyAt = 0;
   let timers = [];
   let listeners = [];
   let gaugeVal = 0;
@@ -5248,17 +5383,13 @@ const Lore = (() => {
     });
     listeners = [];
   }
-  function haptic(type) {
-    try { window.Telegram.WebApp.HapticFeedback.impactOccurred(type || 'light'); } catch {}
-  }
-
   function showScene(name) {
     const root = document.getElementById('screen-lore');
     if (!root) return;
     root.querySelectorAll('.lore-scene').forEach(s => s.classList.remove('active'));
     const el = root.querySelector('[data-lore-scene="' + name + '"]');
     if (el) el.classList.add('active');
-    const dotMap = { '1':'1', '2':'2', '3':'3', '5':'5', '6a':'6', '6b':'6' };
+    const dotMap = { '1':'1', '2':'2', '3':'3', '4':'4', '5':'5', '6a':'6', '6b':'6' };
     const want = dotMap[name];
     root.querySelectorAll('.lore-dot').forEach(d => {
       d.classList.toggle('active', d.dataset.dot === want);
@@ -5269,16 +5400,19 @@ const Lore = (() => {
     onComplete = cb;
     clearTimers();
     clearListeners();
+    applyI18n();
     document.querySelectorAll('.screen').forEach(s => {
       if (s.id !== 'screen-lore') s.classList.remove('active');
     });
     document.getElementById('screen-lore').classList.add('active');
+    Music.start();
     runScene1();
   }
 
   function finish() {
     clearTimers();
     clearListeners();
+    Music.stop();
     try { localStorage.setItem(KEY, '1'); } catch {}
     const root = document.getElementById('screen-lore');
     if (root) {
@@ -5290,8 +5424,6 @@ const Lore = (() => {
     if (cb) cb();
   }
 
-  function skip() { finish(); }
-
   // ---- Scene 1 ----
   function runScene1() {
     clearListeners();
@@ -5299,24 +5431,29 @@ const Lore = (() => {
     showScene('1');
     s1Step = 0;
     s1Lock = false;
+    s1ReadyAt = Date.now() + SCENE1_LIGHTNING_MS;
     const wrap = document.getElementById('lore-s1-lines');
-    wrap.innerHTML = S1_EN.map((en, i) =>
-      '<div class="lore-line" data-step="' + i + '">' +
-        en +
-        '<span class="lore-ru">' + S1_RU[i] + '</span>' +
-      '</div>'
+    const lines = L[getLang()].s1;
+    wrap.innerHTML = lines.map((line, i) =>
+      '<div class="lore-line" data-step="' + i + '">' + line + '</div>'
     ).join('');
     const hint = document.getElementById('lore-s1-hint');
-    if (hint) hint.style.opacity = '';
+    if (hint) hint.style.opacity = '0';
     const scene = document.querySelector('#screen-lore [data-lore-scene="1"]');
     on(scene, 'click', s1Tap);
+    timers.push(setTimeout(() => {
+      const h = document.getElementById('lore-s1-hint');
+      if (h) h.style.opacity = '';
+    }, SCENE1_LIGHTNING_MS));
   }
   function s1Tap() {
+    if (Date.now() < s1ReadyAt) return;
     if (s1Lock) return;
     s1Lock = true;
     setTimeout(() => { s1Lock = false; }, 220);
-    haptic('light');
-    if (s1Step < S1_EN.length) {
+    tap('light');
+    const lines = L[getLang()].s1;
+    if (s1Step < lines.length) {
       const line = document.querySelector('#lore-s1-lines [data-step="' + s1Step + '"]');
       if (line) line.classList.add('show');
       s1Step++;
@@ -5333,6 +5470,7 @@ const Lore = (() => {
     clearTimers();
     showScene('2');
     const crawl = document.getElementById('lore-crawl');
+    crawl.innerHTML = L[getLang()].crawl.map(p => '<p>' + p + '</p>').join('');
     crawl.classList.remove('run');
     void crawl.offsetWidth;
     crawl.classList.add('run');
@@ -5342,36 +5480,44 @@ const Lore = (() => {
     timers.push(setTimeout(advance, 22000));
   }
 
-  // ---- Scene 3 + 4 ----
+  // ---- Scene 3 (pills only, 20s) ----
   function runScene3() {
     clearListeners();
     clearTimers();
     showScene('3');
     const zone = document.getElementById('lore-pill-zone');
     zone.innerHTML = '';
-    let remaining = 15;
+    let remaining = 20;
     const timerEl = document.getElementById('lore-swipe-timer');
-    timerEl.textContent = '15';
+    timerEl.textContent = '20';
     const inst = document.getElementById('lore-swipe-inst');
     inst.classList.remove('fade');
     timers.push(setTimeout(() => inst.classList.add('fade'), 3000));
-    document.getElementById('lore-staff').classList.remove('show');
 
-    for (let i = 0; i < 10; i++) {
-      timers.push(setTimeout(() => spawnPill(zone), 600 + i * 1100));
+    for (let i = 0; i < 14; i++) {
+      timers.push(setTimeout(() => spawnPill(zone), 600 + i * 1200));
     }
     const tick = setInterval(() => {
       remaining -= 1;
       timerEl.textContent = String(remaining);
-      if (remaining === 8) {
-        document.getElementById('lore-staff').classList.add('show');
-      }
       if (remaining <= 0) {
         clearInterval(tick);
-        runScene5();
+        runScene4();
       }
     }, 1000);
     timers.push(tick);
+  }
+
+  // ---- Scene 4 (fullscreen Mai & Vi + caption) ----
+  function runScene4() {
+    clearListeners();
+    clearTimers();
+    showScene('4');
+    Music.chord([392, 523, 659], 1.6);
+    const scene = document.querySelector('#screen-lore [data-lore-scene="4"]');
+    const advance = () => { clearListeners(); clearTimers(); runScene5(); };
+    on(scene, 'click', () => { tap('light'); advance(); });
+    timers.push(setTimeout(advance, SCENE4_AUTO_MS));
   }
 
   function spawnPill(zone) {
@@ -5416,7 +5562,7 @@ const Lore = (() => {
       pill.style.transition = 'transform 0.35s, opacity 0.35s';
       pill.style.transform = 'translateX(-260px) rotate(-22deg)';
       pill.style.opacity = '0';
-      haptic('medium');
+      tap('medium');
       setTimeout(() => pill.remove(), 380);
     };
     pill.addEventListener('pointerdown', e => startSwipe(e.clientX));
@@ -5448,7 +5594,7 @@ const Lore = (() => {
       gaugeVal = Math.min(100, gaugeVal + 4.5);
       fill.style.width = gaugeVal + '%';
       pct.textContent = Math.round(gaugeVal) + '%';
-      haptic('light');
+      tap('light');
     };
     on(btn, 'click', onTap);
     on(btn, 'touchstart', onTap, { passive: false });
@@ -5478,7 +5624,8 @@ const Lore = (() => {
     clearListeners();
     clearTimers();
     showScene('6a');
-    haptic('heavy');
+    tap('heavy');
+    Music.chord([523, 659, 784, 988], 1.8);
     const wrap = document.getElementById('lore-confetti');
     wrap.innerHTML = '';
     for (let i = 0; i < 50; i++) {
@@ -5499,7 +5646,8 @@ const Lore = (() => {
     clearListeners();
     clearTimers();
     showScene('6b');
-    haptic('medium');
+    tap('medium');
+    Music.chord([294, 349, 415], 1.4);
     timers.push(setTimeout(runScene5, 2000));
   }
 
@@ -5522,8 +5670,13 @@ const Lore = (() => {
   function seen() {
     try { return localStorage.getItem(KEY) === '1'; } catch { return false; }
   }
+  function replay() {
+    start(() => {
+      try { Game.showScreen('levels'); } catch (e) {}
+    });
+  }
 
-  return { start, skip, reset, isAdmin, seen };
+  return { start, replay, reset, isAdmin, seen };
 })();
 window.Lore = Lore;
 
