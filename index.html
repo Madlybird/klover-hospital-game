@@ -5288,7 +5288,8 @@ const Lore = (() => {
     { base: '#9060cc', light: '#c4a6e3', dark: '#4c3173' }
   ];
   const MAX_LIVE_PILLS = 4;
-  const SCENE4_AUTO_MS = 5000;
+  const SCENE4_MIN_MS = 5000;
+  const SCENE4_AUTO_MS = 7000;
 
   const L = {
     en: {
@@ -5656,7 +5657,9 @@ const Lore = (() => {
     Music.chord([392, 523, 659], 1.6);
     const scene = document.querySelector('#screen-lore [data-lore-scene="4"]');
     const advance = () => { clearListeners(); clearTimers(); runScene5(); };
-    on(scene, 'click', () => { tap('light'); advance(); });
+    timers.push(setTimeout(() => {
+      on(scene, 'click', () => { tap('light'); advance(); });
+    }, SCENE4_MIN_MS));
     timers.push(setTimeout(advance, SCENE4_AUTO_MS));
   }
 
@@ -5807,7 +5810,7 @@ const Lore = (() => {
   }
   function replay() {
     start(() => {
-      try { Game.showScreen('levels'); } catch (e) {}
+      try { Game.startLevel(1); } catch (e) {}
     });
   }
 
