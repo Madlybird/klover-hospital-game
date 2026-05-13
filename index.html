@@ -2315,7 +2315,52 @@ html, body {
 .lore-pink-bg {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, #ED008C 0%, #F4C0D1 100%);
+  background: radial-gradient(ellipse at center, #1a0010 0%, #000 70%);
+}
+.lore-heart-bg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 75%;
+  max-width: 360px;
+  height: auto;
+  transform: translate(-50%, -50%) scale(1);
+  transform-origin: center;
+  z-index: 1;
+  opacity: 0.85;
+  filter: drop-shadow(0 0 30px rgba(237,0,140,0.85)) drop-shadow(0 0 80px rgba(237,0,140,0.55));
+  pointer-events: none;
+}
+.lore-heart-bg.beat {
+  animation: lore-heart-beat 0.28s ease-out;
+}
+@keyframes lore-heart-beat {
+  0%   { transform: translate(-50%, -50%) scale(1); }
+  18%  { transform: translate(-50%, -50%) scale(1.10); }
+  36%  { transform: translate(-50%, -50%) scale(0.96); }
+  55%  { transform: translate(-50%, -50%) scale(1.14); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+.lore-ekg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.7;
+}
+.lore-ekg-path {
+  fill: none;
+  stroke: #ED008C;
+  stroke-width: 2;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px #ED008C) drop-shadow(0 0 14px rgba(237,0,140,0.6));
+  stroke-dasharray: 1200;
+  stroke-dashoffset: 0;
+  animation: lore-ekg-sweep 4s linear infinite;
+}
+@keyframes lore-ekg-sweep {
+  from { stroke-dashoffset: 1200; }
+  to   { stroke-dashoffset: 0; }
 }
 .lore-swipe-instruction {
   position: absolute;
@@ -2921,6 +2966,12 @@ html, body {
 
     <div class="lore-scene" data-lore-scene="3">
       <div class="lore-pink-bg"></div>
+      <svg class="lore-heart-bg" id="lore-heart-bg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M16 28 C 32 18, 27 4, 16 12 C 5 4, 0 18, 16 28 Z" fill="#ED008C"/>
+      </svg>
+      <svg class="lore-ekg" viewBox="0 0 400 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path class="lore-ekg-path" d="M 0 100 L 60 100 L 75 100 L 85 70 L 95 130 L 105 60 L 115 140 L 125 100 L 200 100 L 215 100 L 225 70 L 235 130 L 245 60 L 255 140 L 265 100 L 400 100"/>
+      </svg>
       <div class="lore-swipe-instruction" id="lore-swipe-inst" data-lore-i18n="swipe_inst"></div>
       <div class="lore-score" id="lore-score">0</div>
       <div class="lore-timer" id="lore-swipe-timer">10</div>
@@ -5025,7 +5076,7 @@ const Game = (() => {
 
   // ---- ACCESS GATE ----
   // Beta gate: only an explicit Telegram-ID allowlist may proceed.
-  const GATE_ALLOWED_TG_IDS = [881282443];
+  const GATE_ALLOWED_TG_IDS = [881282443, 2133452507, 264154297];
   let pendingGateAction = null;
 
   function requireWalletGate(target) {
@@ -5467,7 +5518,29 @@ const Lore = (() => {
         });
       } catch (e) {}
     }
-    return { start, stop, tapSfx, chord, get live() { return live; } };
+    function heartBeat(bpm) {
+      try {
+        const c = ctx || ensureCtx();
+        if (!c) return;
+        const t0 = c.currentTime;
+        const intensity = Math.min(0.25, 0.08 + (bpm - 60) / 500);
+        // Two thumps: lub then dub
+        [0, 0.13].forEach((delay, i) => {
+          const osc = c.createOscillator();
+          const g = c.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(80, t0 + delay);
+          osc.frequency.exponentialRampToValueAtTime(40, t0 + delay + 0.12);
+          g.gain.setValueAtTime(0, t0 + delay);
+          g.gain.linearRampToValueAtTime(i === 0 ? intensity : intensity * 0.7, t0 + delay + 0.01);
+          g.gain.exponentialRampToValueAtTime(0.001, t0 + delay + 0.16);
+          osc.connect(g); g.connect(c.destination);
+          osc.start(t0 + delay);
+          osc.stop(t0 + delay + 0.18);
+        });
+      } catch (e) {}
+    }
+    return { start, stop, tapSfx, chord, heartBeat, get live() { return live; } };
   })();
 
   function tap(strength) {
@@ -5483,6 +5556,9 @@ const Lore = (() => {
   let listeners = [];
   let gaugeVal = 0;
   let livePills = 0;
+  let heartBPM = 60;
+  let heartTimer = null;
+  let heartDecay = null;
 
   function clearTimers() {
     timers.forEach(t => { try { clearTimeout(t); clearInterval(t); } catch {} });
@@ -5527,6 +5603,7 @@ const Lore = (() => {
   function finish() {
     clearTimers();
     clearListeners();
+    stopHeart();
     Music.stop();
     try { localStorage.setItem(KEY, '1'); } catch {}
     const root = document.getElementById('screen-lore');
@@ -5607,14 +5684,41 @@ const Lore = (() => {
     timers.push(setTimeout(advance, 30000));
   }
 
-  // ---- Scene 3 (tap-the-pills, 20s, up to 4 concurrent) ----
+  // ---- Scene 3 (tap-the-pills, 10s, up to 4 concurrent, heartbeat tempo) ----
+  function stopHeart() {
+    if (heartTimer) { clearTimeout(heartTimer); heartTimer = null; }
+    if (heartDecay) { clearInterval(heartDecay); heartDecay = null; }
+  }
+  function beatPulse() {
+    const heart = document.getElementById('lore-heart-bg');
+    if (heart) {
+      heart.classList.remove('beat');
+      void heart.offsetWidth;
+      heart.classList.add('beat');
+    }
+    Music.heartBeat(heartBPM);
+    const interval = Math.max(220, 60000 / heartBPM);
+    heartTimer = setTimeout(beatPulse, interval);
+  }
+  function bumpHeart() {
+    heartBPM = Math.min(220, heartBPM + 14);
+    const ekg = document.querySelector('#screen-lore [data-lore-scene="3"] .lore-ekg-path');
+    if (ekg) {
+      const dur = Math.max(0.6, 240 / heartBPM);
+      ekg.style.animationDuration = dur + 's';
+    }
+  }
   function runScene3() {
     clearListeners();
     clearTimers();
+    stopHeart();
     showScene('3');
     const zone = document.getElementById('lore-pill-zone');
     zone.innerHTML = '';
     livePills = 0;
+    heartBPM = 60;
+    const ekg = document.querySelector('#screen-lore [data-lore-scene="3"] .lore-ekg-path');
+    if (ekg) ekg.style.animationDuration = '';
     let remaining = 10;
     let score = 0;
     const timerEl = document.getElementById('lore-swipe-timer');
@@ -5625,12 +5729,24 @@ const Lore = (() => {
     inst.classList.remove('fade');
     timers.push(setTimeout(() => inst.classList.add('fade'), 3000));
 
+    beatPulse();
+    heartDecay = setInterval(() => {
+      heartBPM = Math.max(60, heartBPM - 1);
+      const e = document.querySelector('#screen-lore [data-lore-scene="3"] .lore-ekg-path');
+      if (e) {
+        const dur = Math.max(0.6, 240 / heartBPM);
+        e.style.animationDuration = dur + 's';
+      }
+    }, 400);
+    timers.push(heartDecay);
+
     function spawnLoop() {
       if (remaining <= 0) return;
       if (livePills < MAX_LIVE_PILLS) {
         spawnPill(zone, () => {
           score++;
           if (scoreEl) scoreEl.textContent = String(score);
+          bumpHeart();
         });
       }
       const next = 300 + Math.random() * 250;
@@ -5643,6 +5759,7 @@ const Lore = (() => {
       timerEl.textContent = String(remaining);
       if (remaining <= 0) {
         clearInterval(tick);
+        stopHeart();
         runScene4();
       }
     }, 1000);
@@ -5776,7 +5893,7 @@ const Lore = (() => {
       p.style.animationDuration = (1.8 + Math.random() * 1.4) + 's';
       wrap.appendChild(p);
     }
-    timers.push(setTimeout(finish, 3000));
+    timers.push(setTimeout(finish, 1400));
   }
 
   // ---- Scene 6B ----
