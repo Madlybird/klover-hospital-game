@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>KLOVER HOSPITAL — Pill Puzzle Game</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2447,7 +2450,8 @@ html, body {
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background-color: #e8609a;
+  background: #e8609a !important;
+  background-color: #e8609a !important;
   touch-action: manipulation;
   cursor: pointer;
   user-select: none;
@@ -2456,16 +2460,20 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #ffffff;
+  font-size: 36px;
+  line-height: 1;
+  font-family: 'Segoe UI Symbol', 'Apple Color Emoji', Arial, sans-serif;
+  text-align: center;
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.25);
 }
 .lore-pill-heart {
-  width: 62%;
-  height: 62%;
-  position: relative;
-  z-index: 1;
+  color: #ffffff;
   pointer-events: none;
-  display: block;
+  font-size: inherit;
+  line-height: 1;
 }
-.lore-pill-heart path { fill: #ffffff !important; }
 .lore-pill.hit {
   animation: lore-pill-hit 0.30s ease-out forwards !important;
   pointer-events: none;
@@ -5125,7 +5133,7 @@ const Game = (() => {
 
   // ---- ACCESS GATE ----
   // Beta gate: only an explicit Telegram-ID allowlist may proceed.
-  const GATE_ALLOWED_TG_IDS = [881282443, 2133452507, 264154297];
+  const GATE_ALLOWED_TG_IDS = [881282443, 2133452507, 264154297, 18706277767];
   let pendingGateAction = null;
 
   function requireWalletGate(target) {
@@ -5877,15 +5885,20 @@ const Lore = (() => {
     const pal = PILL_PALETTE[Math.floor(Math.random() * PILL_PALETTE.length)];
     const pill = document.createElement('div');
     pill.className = 'lore-pill';
-    pill.style.left = x + 'px';
-    pill.style.top = y + 'px';
-    pill.style.backgroundColor = pal.base;
-    pill.style.backgroundImage = 'radial-gradient(circle at 32% 30%, ' + pal.light + ' 0%, ' + pal.base + ' 78%)';
-    pill.style.boxShadow = '0 0 16px ' + pal.base + ', 0 0 32px rgba(255,255,255,0.18)';
-    pill.innerHTML =
-      '<svg class="lore-pill-heart" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">' +
-        '<path d="M16 28 C 32 18, 27 4, 16 12 C 5 4, 0 18, 16 28 Z" fill="#ffffff" style="fill:#ffffff"/>' +
-      '</svg>';
+    pill.setAttribute('style',
+      'position:absolute;' +
+      'left:' + x + 'px;' +
+      'top:' + y + 'px;' +
+      'width:60px;height:60px;border-radius:50%;' +
+      'background:' + pal.base + ' !important;' +
+      'background-color:' + pal.base + ' !important;' +
+      'box-shadow:0 0 16px ' + pal.base + ',0 0 32px rgba(255,255,255,0.18);' +
+      'display:flex;align-items:center;justify-content:center;' +
+      'color:#ffffff;font-size:36px;line-height:1;font-weight:bold;' +
+      'animation:lore-pill-pop 0.32s cubic-bezier(.34,1.56,.64,1) forwards;' +
+      'cursor:pointer;user-select:none;'
+    );
+    pill.innerHTML = '<span class="lore-pill-heart" style="color:#ffffff !important;">♥</span>';
     zone.appendChild(pill);
     livePills++;
 
