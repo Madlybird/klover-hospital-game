@@ -2286,15 +2286,15 @@ html, body {
   position: absolute;
   bottom: -110%;
   left: 50%;
-  width: 88%;
-  max-width: 460px;
+  width: 94%;
+  max-width: 640px;
   transform: translateX(-50%) rotateX(28deg);
   transform-origin: 50% 100%;
   color: #ED008C;
   font-family: Georgia, serif;
-  font-size: 22px;
+  font-size: 44px;
   font-weight: bold;
-  line-height: 1.55;
+  line-height: 1.5;
   text-align: center;
   text-shadow: 0 0 14px rgba(237,0,140,0.5);
 }
@@ -2403,9 +2403,12 @@ html, body {
   width: 58px;
   height: 58px;
   border-radius: 50%;
-  border: 2px solid var(--pill-dark, #555);
+  border: 1px solid rgba(255,255,255,0.55);
   background: radial-gradient(circle at 32% 30%, var(--pill-light, #fff) 0%, var(--pill-base, #e8609a) 72%);
-  box-shadow: 0 8px 18px rgba(0,0,0,0.32), inset 0 -6px 10px rgba(0,0,0,0.18);
+  box-shadow:
+    0 0 14px var(--pill-base, #e8609a),
+    0 0 28px rgba(255,255,255,0.15),
+    inset 0 4px 8px rgba(255,255,255,0.35);
   touch-action: manipulation;
   cursor: pointer;
   user-select: none;
@@ -2670,6 +2673,33 @@ html, body {
   border-left: 2px solid #ED008C;
   border-top: 2px solid #ED008C;
 }
+.lore-play-btn {
+  margin-top: 22px;
+  background: linear-gradient(180deg, #ff4fb0 0%, #ED008C 100%);
+  color: #fff;
+  border: 3px solid #fff;
+  border-radius: 32px;
+  padding: 14px 46px;
+  font-family: 'Nunito', Georgia, serif;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 10px 26px rgba(237,0,140,0.55), 0 0 0 4px rgba(237,0,140,0.15);
+  z-index: 9;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  transition: transform 0.08s ease-out, box-shadow 0.2s;
+  animation: lore-play-pulse 1.4s ease-in-out infinite;
+}
+.lore-play-btn:hover { box-shadow: 0 12px 32px rgba(237,0,140,0.7), 0 0 0 6px rgba(237,0,140,0.2); }
+.lore-play-btn:active { transform: scale(0.95); }
+@keyframes lore-play-pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.05); }
+}
 .lore-confetti {
   position: absolute;
   inset: 0;
@@ -2696,9 +2726,7 @@ html, body {
 
 @media (max-width: 380px) {
   .lore-scene1-text { font-size: 17px; }
-  .lore-scene1-text .lore-line .lore-ru { font-size: 13px; }
-  .lore-crawl { font-size: 18px; }
-  .lore-crawl .lore-crawl-ru { font-size: 15px; }
+  .lore-crawl { font-size: 34px; }
   .lore-tap-btn { width: 140px; height: 140px; font-size: 19px; }
   .lore-result-text { font-size: 17px; }
   .lore-bubble { font-size: 14px; }
@@ -3001,6 +3029,7 @@ html, body {
       <img class="lore-result-img" src="assets/story/5.PNG" alt="Mai happy">
       <div class="lore-result-text" data-lore-i18n="success_text"></div>
       <div class="lore-bubble" data-lore-i18n="success_bubble"></div>
+      <button class="lore-play-btn" id="lore-play-btn" data-lore-i18n="play_btn" onclick="Lore.finishNow()"></button>
       <div class="lore-confetti" id="lore-confetti"></div>
     </div>
 
@@ -5365,6 +5394,7 @@ const Lore = (() => {
       tap_btn: 'TAP!',
       success_text: 'Outstanding work! Simulation ready.',
       success_bubble: '"I knew you could do it!"',
+      play_btn: 'Play',
       fail_text: 'Hey... can you hear me?',
       fail_bubble: '"We need to try again. Focus!"'
     },
@@ -5390,6 +5420,7 @@ const Lore = (() => {
       tap_btn: 'ТАП!',
       success_text: 'Отличная работа! Симуляция готова.',
       success_bubble: '«Я знала, что ты справишься!»',
+      play_btn: 'Играть',
       fail_text: 'Эй... ты меня слышишь?',
       fail_bubble: '«Нам нужно попробовать снова. Сосредоточься!»'
     }
@@ -5893,7 +5924,11 @@ const Lore = (() => {
       p.style.animationDuration = (1.8 + Math.random() * 1.4) + 's';
       wrap.appendChild(p);
     }
-    timers.push(setTimeout(finish, 1400));
+    timers.push(setTimeout(finish, 6000));
+  }
+  function finishNow() {
+    tap('heavy');
+    finish();
   }
 
   // ---- Scene 6B ----
