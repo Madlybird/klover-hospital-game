@@ -2298,7 +2298,7 @@ html, body {
   text-align: center;
   text-shadow: 0 0 14px rgba(237,0,140,0.5);
 }
-.lore-crawl.run { animation: lore-crawl-anim 22s linear forwards; }
+.lore-crawl.run { animation: lore-crawl-anim 30s linear forwards; }
 .lore-crawl p { margin-bottom: 26px; }
 .lore-crawl .lore-crawl-ru {
   color: #F4C0D1;
@@ -2361,11 +2361,63 @@ html, body {
   display: flex;
   overflow: hidden;
   box-shadow: 0 6px 16px rgba(0,0,0,0.35), inset 0 -4px 8px rgba(0,0,0,0.22), inset 0 4px 8px rgba(255,255,255,0.5);
-  touch-action: none;
-  cursor: grab;
+  touch-action: manipulation;
+  cursor: pointer;
   user-select: none;
+  transform-origin: center;
+  animation: lore-pill-pop 0.32s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+.lore-pill::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 26px;
+  pointer-events: none;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.0);
+  animation: lore-pill-ring 1.8s ease-in-out infinite;
 }
 .lore-pill > span { flex: 1; height: 100%; }
+.lore-pill.hit {
+  animation: lore-pill-hit 0.30s ease-out forwards !important;
+  pointer-events: none;
+}
+.lore-pill.miss {
+  animation: lore-pill-miss 0.35s ease-in forwards !important;
+  pointer-events: none;
+}
+@keyframes lore-pill-pop {
+  0%   { transform: scale(0.25); opacity: 0; }
+  60%  { transform: scale(1.18); opacity: 1; }
+  100% { transform: scale(1);    opacity: 1; }
+}
+@keyframes lore-pill-hit {
+  0%   { transform: scale(1);   opacity: 1; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+@keyframes lore-pill-miss {
+  0%   { transform: scale(1);   opacity: 1; }
+  100% { transform: scale(0.4); opacity: 0; }
+}
+@keyframes lore-pill-ring {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(255,255,255,0.0); }
+  50%      { box-shadow: 0 0 0 4px rgba(255,255,255,0.45); }
+}
+.lore-score {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  z-index: 90;
+  background: rgba(24,95,165,0.75);
+  border: 2px solid #185FA5;
+  border-radius: 14px;
+  padding: 2px 12px;
+  color: #fff;
+  font-family: Georgia, serif;
+  font-size: 18px;
+  font-weight: bold;
+  min-width: 44px;
+  text-align: center;
+}
 
 /* Scene 4 — fullscreen image + caption */
 #screen-lore [data-lore-scene="4"] { background: #000; padding: 0; }
@@ -2847,6 +2899,7 @@ html, body {
     <div class="lore-scene" data-lore-scene="3">
       <div class="lore-pink-bg"></div>
       <div class="lore-swipe-instruction" id="lore-swipe-inst" data-lore-i18n="swipe_inst"></div>
+      <div class="lore-score" id="lore-score">0</div>
       <div class="lore-timer" id="lore-swipe-timer">20</div>
       <div class="lore-pill-zone" id="lore-pill-zone"></div>
     </div>
@@ -5220,9 +5273,12 @@ const Lore = (() => {
       crawl: [
         "The clinic's special division — KLAS —<br>creates simulation worlds<br>built from patients' own memories.",
         'Inside these worlds,<br>patients must relive and overcome<br>their most traumatic events.',
+        'Mai and Vi, our chief medics,<br>will accompany you<br>through every session.',
+        'Every pill, every choice,<br>brings the patient closer to recovery —<br>or to losing themselves entirely.',
+        'Your reflexes, your focus,<br>and your heart<br>will decide their fate.',
         'The journey begins now.'
       ],
-      swipe_inst: 'Swipe the pills away! →',
+      swipe_inst: 'Tap the pills!',
       staff_caption: 'Our caring medical staff will guide you through the simulation.',
       gauge_inst: 'Tap rapidly to reach maximum!',
       tap_btn: 'TAP!',
@@ -5242,9 +5298,12 @@ const Lore = (() => {
       crawl: [
         'Особое подразделение клиники — KLAS —<br>создаёт миры-симуляции<br>на основе воспоминаний пациентов.',
         'Внутри этих миров<br>пациенты должны заново пережить<br>и преодолеть свои травмы.',
+        'Май и Ви, наши главные медики,<br>будут рядом<br>на каждом сеансе.',
+        'Каждая таблетка, каждый выбор<br>приближает пациента к выздоровлению —<br>или к полной потере себя.',
+        'Твои рефлексы, твоё внимание<br>и твоё сердце<br>решат их судьбу.',
         'Погружение начинается.'
       ],
-      swipe_inst: 'Смахивай таблетки! →',
+      swipe_inst: 'Тапай таблетки!',
       staff_caption: 'Наш заботливый медицинский персонал поможет вам пройти симуляцию.',
       gauge_inst: 'Тапай быстро — достигни максимума!',
       tap_btn: 'ТАП!',
@@ -5503,10 +5562,10 @@ const Lore = (() => {
     const scene = document.querySelector('#screen-lore [data-lore-scene="2"]');
     const advance = () => { clearListeners(); clearTimers(); runScene3(); };
     on(scene, 'click', advance);
-    timers.push(setTimeout(advance, 22000));
+    timers.push(setTimeout(advance, 30000));
   }
 
-  // ---- Scene 3 (pills only, 20s) ----
+  // ---- Scene 3 (tap-the-pills, 20s, medium difficulty) ----
   function runScene3() {
     clearListeners();
     clearTimers();
@@ -5514,15 +5573,26 @@ const Lore = (() => {
     const zone = document.getElementById('lore-pill-zone');
     zone.innerHTML = '';
     let remaining = 20;
+    let score = 0;
     const timerEl = document.getElementById('lore-swipe-timer');
+    const scoreEl = document.getElementById('lore-score');
     timerEl.textContent = '20';
+    if (scoreEl) scoreEl.textContent = '0';
     const inst = document.getElementById('lore-swipe-inst');
     inst.classList.remove('fade');
     timers.push(setTimeout(() => inst.classList.add('fade'), 3000));
 
-    for (let i = 0; i < 14; i++) {
-      timers.push(setTimeout(() => spawnPill(zone), 600 + i * 1200));
+    function spawnLoop() {
+      if (remaining <= 0) return;
+      spawnPill(zone, () => {
+        score++;
+        if (scoreEl) scoreEl.textContent = String(score);
+      });
+      const next = 800 + Math.random() * 250;
+      timers.push(setTimeout(spawnLoop, next));
     }
+    timers.push(setTimeout(spawnLoop, 500));
+
     const tick = setInterval(() => {
       remaining -= 1;
       timerEl.textContent = String(remaining);
@@ -5546,58 +5616,45 @@ const Lore = (() => {
     timers.push(setTimeout(advance, SCENE4_AUTO_MS));
   }
 
-  function spawnPill(zone) {
+  function spawnPill(zone, onHit) {
     if (!zone || !zone.isConnected) return;
     const rect = zone.getBoundingClientRect();
     const w = rect.width || window.innerWidth;
     const h = rect.height || window.innerHeight;
-    const top = 110 + Math.random() * Math.max(60, h - 320);
+    const padX = 24, padTop = 120, padBot = 90;
+    const x = padX + Math.random() * Math.max(20, w - 2 * padX - 72);
+    const y = padTop + Math.random() * Math.max(20, h - padTop - padBot - 32);
     const pill = document.createElement('div');
     pill.className = 'lore-pill';
     const c1 = PILL_COLORS[Math.floor(Math.random() * PILL_COLORS.length)];
     let c2 = PILL_COLORS[Math.floor(Math.random() * PILL_COLORS.length)];
     if (c2 === c1) c2 = PILL_COLORS[(PILL_COLORS.indexOf(c1) + 1) % PILL_COLORS.length];
     pill.innerHTML = '<span style="background:' + c1 + '"></span><span style="background:' + c2 + '"></span>';
-    pill.style.left = (w + 40) + 'px';
-    pill.style.top = top + 'px';
+    pill.style.left = x + 'px';
+    pill.style.top = y + 'px';
     zone.appendChild(pill);
 
-    const startTime = performance.now();
-    const speed = 60 + Math.random() * 30;
-    function step(now) {
-      if (!pill.isConnected) return;
-      if (pill.dataset.swiped === '1') return;
-      const dt = (now - startTime) / 1000;
-      const x = w + 40 - dt * speed;
-      pill.style.left = x + 'px';
-      if (x < -120) { pill.remove(); return; }
-      requestAnimationFrame(step);
-    }
-    requestAnimationFrame(step);
+    const lifespan = 2100;
+    let resolved = false;
 
-    let startX = null;
-    const startSwipe = (clientX) => { startX = clientX; };
-    const moveSwipe = (clientX) => {
-      if (startX == null) return;
-      const dx = clientX - startX;
-      if (dx < -30) swipeAway();
-    };
-    const swipeAway = () => {
-      if (pill.dataset.swiped === '1') return;
-      pill.dataset.swiped = '1';
-      pill.style.transition = 'transform 0.35s, opacity 0.35s';
-      pill.style.transform = 'translateX(-260px) rotate(-22deg)';
-      pill.style.opacity = '0';
+    const hit = (e) => {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      if (resolved) return;
+      resolved = true;
+      pill.classList.add('hit');
       tap('medium');
-      setTimeout(() => pill.remove(), 380);
+      if (onHit) onHit();
+      setTimeout(() => pill.remove(), 300);
     };
-    pill.addEventListener('pointerdown', e => startSwipe(e.clientX));
-    pill.addEventListener('pointermove', e => moveSwipe(e.clientX));
-    pill.addEventListener('pointerup', () => { startX = null; });
-    pill.addEventListener('touchstart', e => { if (e.touches[0]) startSwipe(e.touches[0].clientX); }, { passive: true });
-    pill.addEventListener('touchmove', e => { if (e.touches[0]) moveSwipe(e.touches[0].clientX); }, { passive: true });
-    pill.addEventListener('touchend', () => { startX = null; });
-    pill.addEventListener('click', swipeAway);
+    pill.addEventListener('click', hit);
+    pill.addEventListener('touchstart', hit, { passive: false });
+
+    setTimeout(() => {
+      if (resolved || !pill.isConnected) return;
+      resolved = true;
+      pill.classList.add('miss');
+      setTimeout(() => pill.remove(), 360);
+    }, lifespan);
   }
 
   // ---- Scene 5 (gauge) ----
