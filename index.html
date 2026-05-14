@@ -686,6 +686,119 @@ html, body {
   margin-top: 4px;
 }
 
+/* ===== REFERRAL "COMING SOON" MEDICAL CARD ===== */
+.ref-soon {
+  margin: 24px 20px 0;
+  padding: 28px 22px 24px;
+  background: #fff;
+  border: 2px solid #d8e8f5;
+  border-top: 6px solid var(--color-primary, #e8609a);
+  border-radius: 18px;
+  box-shadow:
+    0 12px 32px rgba(24,95,165,0.18),
+    0 0 0 1px rgba(255,255,255,0.6) inset;
+  position: relative;
+  text-align: center;
+  font-family: 'Barlow Condensed', sans-serif;
+  color: #1a3160;
+  overflow: hidden;
+}
+.ref-soon::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 6px;
+  background: repeating-linear-gradient(45deg,
+    var(--color-primary, #e8609a) 0 12px,
+    rgba(232,96,154,0.55) 12px 24px);
+}
+.ref-soon-cross {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  margin: 6px auto 14px;
+}
+.ref-soon-cross span {
+  position: absolute;
+  background: var(--color-primary, #e8609a);
+  border-radius: 6px;
+  box-shadow: 0 4px 10px rgba(232,96,154,0.4);
+}
+.ref-soon-cross span:first-child {
+  left: 50%; top: 0;
+  width: 18px; height: 56px;
+  margin-left: -9px;
+}
+.ref-soon-cross span:last-child {
+  top: 50%; left: 0;
+  width: 56px; height: 18px;
+  margin-top: -9px;
+}
+.ref-soon-stamp {
+  display: inline-block;
+  margin-bottom: 14px;
+  padding: 4px 12px;
+  border: 2px dashed #b8d4f0;
+  border-radius: 6px;
+  color: #6a8bab;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  transform: rotate(-2deg);
+}
+.ref-soon-title {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #185FA5;
+  margin-bottom: 8px;
+}
+.ref-soon-status {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-primary, #e8609a);
+  letter-spacing: 2px;
+  margin-bottom: 16px;
+}
+.ref-soon-body {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: #3a5a82;
+  margin: 0 auto 22px;
+  max-width: 320px;
+}
+.ref-soon-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  color: #6a8bab;
+  border-top: 1px dashed #d8e8f5;
+  padding-top: 12px;
+  margin-bottom: 18px;
+}
+.ref-soon-rec { display: inline-flex; align-items: center; gap: 6px; color: var(--color-primary, #e8609a); }
+.ref-soon-rec-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--color-primary, #e8609a);
+  box-shadow: 0 0 8px var(--color-primary, #e8609a);
+  animation: ref-soon-rec-blink 1.2s steps(2) infinite;
+}
+@keyframes ref-soon-rec-blink {
+  0%, 50% { opacity: 1;   }
+  51%,100% { opacity: 0.2; }
+}
+.ref-soon-back {
+  width: 100%;
+}
+
 /* ===== SETTINGS SCREEN ===== */
 #screen-settings {
   background: var(--color-bg);
@@ -3289,7 +3402,21 @@ html, body {
       <div class="screen-title" data-i18n="menu_referral">Patient records</div>
       <div style="width:40px;"></div>
     </div>
-    <div class="referral-stats">
+    <div class="ref-soon">
+      <div class="ref-soon-cross">
+        <span></span><span></span>
+      </div>
+      <div class="ref-soon-stamp" data-i18n="ref_soon_stamp">UNDER CONSTRUCTION</div>
+      <div class="ref-soon-title" data-i18n="ref_soon_title">Patient records department</div>
+      <div class="ref-soon-status" data-i18n="ref_soon_status">STATUS&nbsp;:&nbsp;COMING SOON</div>
+      <div class="ref-soon-body" data-i18n="ref_soon_body">Access to the referral programme is being prepared by the medical team.</div>
+      <div class="ref-soon-meta">
+        <span>KLAS&nbsp;SYSTEM v2.0</span>
+        <span class="ref-soon-rec"><span class="ref-soon-rec-dot"></span>&nbsp;PROCESSING</span>
+      </div>
+      <button class="btn-secondary ref-soon-back" onclick="Game.showScreen('menu')" data-i18n="back_to_menu">BACK TO MENU</button>
+    </div>
+    <div class="referral-stats" style="display:none">
       <div class="stat-box">
         <span class="stat-value" id="ref-friends">0</span>
         <span class="stat-label" data-i18n="ref_friends">Friends</span>
@@ -3299,15 +3426,15 @@ html, body {
         <span class="stat-label" data-i18n="ref_coins">Coins Earned</span>
       </div>
     </div>
-    <div class="referral-link-box">
+    <div class="referral-link-box" style="display:none">
       <div class="referral-link-text" id="referral-link-text">Loading...</div>
       <button class="btn-copy" onclick="Game.copyReferralLink()" data-i18n="copy">COPY</button>
     </div>
-    <div class="referral-buttons">
+    <div class="referral-buttons" style="display:none">
       <button class="btn-primary" onclick="Game.inviteFriend()" data-i18n="invite_friend">INVITE FRIEND</button>
       <button class="btn-secondary" onclick="Game.showScreen('menu')" data-i18n="back_to_menu">BACK TO MENU</button>
     </div>
-    <div class="referral-reward-note" data-i18n="ref_reward_note">+500 coins when a friend completes Level 1</div>
+    <div class="referral-reward-note" data-i18n="ref_reward_note" style="display:none">+500 coins when a friend completes Level 1</div>
   </div>
 
   <!-- SETTINGS -->
@@ -3477,7 +3604,6 @@ html, body {
       <span class="lore-dot" data-dot="3"></span>
       <span class="lore-dot" data-dot="4"></span>
       <span class="lore-dot" data-dot="5"></span>
-      <span class="lore-dot" data-dot="6"></span>
     </div>
   </div>
 
@@ -3680,6 +3806,10 @@ const I18N = {
     invite_friend: 'INVITE FRIEND',
     back_to_menu: 'BACK TO MENU',
     ref_reward_note: '+500 coins when a friend completes Level 1',
+    ref_soon_stamp: 'UNDER CONSTRUCTION',
+    ref_soon_title: 'Patient records department',
+    ref_soon_status: 'STATUS : COMING SOON',
+    ref_soon_body: 'Access to the referral programme is being prepared by the medical team. Check back after the next round of treatment.',
     slide_1: "Nurse Mai's treatment guide.",
     slide_2: 'Left/Right to move. Tap to rotate. Down to drop.',
     slide_3: 'Match four or more pills of the same color to clear them.',
@@ -3765,6 +3895,10 @@ const I18N = {
     invite_friend: 'ПРИГЛАСИТЬ ДРУГА',
     back_to_menu: 'НАЗАД В МЕНЮ',
     ref_reward_note: '+500 монет, когда друг проходит Уровень 1',
+    ref_soon_stamp: 'В РАЗРАБОТКЕ',
+    ref_soon_title: 'Картотека пациента',
+    ref_soon_status: 'СТАТУС : СКОРО',
+    ref_soon_body: 'Доступ к реферальной программе готовится медицинской командой. Загляни после следующего сеанса лечения.',
     slide_1: 'Гид от медсестры Май.',
     slide_2: 'Влево/Вправо — двигать. Нажмите — поворот. Вниз — падение.',
     slide_3: 'Соберите 4 или больше таблеток одного цвета.',
@@ -6162,7 +6296,7 @@ const Lore = (() => {
     root.querySelectorAll('.lore-scene').forEach(s => s.classList.remove('active'));
     const el = root.querySelector('[data-lore-scene="' + name + '"]');
     if (el) el.classList.add('active');
-    const dotMap = { '1':'1', '2':'2', '4':'3', 'emotion':'4', 'ready':'5', '5':'6', '6a':'6', '6b':'6' };
+    const dotMap = { '1':'1', '2':'2', '4':'3', 'emotion':'4', 'ready':'5' };
     const want = dotMap[name];
     root.querySelectorAll('.lore-dot').forEach(d => {
       d.classList.toggle('active', d.dataset.dot === want);
@@ -6492,7 +6626,7 @@ const Lore = (() => {
       void bubble.offsetWidth;
       bubble.classList.add('pop');
     }
-    const advance = () => { clearListeners(); clearTimers(); runScene5(); };
+    const advance = () => { clearListeners(); clearTimers(); finish(); };
     timers.push(setTimeout(() => {
       on(scene, 'click', () => { tap('light'); advance(); });
     }, READY_MIN_MS));
