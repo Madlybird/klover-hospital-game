@@ -2710,6 +2710,11 @@ html, body {
   animation: lore-glitch-bg 1.7s linear forwards;
   overflow: hidden;
 }
+/* Long variant — 5s before entering the tap game */
+.lore-glitch-overlay.long { animation-duration: 5s; }
+.lore-glitch-overlay.long .lore-glitch-bar { animation-duration: 5s; }
+.lore-glitch-overlay.long .lore-glitch-text { animation-duration: 0.14s, 5s; }
+.lore-glitch-overlay.long .lore-glitch-noise { animation-duration: 0.08s; }
 @keyframes lore-glitch-bg {
   0%   { background: rgba(255,255,255,1);    }
   5%   { background: rgba(255,255,255,0.95); }
@@ -2811,17 +2816,17 @@ html, body {
   position: relative;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  background: #0a1a3a; /* fallback if image fails */
+  background: #0a1a3a;
+  padding: 0;
 }
-.lore-scene5-bg {
-  position: absolute; inset: 0;
-  background: #0a1a3a url("assets/story/3.JPG") center/cover no-repeat;
-  z-index: 0;
+#screen-lore [data-lore-scene="5"] .lore-fullscreen-img {
+  z-index: 1;
 }
-.lore-scene5-bg::after {
-  content: '';
+.lore-scene5-shade {
   position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(10,26,58,0.15) 0%, rgba(10,26,58,0.65) 100%);
+  z-index: 2;
+  background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.6) 100%);
+  pointer-events: none;
 }
 .lore-gauge-instruction {
   position: absolute;
@@ -3437,7 +3442,8 @@ html, body {
     </div>
 
     <div class="lore-scene" data-lore-scene="5">
-      <div class="lore-scene5-bg"></div>
+      <img class="lore-fullscreen-img" src="assets/story/3.JPG" alt="">
+      <div class="lore-scene5-shade"></div>
       <div class="lore-timer" id="lore-gauge-timer">10</div>
       <div class="lore-gauge-instruction" data-lore-i18n="gauge_inst"></div>
       <div class="lore-tap-hint-pulse" id="lore-tap-hint-pulse"></div>
@@ -5788,6 +5794,7 @@ const Lore = (() => {
   const ADMIN_TG_ID = 264154297;
   const SCENE4_AUTO_MS = 3000;
   const GLITCH_MS = 1700;
+  const GLITCH2_MS = 5000;
   const READY_MIN_MS = 2000;
   const READY_AUTO_MS = 4500;
 
@@ -5804,8 +5811,6 @@ const Lore = (() => {
         "The clinic's special division — KLAS — creates simulation worlds built from patients' own memories.",
         'Inside these worlds, patients must relive and overcome their most traumatic events.',
         'Mai and Vi, our chief medics, will accompany you through every session.',
-        'Every pill, every choice brings the patient closer to recovery — or to losing themselves entirely.',
-        'Your reflexes, your focus, and your heart will decide their fate.',
         'The journey begins now.'
       ],
       staff_caption: 'Our caring medical staff will guide you through the simulation.',
@@ -5846,8 +5851,6 @@ const Lore = (() => {
         'Особое подразделение клиники — KLAS — создаёт миры-симуляции на основе воспоминаний пациентов.',
         'Внутри этих миров пациенты должны заново пережить и преодолеть свои травмы.',
         'Май и Ви, наши главные медики, будут рядом на каждом сеансе.',
-        'Каждая таблетка, каждый выбор приближает пациента к выздоровлению — или к полной потере себя.',
-        'Твои рефлексы, твоё внимание и твоё сердце решат их судьбу.',
         'Погружение начинается.'
       ],
       staff_caption: 'Наш заботливый медицинский персонал поможет вам пройти симуляцию.',
@@ -6464,11 +6467,35 @@ const Lore = (() => {
       void bubble.offsetWidth;
       bubble.classList.add('pop');
     }
-    const advance = () => { clearListeners(); clearTimers(); runScene5(); };
+    const advance = () => { clearListeners(); clearTimers(); runGlitchThenScene5(); };
     timers.push(setTimeout(() => {
       on(scene, 'click', () => { tap('light'); advance(); });
     }, READY_MIN_MS));
     timers.push(setTimeout(advance, READY_AUTO_MS));
+  }
+
+  // ---- 5s bad-trip glitch into the tap game ----
+  function runGlitchThenScene5() {
+    clearListeners();
+    clearTimers();
+    const overlay = document.createElement('div');
+    overlay.className = 'lore-glitch-overlay long';
+    const safeEmo = String(chosenEmotion || 'SIMULATION').toUpperCase().replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+    overlay.innerHTML =
+      '<div class="lore-glitch-bar" style="--y:8%"></div>' +
+      '<div class="lore-glitch-bar" style="--y:22%"></div>' +
+      '<div class="lore-glitch-bar" style="--y:38%"></div>' +
+      '<div class="lore-glitch-bar" style="--y:54%"></div>' +
+      '<div class="lore-glitch-bar" style="--y:71%"></div>' +
+      '<div class="lore-glitch-bar" style="--y:87%"></div>' +
+      '<div class="lore-glitch-noise"></div>' +
+      '<div class="lore-glitch-text">' + safeEmo + '</div>';
+    document.body.appendChild(overlay);
+    Music.glitch(GLITCH2_MS / 1000);
+    timers.push(setTimeout(() => {
+      try { overlay.remove(); } catch {}
+      runScene5();
+    }, GLITCH2_MS));
   }
 
   // ---- Scene 5 (tap anywhere, gauge at bottom) ----
