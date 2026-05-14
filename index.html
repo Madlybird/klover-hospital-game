@@ -3669,9 +3669,9 @@ html, body {
           <p class="small-text" data-i18n="gate_verifying_note">Checking your wallet on the partner registry</p>
         </div>
         <div class="gate-denied">
-          <p data-i18n="gate_denied_title">No MAI / VI NFT found</p>
-          <p class="gate-strong" data-i18n="gate_denied_sub">in this wallet</p>
-          <p class="small-text" data-i18n="gate_denied_note">Try another wallet or get a sticker first</p>
+          <p id="gate-denied-title" data-i18n="gate_denied_title">No MAI / VI NFT found</p>
+          <p class="gate-strong" id="gate-denied-sub" data-i18n="gate_denied_sub">in this wallet</p>
+          <p class="small-text" id="gate-denied-note" data-i18n="gate_denied_note">Try another wallet or get a sticker first</p>
         </div>
       </div>
       <div class="gate-buttons">
@@ -5792,10 +5792,40 @@ const Game = (() => {
     }
     // reason in {no_auth, goodies_unavailable} → leave cache alone
 
+    // Customize denied-state copy based on why we said no
+    paintDeniedReason(data.reason, !!walletAddress);
+
     walletVerifying = false;
     renderWalletGateState();
     updateMenuUI();
     return walletAccess === true;
+  }
+
+  function paintDeniedReason(reason, hasWallet) {
+    const t = document.getElementById('gate-denied-title');
+    const s = document.getElementById('gate-denied-sub');
+    const n = document.getElementById('gate-denied-note');
+    if (!t || !s || !n) return;
+    const lang = (window.__currentLang === 'ru') ? 'ru' : 'en';
+    const M = {
+      en: {
+        not_holder:          ['No MAI / VI NFT found',           'in this wallet',          'Try another wallet or get a sticker first'],
+        no_auth:             ['Open via Telegram',               'session not detected',     'Please open the mini-app through the bot, then try again'],
+        goodies_unavailable: ['Verification temporarily down',    'try connecting your wallet','We will verify on-chain instead'],
+        default:             ['Access denied',                    'verification failed',      'Try again or contact support'],
+      },
+      ru: {
+        not_holder:          ['NFT MAI / VI не найден',           'в этом кошельке',         'Подключи другой кошелёк или получи стикер'],
+        no_auth:             ['Открой через Telegram',            'сессия не определена',    'Открой мини-апп через бота и попробуй снова'],
+        goodies_unavailable: ['Проверка временно недоступна',     'подключи кошелёк',        'Проверим владение прямо в блокчейне'],
+        default:             ['Доступ запрещён',                  'проверка не пройдена',     'Попробуй ещё раз или напиши в поддержку'],
+      },
+    };
+    const m = M[lang];
+    const r = m[reason] || m.default;
+    t.textContent = r[0];
+    s.textContent = r[1];
+    n.textContent = r[2];
   }
 
   // Admin helper exposed via Game.debugAccess() — re-runs the check
@@ -5830,7 +5860,7 @@ const Game = (() => {
 
   // ---- ACCESS GATE ----
   // Telegram-ID allowlist still bypasses the wallet verification (admins).
-  const GATE_ALLOWED_TG_IDS = [881282443, 2133452507, 264154297, 18706277767, 1870627767, 5685554239];
+  const GATE_ALLOWED_TG_IDS = [881282443, 2133452507, 264154297, 18706277767, 1870627767, 5685554239, 774584443, 750416265];
   let pendingGateAction = null;
 
   function isAdminBypass() {
@@ -5860,6 +5890,14 @@ const Game = (() => {
           const action = pendingGateAction;
           closeWalletGate();
           runGateAction(action);
+          return;
+        }
+        // If the Goodies path was unavailable (HMAC / env / network) and
+        // the user has no wallet yet, auto-prompt TonConnect so the
+        // on-chain path can take over. No "tap Confirm" friction.
+        const last = window.__lastAccessCheck || {};
+        if (last.reason === 'goodies_unavailable' && !walletAddress && tonUI) {
+          tonUI.openModal().catch(() => {});
         }
       });
     }
