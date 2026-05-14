@@ -132,20 +132,55 @@ async function tonapiOwnsCollection(walletAddress, collectionAddress, label, att
 }
 
 export default async function handler(req, res) {
-  // GET diagnostic — no Goodies traffic, no secrets
+  // GET diagnostic — no Goodies traffic by default.
+  // Admin mode (?secret=...&tg=...) runs Goodies for a given tg-id,
+  // bypassing HMAC. Lets you debug a user's status without their
+  // initData.
   if (req.method === 'GET') {
+    const adminSecret = process.env.ADMIN_DEBUG_SECRET || '';
+    const secret = (req.query && req.query.secret) || '';
+    const tg = (req.query && (req.query.tg || req.query.telegramUserId)) || '';
+    if (adminSecret && secret === adminSecret && tg) {
+      if (!GOODIES_USERNAME || !GOODIES_PASSWORD) {
+        return res.status(500).json({ error: 'goodies_creds_missing' });
+      }
+      const attempts = [];
+      const drop = await goodiesVerifyDrop(tg, attempts);
+      let mai = false, vi = false;
+      if (!drop.owner) {
+        [mai, vi] = await Promise.all([
+          goodiesHoldersIncludes(COLLECTIONS.mai, tg, 'mai', attempts),
+          goodiesHoldersIncludes(COLLECTIONS.vi,  tg, 'vi',  attempts),
+        ]);
+      }
+      const hasAccess = drop.owner || mai || vi;
+      return res.status(200).json({
+        ok: true,
+        mode: 'admin_debug',
+        telegramUserId: String(tg),
+        hasAccess,
+        drop: drop.owner,
+        mai, vi,
+        packAmount: drop.packAmount || 0,
+        attempts,
+      });
+    }
     return res.status(200).json({
       ok: true,
       env: {
-        TELEGRAM_BOT_TOKEN: !!BOT_TOKEN,
-        GOODIES_USERNAME:   !!GOODIES_USERNAME,
-        GOODIES_PASSWORD:   !!GOODIES_PASSWORD,
-        TONAPI_KEY:         !!TONAPI_KEY, // optional
+        TELEGRAM_BOT_TOKEN:   !!BOT_TOKEN,
+        GOODIES_USERNAME:     !!GOODIES_USERNAME,
+        GOODIES_PASSWORD:     !!GOODIES_PASSWORD,
+        TONAPI_KEY:           !!TONAPI_KEY,
+        ADMIN_DEBUG_SECRET:   !!adminSecret,
       },
       dropId: DROP_ID,
       collections: COLLECTIONS,
       collectionsTon: COLLECTIONS_TON,
-      build: 'verify-access v4 (goodies + tonapi onchain)',
+      build: 'verify-access v5 (admin debug + reason codes)',
+      hint: adminSecret
+        ? 'Admin debug: GET ?secret=<value>&tg=<tg_id>'
+        : 'Set ADMIN_DEBUG_SECRET env var to enable per-tg-id admin debug.',
     });
   }
   if (req.method !== 'POST') {
@@ -210,11 +245,28 @@ export default async function handler(req, res) {
   const chain   = chainMai || chainVi;
   const hasAccess = goodies || chain;
 
+  // Explicit reason when denied — easier to triage from Vercel logs
+  let reason = null;
+  if (!hasAccess) {
+    if (!goodiesAvailable && !wallet) reason = 'no_auth';
+    else if (!goodiesAvailable)        reason = 'goodies_unavailable';
+    else                                reason = 'not_holder';
+  }
+
+  console.log('[verify-access]',
+    'tg=' + (telegramUserId || '-'),
+    'wallet=' + (wallet ? wallet.slice(0, 10) + '...' : '-'),
+    'access=' + hasAccess,
+    'goodies=' + goodies,
+    'chain=' + chain,
+    'reason=' + (reason || 'ok'));
+
   const payload = {
     ok: true,
     hasAccess,
     telegramUserId: telegramUserId ? String(telegramUserId) : null,
     wallet: wallet || null,
+    reason,
     via: {
       goodies: { drop: goodiesDrop.owner, mai: goodiesMai, vi: goodiesVi, available: goodiesAvailable },
       chain:   { mai: chainMai, vi: chainVi, available: !!wallet },
