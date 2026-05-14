@@ -39,8 +39,6 @@ function readBody(req) {
 }
 
 export default async function handler(req, res) {
-  // GET: diagnostic (no secrets leaked) — lets you curl this and see
-  // which piece is missing without opening Vercel logs.
   if (req.method === 'GET') {
     return res.status(200).json({
       ok: true,
@@ -50,8 +48,7 @@ export default async function handler(req, res) {
         TELEGRAM_BOT_TOKEN: !!BOT_TOKEN,
       },
       supabase_client: !!supabase,
-      bot_token_length: BOT_TOKEN ? BOT_TOKEN.length : 0,
-      build: 'save-user v2',
+      build: 'save-user v3 (graceful supabase)',
     });
   }
 
@@ -60,31 +57,25 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  if (!supabase) {
-    console.error('[save-user] supabase client missing (env vars not set)');
-    return res.status(500).json({ error: 'server_not_configured', env: { url: !!SUPABASE_URL, key: !!SUPABASE_SERVICE_KEY } });
-  }
+  // Validate user even when storage is degraded — useful telemetry
   if (!BOT_TOKEN) {
-    console.error('[save-user] TELEGRAM_BOT_TOKEN missing');
-    return res.status(500).json({ error: 'bot_token_missing' });
+    return res.status(200).json({ ok: true, degraded: 'bot_token_missing' });
   }
-
   const initData = req.headers['telegram-init-data'] || req.headers['x-telegram-init-data'];
-  console.log('[save-user] initData length:', initData ? initData.length : 0);
-  if (!initData) return res.status(401).json({ error: 'no_init_data' });
-
+  if (!initData) return res.status(200).json({ ok: true, degraded: 'no_init_data' });
   const verdict = hmacCheck(initData, BOT_TOKEN);
   if (!verdict.ok) {
-    console.warn('[save-user] verify failed:', verdict.reason);
-    return res.status(401).json({ error: 'verify_failed', reason: verdict.reason });
+    return res.status(200).json({ ok: true, degraded: 'verify_failed', reason: verdict.reason });
   }
-
   const user = verdict.user;
-  if (!user?.id) {
-    console.warn('[save-user] user payload missing id');
-    return res.status(401).json({ error: 'no_user_id' });
+  if (!user?.id) return res.status(200).json({ ok: true, degraded: 'no_user_id' });
+
+  // If Supabase isn't configured (or unreachable), don't 500 — the
+  // game's core flow doesn't need it. Just log and respond ok.
+  if (!supabase) {
+    console.log('[save-user] supabase unavailable — skipping persistence for', user.id);
+    return res.status(200).json({ ok: true, degraded: 'supabase_unconfigured', user: { telegram_id: user.id } });
   }
-  console.log('[save-user] verified user', user.id, user.username || user.first_name);
 
   const body = readBody(req);
   const referredBy = Number.isFinite(body.referredBy) ? Math.floor(body.referredBy) : null;
@@ -98,27 +89,31 @@ export default async function handler(req, res) {
   if (user.language_code) row.language_code = String(user.language_code).slice(0, 8);
   if (referredBy && referredBy !== user.id) row.referred_by = referredBy;
 
-  let { data, error } = await supabase
-    .from('users')
-    .upsert(row, { onConflict: 'telegram_id', ignoreDuplicates: false })
-    .select('telegram_id, username, created_at')
-    .single();
-
-  if (error && /column|does not exist|schema/i.test(error.message)) {
-    console.warn('[save-user] schema mismatch, retrying minimal row:', error.message);
-    const minimal = { telegram_id: row.telegram_id, username: row.username };
-    if (row.referred_by) minimal.referred_by = row.referred_by;
-    ({ data, error } = await supabase
+  try {
+    let { data, error } = await supabase
       .from('users')
-      .upsert(minimal, { onConflict: 'telegram_id', ignoreDuplicates: false })
+      .upsert(row, { onConflict: 'telegram_id', ignoreDuplicates: false })
       .select('telegram_id, username, created_at')
-      .single());
-  }
+      .single();
 
-  if (error) {
-    console.error('[save-user] supabase error:', error);
-    return res.status(500).json({ error: 'db_error', message: error.message, code: error.code });
+    if (error && /column|does not exist|schema/i.test(error.message)) {
+      const minimal = { telegram_id: row.telegram_id, username: row.username };
+      if (row.referred_by) minimal.referred_by = row.referred_by;
+      ({ data, error } = await supabase
+        .from('users')
+        .upsert(minimal, { onConflict: 'telegram_id', ignoreDuplicates: false })
+        .select('telegram_id, username, created_at')
+        .single());
+    }
+
+    if (error) {
+      console.warn('[save-user] supabase error (soft):', error.message);
+      return res.status(200).json({ ok: true, degraded: 'db_error', message: error.message, user: { telegram_id: user.id } });
+    }
+    return res.status(200).json({ ok: true, user: data });
+  } catch (e) {
+    // Network/DNS errors when Supabase is gone — soft-fail
+    console.warn('[save-user] supabase unreachable (soft):', e.message);
+    return res.status(200).json({ ok: true, degraded: 'supabase_unreachable', user: { telegram_id: user.id } });
   }
-  console.log('[save-user] upserted', data?.telegram_id);
-  return res.status(200).json({ ok: true, user: data });
 }
