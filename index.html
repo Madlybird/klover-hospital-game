@@ -2792,30 +2792,15 @@ html, body {
    ============================================================ */
 #screen-lore [data-lore-scene="5"] {
   position: relative;
-  background: linear-gradient(180deg, #ff4fb0 0%, #e8609a 45%, #b03470 100%);
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255,255,255,0.25) 0%, transparent 50%),
+    radial-gradient(circle at 70% 80%, rgba(255,180,220,0.4) 0%, transparent 60%),
+    linear-gradient(180deg, #ff66b8 0%, #e8609a 50%, #b03470 100%) !important;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   padding: 0;
   overflow: hidden;
   user-select: none;
-}
-.tg-img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 1;
-  display: block;
-  opacity: 0.75;
-}
-.tg-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at center, rgba(255,160,200,0.35) 0%, rgba(232,96,154,0) 60%);
 }
 .tg-title {
   position: absolute;
@@ -3453,8 +3438,6 @@ html, body {
     </div>
 
     <div class="lore-scene" data-lore-scene="5">
-      <img class="tg-img" src="assets/story/3.JPG" alt="">
-      <div class="tg-overlay"></div>
       <div class="tg-title" data-lore-i18n="tg_title"></div>
       <div class="tg-sub" data-lore-i18n="tg_sub"></div>
       <div class="tg-button" id="tg-button">
@@ -6520,11 +6503,17 @@ const Lore = (() => {
   function runScene5() {
     clearListeners();
     clearTimers();
+    // Belt-and-suspenders: kill any stray overlays before showing
+    document.querySelectorAll('.lore-glitch').forEach(o => { try { o.remove(); } catch {} });
     showScene('5');
 
     const scene = document.querySelector('#screen-lore [data-lore-scene="5"]');
     if (!scene) { runScene6B(); return; }
     scene.classList.add('active');
+    // Force visible pink background inline — overrides any cached/stale CSS
+    scene.style.background = 'radial-gradient(circle at 30% 20%, rgba(255,255,255,0.25) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(255,180,220,0.4) 0%, transparent 60%), linear-gradient(180deg, #ff66b8 0%, #e8609a 50%, #b03470 100%)';
+    scene.style.display = 'flex';
+    scene.style.opacity = '1';
 
     const fill   = document.getElementById('tg-bar-fill');
     const pct    = document.getElementById('tg-pct');
