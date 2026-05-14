@@ -31,56 +31,71 @@ export default async function handler(req, res) {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Method not allowed' });
   }
+  // Always return 200 — the referral reward is a nice-to-have, not a
+  // blocker. If Supabase is unreachable we just skip silently and let
+  // the client move on with the game flow.
   if (!supabase || !BOT_TOKEN) {
-    return res.status(500).json({ error: 'Server not configured' });
+    return res.status(200).json({ ok: true, credited: false, degraded: 'server_not_configured' });
   }
   const initData = req.headers['telegram-init-data'] || req.headers['x-telegram-init-data'];
   const verdict = hmacCheck(initData, BOT_TOKEN);
-  if (!verdict.ok || !verdict.user?.id) return res.status(401).json({ error: 'Invalid Telegram data' });
-
+  if (!verdict.ok || !verdict.user?.id) {
+    return res.status(200).json({ ok: true, credited: false, degraded: 'verify_failed' });
+  }
   const telegramId = verdict.user.id;
 
-  // Load the caller's row. Must include referred_by and level1_complete.
-  const { data: me, error: loadErr } = await supabase
-    .from('users')
-    .select('telegram_id, referred_by, level1_complete')
-    .eq('telegram_id', telegramId)
-    .maybeSingle();
-  if (loadErr) return res.status(500).json({ error: loadErr.message });
-  if (!me) return res.status(404).json({ error: 'user_not_found' });
+  try {
+    const { data: me, error: loadErr } = await supabase
+      .from('users')
+      .select('telegram_id, referred_by, level1_complete')
+      .eq('telegram_id', telegramId)
+      .maybeSingle();
+    if (loadErr) {
+      console.warn('[referral-complete] load err (soft):', loadErr.message);
+      return res.status(200).json({ ok: true, credited: false, degraded: 'db_error' });
+    }
+    if (!me) {
+      return res.status(200).json({ ok: true, credited: false, reason: 'user_not_found' });
+    }
+    if (me.level1_complete) {
+      return res.status(200).json({ ok: true, credited: false, reason: 'already_flagged' });
+    }
 
-  if (me.level1_complete) {
-    return res.status(200).json({ ok: true, credited: false, reason: 'already_flagged' });
+    const { error: flagErr } = await supabase
+      .from('users')
+      .update({ level1_complete: true })
+      .eq('telegram_id', telegramId);
+    if (flagErr) {
+      console.warn('[referral-complete] flag err (soft):', flagErr.message);
+      return res.status(200).json({ ok: true, credited: false, degraded: 'db_error' });
+    }
+
+    if (!me.referred_by) {
+      return res.status(200).json({ ok: true, credited: false, reason: 'no_referrer' });
+    }
+
+    const { data: ref, error: refLoadErr } = await supabase
+      .from('users')
+      .select('telegram_id, coins')
+      .eq('telegram_id', me.referred_by)
+      .maybeSingle();
+    if (refLoadErr || !ref) {
+      return res.status(200).json({ ok: true, credited: false, reason: 'referrer_missing' });
+    }
+
+    const newCoins = Math.min(10_000_000, (ref.coins ?? 0) + 500);
+    const { error: updErr } = await supabase
+      .from('users')
+      .update({ coins: newCoins })
+      .eq('telegram_id', ref.telegram_id);
+    if (updErr) {
+      console.warn('[referral-complete] update err (soft):', updErr.message);
+      return res.status(200).json({ ok: true, credited: false, degraded: 'db_error' });
+    }
+
+    return res.status(200).json({ ok: true, credited: true, referrer: ref.telegram_id, amount: 500 });
+  } catch (e) {
+    console.warn('[referral-complete] supabase unreachable (soft):', e.message);
+    return res.status(200).json({ ok: true, credited: false, degraded: 'supabase_unreachable' });
   }
-
-  // Flag the caller regardless so the credit fires at most once.
-  const { error: flagErr } = await supabase
-    .from('users')
-    .update({ level1_complete: true })
-    .eq('telegram_id', telegramId);
-  if (flagErr) return res.status(500).json({ error: flagErr.message });
-
-  if (!me.referred_by) {
-    return res.status(200).json({ ok: true, credited: false, reason: 'no_referrer' });
-  }
-
-  // Credit referrer +500 coins atomically (read-modify-write here; for a real
-  // high-concurrency app use a Postgres RPC instead).
-  const { data: ref, error: refLoadErr } = await supabase
-    .from('users')
-    .select('telegram_id, coins')
-    .eq('telegram_id', me.referred_by)
-    .maybeSingle();
-  if (refLoadErr || !ref) {
-    return res.status(200).json({ ok: true, credited: false, reason: 'referrer_missing' });
-  }
-
-  const newCoins = Math.min(10_000_000, (ref.coins ?? 0) + 500);
-  const { error: updErr } = await supabase
-    .from('users')
-    .update({ coins: newCoins })
-    .eq('telegram_id', ref.telegram_id);
-  if (updErr) return res.status(500).json({ error: updErr.message });
-
-  return res.status(200).json({ ok: true, credited: true, referrer: ref.telegram_id, amount: 500 });
 }
