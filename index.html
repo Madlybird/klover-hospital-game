@@ -2799,8 +2799,8 @@ html, body {
 }
 .lore-tarot-card {
   flex: 0 0 auto;
-  width: 64px;
-  height: 130px;
+  width: 68px;
+  height: 134px;
   border-radius: 10px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -2809,25 +2809,25 @@ html, body {
   transform-origin: bottom center;
   transform: rotate(var(--ang, 0deg)) translateY(0);
   background:
-    radial-gradient(circle at 50% 25%, rgba(255,255,255,0.25) 0%, transparent 70%),
+    radial-gradient(circle at 50% 25%, rgba(255,255,255,0.18) 0%, transparent 70%),
     linear-gradient(135deg, #1a3160 0%, #0a1a3a 60%, #2c1448 100%);
-  border: 2px solid var(--color-blue, #5b9de8);
+  border: 1.5px solid rgba(91,157,232,0.85);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 6px 4px;
+  padding: 8px 5px;
   text-align: center;
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 11px;
-  line-height: 1.15;
-  letter-spacing: 0.4px;
-  font-weight: 700;
-  text-transform: uppercase;
+  font-size: 12px;
+  line-height: 1.2;
+  letter-spacing: 0.5px;
+  font-weight: 400;
+  text-transform: none;
   color: #fff;
-  text-shadow: 0 0 6px var(--color-blue, #5b9de8), 0 0 12px rgba(91,157,232,0.5);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.85);
   box-shadow:
-    inset 0 0 18px rgba(91,157,232,0.4),
-    0 6px 14px rgba(0,0,0,0.7);
+    inset 0 0 14px rgba(91,157,232,0.18),
+    0 5px 12px rgba(0,0,0,0.7);
   word-break: break-word;
   hyphens: auto;
 }
@@ -2843,21 +2843,22 @@ html, body {
 .lore-tarot-card.chosen {
   position: fixed;
   z-index: 50;
-  width: 220px;
-  height: 320px;
+  width: 240px;
+  height: 340px;
   top: 50%;
   left: 50%;
-  margin-left: -110px;
-  margin-top: -160px;
+  margin-left: -120px;
+  margin-top: -170px;
   transform: none !important;
   font-size: 22px;
-  line-height: 1.3;
-  padding: 18px;
+  font-weight: 500;
+  line-height: 1.35;
+  padding: 24px;
   border-color: var(--color-primary, #e8609a);
-  border-width: 3px;
-  text-shadow: 0 0 10px var(--color-primary, #e8609a), 0 0 24px rgba(232,96,154,0.7);
+  border-width: 2px;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.85);
   box-shadow:
-    inset 0 0 36px rgba(232,96,154,0.55),
+    inset 0 0 36px rgba(232,96,154,0.4),
     0 0 30px rgba(232,96,154,0.5),
     0 12px 28px rgba(0,0,0,0.85);
   transition: all 0.6s cubic-bezier(.34,1.4,.4,1);
@@ -2888,217 +2889,6 @@ html, body {
   to { opacity: 0.85; }
 }
 .lore-tarot-hint.hide { opacity: 0; transition: opacity 0.4s ease; }
-
-/* Glitch overlay — bad-trip transition */
-.lore-glitch-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  pointer-events: none;
-  background: #ffffff;
-  animation: lore-glitch-bg 1.7s linear forwards;
-  overflow: hidden;
-}
-/* Long variant — 5s before entering the tap game */
-.lore-glitch-overlay.long { animation-duration: 3s; }
-.lore-glitch-overlay.long .lore-glitch-bar { animation-duration: 3s; }
-.lore-glitch-overlay.long .lore-glitch-text { animation-duration: 0.14s, 3s; }
-.lore-glitch-overlay.long .lore-glitch-noise { animation-duration: 0.08s; }
-
-/* Horror variant — used after the patient-ready slide.
-   IMPORTANT: animation fades opacity to 0 at the end so even if
-   the JS removal fails the overlay can never block scene 5. */
-.lore-glitch-overlay.horror {
-  background: rgba(0,0,0,0);
-  opacity: 1;
-  animation: lore-horror-bg 3s linear forwards, lore-horror-fade 3s linear forwards;
-}
-@keyframes lore-horror-fade {
-  0%   { opacity: 1; }
-  90%  { opacity: 1; }
-  100% { opacity: 0; }
-}
-@keyframes lore-horror-bg {
-  0%   { background: rgba(255,255,255,0.95); }
-  4%   { background: rgba(0,0,0,0.85);       }
-  10%  { background: rgba(120,0,0,0.55);     }
-  16%  { background: rgba(0,0,0,0.95);       }
-  24%  { background: rgba(255,255,255,0.4);  }
-  30%  { background: rgba(0,0,0,0.95);       }
-  46%  { background: rgba(60,0,80,0.7);      }
-  60%  { background: rgba(0,0,0,1);          }
-  72%  { background: rgba(180,0,40,0.55);    }
-  88%  { background: rgba(0,0,0,0.7);        }
-  100% { background: rgba(0,0,0,0);          }
-}
-.lore-horror-whispers {
-  position: absolute;
-  inset: 0;
-  z-index: 4;
-  pointer-events: none;
-  overflow: hidden;
-}
-.lore-whisper {
-  position: absolute;
-  color: rgba(255,255,255,0.4);
-  font-family: Georgia, serif;
-  font-style: italic;
-  font-size: 18px;
-  white-space: nowrap;
-  text-shadow: 0 0 8px rgba(255,255,255,0.4), 0 0 18px rgba(120,0,40,0.6);
-  filter: blur(0.5px);
-  animation: lore-whisper-drift 4.2s ease-in-out forwards;
-}
-@keyframes lore-whisper-drift {
-  0%   { opacity: 0;   transform: translate(0, 0) scale(0.85); filter: blur(2px); }
-  20%  { opacity: 0.9; transform: translate(var(--wx, 10px), var(--wy, -20px)) scale(1); filter: blur(0); }
-  80%  { opacity: 0.8; transform: translate(calc(var(--wx, 10px) * 2), calc(var(--wy, -20px) * 2)) scale(1.1); }
-  100% { opacity: 0;   transform: translate(calc(var(--wx, 10px) * 3), calc(var(--wy, -20px) * 3)) scale(1.25); filter: blur(4px); }
-}
-.lore-horror-funnel {
-  position: absolute;
-  top: 50%; left: 50%;
-  width: 200vmax;
-  height: 200vmax;
-  margin-left: -100vmax;
-  margin-top: -100vmax;
-  z-index: 3;
-  pointer-events: none;
-  animation: lore-funnel-spin 5s linear forwards;
-}
-@keyframes lore-funnel-spin {
-  from { transform: rotate(0deg)   scale(0.4); }
-  to   { transform: rotate(720deg) scale(1.4); }
-}
-.lore-funnel-word {
-  position: absolute;
-  top: 50%; left: 50%;
-  color: rgba(255,80,80,0.85);
-  font-family: Georgia, serif;
-  font-weight: bold;
-  font-size: 22px;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  white-space: nowrap;
-  text-shadow: 0 0 8px rgba(255,40,40,0.8), 0 0 18px rgba(120,0,0,0.8);
-  /* angle and radius set inline */
-  transform-origin: 0 0;
-  opacity: 0;
-  animation: lore-funnel-word 5s ease-in forwards;
-}
-@keyframes lore-funnel-word {
-  0%   { opacity: 0;   }
-  10%  { opacity: 0.95; }
-  90%  { opacity: 0.85; }
-  100% { opacity: 0;   }
-}
-.lore-horror-strobe {
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-  pointer-events: none;
-  overflow: hidden;
-}
-.lore-strobe-word {
-  position: absolute;
-  font-family: 'Courier New', monospace;
-  font-weight: 900;
-  white-space: nowrap;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  text-shadow: 4px 0 0 #00e1ff, -4px 0 0 #ff003c, 0 0 14px rgba(255,255,255,0.9);
-  color: #fff;
-  opacity: 0;
-  animation: lore-strobe-flash 0.18s steps(2) forwards;
-}
-@keyframes lore-strobe-flash {
-  0%   { opacity: 0;   transform: scale(0.7); }
-  20%  { opacity: 1;   transform: scale(1.05); }
-  80%  { opacity: 0.95; transform: scale(1); }
-  100% { opacity: 0;   transform: scale(1.15); }
-}
-@keyframes lore-glitch-bg {
-  0%   { background: rgba(255,255,255,1);    }
-  5%   { background: rgba(255,255,255,0.95); }
-  10%  { background: rgba(255,0,80,0.85);    }
-  18%  { background: rgba(0,225,255,0.78);   }
-  25%  { background: rgba(255,255,255,0.92); }
-  35%  { background: rgba(20,0,40,0.9);      }
-  45%  { background: rgba(237,0,140,0.75);   }
-  55%  { background: rgba(0,0,0,0.92);       }
-  65%  { background: rgba(255,255,255,0.55); }
-  75%  { background: rgba(40,0,60,0.95);     }
-  90%  { background: rgba(0,0,0,1);          }
-  100% { background: rgba(0,0,0,1);          }
-}
-.lore-glitch-bar {
-  position: absolute;
-  left: -10%;
-  width: 120%;
-  height: 36px;
-  top: var(--y);
-  background: linear-gradient(90deg, rgba(255,0,120,0) 0%, rgba(255,0,120,1) 35%, rgba(0,225,255,1) 65%, rgba(255,255,255,0) 100%);
-  mix-blend-mode: screen;
-  filter: blur(1.5px) contrast(1.4);
-  animation: lore-glitch-bar 1.7s steps(20) forwards;
-  opacity: 0.95;
-}
-@keyframes lore-glitch-bar {
-  0%   { transform: translateX(0) scaleY(0.5);   opacity: 0; }
-  6%   { transform: translateX(-90px) scaleY(4); opacity: 1; }
-  18%  { transform: translateX(110px) scaleY(0.3); }
-  30%  { transform: translateX(-50px) scaleY(2.6); }
-  45%  { transform: translateX(70px) scaleY(0.5); }
-  60%  { transform: translateX(-20px) scaleY(2.2); opacity: 1; }
-  80%  { transform: translateX(0) scaleY(1.4); opacity: 0.85; }
-  100% { transform: translateX(0) scaleY(0.2); opacity: 0; }
-}
-.lore-glitch-noise {
-  position: absolute;
-  inset: -20%;
-  background:
-    repeating-linear-gradient(90deg, rgba(255,255,255,0.12) 0 2px, transparent 2px 4px),
-    repeating-linear-gradient(0deg, rgba(0,0,0,0.4) 0 1px, transparent 1px 3px);
-  mix-blend-mode: overlay;
-  animation: lore-glitch-shake 0.08s steps(2) infinite;
-  opacity: 0.85;
-}
-@keyframes lore-glitch-shake {
-  0%   { transform: translate(0, 0); }
-  50%  { transform: translate(-10px, 6px); }
-  100% { transform: translate(7px, -5px); }
-}
-.lore-glitch-text {
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  color: #fff;
-  font-family: 'Courier New', monospace;
-  font-size: 44px;
-  font-weight: 900;
-  letter-spacing: 6px;
-  text-transform: uppercase;
-  text-shadow:
-    4px 0 0 #00e1ff,
-    -4px 0 0 #ff003c,
-    0 0 18px rgba(255,255,255,0.9);
-  animation: lore-glitch-text 0.14s steps(2) infinite, lore-glitch-text-fade 1.7s ease-in forwards;
-  white-space: nowrap;
-  max-width: 90vw;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-@keyframes lore-glitch-text {
-  0%   { transform: translate(-50%, -50%) skewX(0deg); }
-  50%  { transform: translate(-46%, -54%) skewX(-14deg); }
-  100% { transform: translate(-54%, -47%) skewX(10deg); }
-}
-@keyframes lore-glitch-text-fade {
-  0%   { opacity: 0;   }
-  10%  { opacity: 1;   }
-  70%  { opacity: 1;   }
-  100% { opacity: 0;   }
-}
 
 /* Patient ready scene */
 #screen-lore [data-lore-scene="ready"] { background: #000; padding: 0; }
@@ -3133,8 +2923,7 @@ html, body {
   object-fit: cover;
   z-index: 1;
   display: block;
-  opacity: 0.85;
-  mix-blend-mode: luminosity;
+  opacity: 0.75;
 }
 .tg-overlay {
   position: absolute;
@@ -7034,109 +6823,6 @@ const Lore = (() => {
       on(scene, 'click', () => { tap('light'); advance(); });
     }, READY_MIN_MS));
     timers.push(setTimeout(advance, READY_AUTO_MS));
-  }
-
-  // Body-appended horror overlay between Ready and Tap scenes.
-  // 3 seconds. Triple-safety against sticking:
-  //  1) Keyframes fade opacity to 0 at the final frame (visual safety)
-  //  2) Tracked setTimeout calls handoff() → removes overlay + runScene5
-  //  3) Untracked backup setTimeout fires regardless of clearTimers
-  function runHorrorGlitch() {
-    clearListeners();
-    clearTimers();
-    // Hard-clean any orphan overlay first
-    document.querySelectorAll('.lore-glitch-overlay').forEach(o => {
-      try { o.remove(); } catch {}
-    });
-    const overlay = document.createElement('div');
-    overlay.className = 'lore-glitch-overlay long horror';
-    decorateGlitchEl(overlay);
-    document.body.appendChild(overlay);
-    Music.glitch(GLITCH2_MS / 1000);
-    let handed = false;
-    function handoff() {
-      if (handed) return;
-      handed = true;
-      document.querySelectorAll('.lore-glitch-overlay').forEach(o => {
-        try { o.remove(); } catch {}
-      });
-      runScene5();
-    }
-    timers.push(setTimeout(handoff, GLITCH2_MS));
-    setTimeout(handoff, GLITCH2_MS + 800);
-  }
-
-  // Decorate a glitch element with the horror sub-layers (bars, noise,
-  // whispers, funnel, strobe flashes built from the user's answers).
-  function decorateGlitchEl(glitchEl) {
-    if (!glitchEl) return;
-    const esc = (s) => String(s || '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
-    const answers = [chosenEmotion, chosenFear, chosenForgive].filter(Boolean);
-    if (!answers.length) answers.push('SIMULATION');
-
-    let html = '' +
-      '<div class="lore-glitch-bar" style="--y:8%"></div>' +
-      '<div class="lore-glitch-bar" style="--y:22%"></div>' +
-      '<div class="lore-glitch-bar" style="--y:38%"></div>' +
-      '<div class="lore-glitch-bar" style="--y:54%"></div>' +
-      '<div class="lore-glitch-bar" style="--y:71%"></div>' +
-      '<div class="lore-glitch-bar" style="--y:87%"></div>' +
-      '<div class="lore-glitch-noise"></div>';
-
-    let whispers = '<div class="lore-horror-whispers">';
-    for (let i = 0; i < 14; i++) {
-      const word = answers[i % answers.length];
-      const x = Math.floor(5 + Math.random() * 80);
-      const y = Math.floor(8 + Math.random() * 80);
-      const dx = Math.round((Math.random() - 0.5) * 40);
-      const dy = Math.round((Math.random() - 0.5) * 40);
-      const delay = (Math.random() * 4).toFixed(2);
-      const size = 14 + Math.floor(Math.random() * 14);
-      whispers += '<div class="lore-whisper" style="' +
-        'left:' + x + '%;top:' + y + '%;' +
-        '--wx:' + dx + 'px;--wy:' + dy + 'px;' +
-        'animation-delay:' + delay + 's;' +
-        'font-size:' + size + 'px;">' + esc(word) + '</div>';
-    }
-    whispers += '</div>';
-
-    let funnel = '<div class="lore-horror-funnel">';
-    const FN = 16;
-    for (let i = 0; i < FN; i++) {
-      const angle = (360 / FN) * i;
-      const radius = 80 + (i % 3) * 60;
-      const word = answers[i % answers.length];
-      const delay = (i * 0.07).toFixed(2);
-      funnel += '<div class="lore-funnel-word" style="' +
-        'transform: rotate(' + angle + 'deg) translate(' + radius + 'px, 0);' +
-        'animation-delay:' + delay + 's;">' + esc(word) + '</div>';
-    }
-    funnel += '</div>';
-
-    let strobe = '<div class="lore-horror-strobe" id="lore-horror-strobe"></div>';
-    glitchEl.innerHTML = html + whispers + funnel + strobe;
-
-    const fonts = ['Georgia, serif', "'Courier New', monospace", "'Arial Black', sans-serif", 'Impact, sans-serif'];
-    const colors = ['#fff', '#ff3b5c', '#ffe040', '#00e1ff', '#b787d8'];
-    const strobeEl = glitchEl.querySelector('#lore-horror-strobe');
-    function flashOne() {
-      if (!glitchEl.isConnected || !strobeEl) return;
-      const word = answers[Math.floor(Math.random() * answers.length)];
-      const el = document.createElement('div');
-      el.className = 'lore-strobe-word';
-      el.textContent = (word || '').toUpperCase();
-      el.style.left = (5 + Math.random() * 70) + '%';
-      el.style.top = (10 + Math.random() * 70) + '%';
-      el.style.fontSize = (24 + Math.random() * 26) + 'px';
-      el.style.fontFamily = fonts[Math.floor(Math.random() * fonts.length)];
-      el.style.color = colors[Math.floor(Math.random() * colors.length)];
-      el.style.transform = 'rotate(' + (Math.round((Math.random() - 0.5) * 12)) + 'deg)';
-      strobeEl.appendChild(el);
-      setTimeout(() => { try { el.remove(); } catch {} }, 240);
-    }
-    [0, 180, 360, 540, 700, 880, 1100, 1320, 1600, 1900, 2200, 2500, 2800, 3100, 3400, 3700, 4100, 4400].forEach(t => {
-      timers.push(setTimeout(flashOne, t));
-    });
   }
 
   // ---- Scene 8 (tap game) — fresh tg-* namespace, no overlays ----
