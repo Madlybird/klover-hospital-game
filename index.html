@@ -2277,48 +2277,129 @@ html, body {
   transform: translateY(0);
 }
 
-/* Scene 2 — tap-revealed crawl */
-.lore-crawl-wrap {
+/* Scene 2 — wormhole zoom-in */
+.lore-wormhole-wrap {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at center, #0a0418 0%, #000 75%);
+  background: #000;
   overflow: hidden;
+  perspective: 900px;
+  perspective-origin: 50% 50%;
 }
-.lore-crawl {
+.lore-wormhole-stage {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  animation: lore-wh-spin 24s linear infinite;
+  will-change: transform;
+}
+.lore-wormhole-layer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 180vmax;
+  height: 180vmax;
+  margin-left: -90vmax;
+  margin-top: -90vmax;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  border-radius: 50%;
+  opacity: 0;
+  mix-blend-mode: screen;
+  filter: blur(28px) saturate(1.2) brightness(0.85);
+  transform: rotate(calc(var(--wh-i) * 51deg)) scale(calc(1 - var(--wh-i) * 0.06));
+  animation: lore-wh-layer-spin calc(18s + var(--wh-i) * 3s) linear infinite;
+  animation-direction: alternate;
+  will-change: transform, opacity;
+}
+.lore-wormhole-layer.on { opacity: calc(0.28 + var(--wh-i) * 0.05); }
+.lore-wormhole-core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 60vmax;
+  height: 60vmax;
+  margin-left: -30vmax;
+  margin-top: -30vmax;
+  border-radius: 50%;
+  background: radial-gradient(circle at center,
+    #000 0%,
+    #000 18%,
+    rgba(20,0,30,0.95) 30%,
+    rgba(60,10,90,0.6) 45%,
+    rgba(237,0,140,0.25) 62%,
+    rgba(0,0,0,0) 80%);
+  box-shadow: 0 0 120px 30px rgba(0,0,0,0.95) inset;
+  pointer-events: none;
+  z-index: 3;
+  animation: lore-wh-pulse 4s ease-in-out infinite;
+}
+@keyframes lore-wh-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes lore-wh-layer-spin {
+  from { transform: rotate(calc(var(--wh-i) * 51deg)) scale(calc(1 - var(--wh-i) * 0.06)); }
+  to   { transform: rotate(calc(var(--wh-i) * 51deg + 360deg)) scale(calc(1 - var(--wh-i) * 0.06 + 0.08)); }
+}
+@keyframes lore-wh-pulse {
+  0%, 100% { transform: scale(1);    filter: hue-rotate(0deg); }
+  50%      { transform: scale(1.06); filter: hue-rotate(20deg); }
+}
+.lore-wormhole-text {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 100px 24px 130px;
+  padding: 80px 24px 120px;
+  z-index: 5;
   pointer-events: none;
+  transform-style: preserve-3d;
+  perspective: 700px;
 }
-.lore-crawl p {
+.lore-wormhole-text p {
   position: absolute;
   left: 0;
   right: 0;
   margin: 0 auto;
   width: calc(100% - 48px);
   max-width: 620px;
-  color: #ED008C;
+  color: #fff;
   font-family: Georgia, serif;
   font-size: 30px;
   font-weight: bold;
   line-height: 1.45;
   text-align: center;
-  text-shadow: 0 0 16px rgba(237,0,140,0.55), 0 0 32px rgba(237,0,140,0.3);
+  text-shadow:
+    0 0 8px rgba(255,255,255,0.85),
+    0 0 22px rgba(237,0,140,0.6),
+    0 0 44px rgba(237,0,140,0.35);
   opacity: 0;
-  transform: translateY(-40px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
+  transform: translateZ(-400px) scale(0.4);
+  transition: opacity 0.6s ease, transform 1.1s cubic-bezier(.2,.7,.2,1);
+  will-change: transform, opacity;
 }
-.lore-crawl p.show {
+.lore-wormhole-text p.show {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateZ(0) scale(1);
 }
-.lore-crawl p.gone {
+.lore-wormhole-text p.gone {
   opacity: 0;
-  transform: translateY(80px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
+  transform: translateZ(600px) scale(3.2);
+  transition: opacity 0.55s ease, transform 0.85s cubic-bezier(.7,0,.85,.2);
+}
+.lore-wormhole-wrap.diving .lore-wormhole-stage {
+  animation-duration: 4s;
+}
+.lore-wormhole-wrap.diving .lore-wormhole-core {
+  animation: lore-wh-collapse 1.4s ease-in forwards;
+}
+@keyframes lore-wh-collapse {
+  0%   { transform: scale(1);   background: radial-gradient(circle at center, #000 0%, #000 18%, rgba(60,10,90,0.6) 45%, rgba(237,0,140,0.25) 62%, rgba(0,0,0,0) 80%); }
+  60%  { transform: scale(2.4); background: radial-gradient(circle at center, #fff 0%, #ffd9ee 25%, rgba(237,0,140,0.6) 55%, rgba(0,0,0,0) 80%); }
+  100% { transform: scale(7);   background: radial-gradient(circle at center, #fff 0%, #fff 60%, rgba(255,255,255,0.4) 80%, rgba(0,0,0,0) 100%); }
 }
 .lore-crawl-tap-hint {
   position: absolute;
@@ -2330,7 +2411,7 @@ html, body {
   font-family: Georgia, serif;
   font-size: 14px;
   letter-spacing: 1.5px;
-  z-index: 5;
+  z-index: 6;
   pointer-events: none;
   opacity: 0;
   animation: lore-pulse 1.4s ease-in-out infinite;
@@ -2343,19 +2424,19 @@ html, body {
   transform: translateX(-50%);
   display: flex;
   gap: 6px;
-  z-index: 5;
+  z-index: 6;
   pointer-events: none;
 }
 .lore-crawl-progress span {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: rgba(237,0,140,0.25);
+  background: rgba(255,255,255,0.25);
   transition: background 0.3s;
 }
 .lore-crawl-progress span.on {
-  background: #ED008C;
-  box-shadow: 0 0 6px #ED008C;
+  background: #fff;
+  box-shadow: 0 0 6px #fff;
 }
 
 /* Scene 3 — pill swipe */
@@ -2364,43 +2445,35 @@ html, body {
   inset: 0;
   background: radial-gradient(ellipse at center, #1a0010 0%, #000 70%);
 }
-.lore-heart-bg {
+.lore-ekg {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 75%;
-  max-width: 360px;
-  height: auto;
-  transform: translate(-50%, -50%) scale(1);
+  width: 92%;
+  max-width: 520px;
+  height: 28%;
+  transform: translate(-50%, -50%);
   transform-origin: center;
   z-index: 1;
-  opacity: 0.85;
-  filter: drop-shadow(0 0 30px rgba(237,0,140,0.85)) drop-shadow(0 0 80px rgba(237,0,140,0.55));
   pointer-events: none;
+  opacity: 0.95;
+  transition: transform 0.16s ease-out;
 }
-.lore-heart-bg.beat {
-  animation: lore-heart-beat 0.28s ease-out;
+.lore-ekg.beat {
+  animation: lore-ekg-beat 0.32s ease-out;
 }
-@keyframes lore-heart-beat {
+@keyframes lore-ekg-beat {
   0%   { transform: translate(-50%, -50%) scale(1); }
-  18%  { transform: translate(-50%, -50%) scale(1.10); }
-  36%  { transform: translate(-50%, -50%) scale(0.96); }
-  55%  { transform: translate(-50%, -50%) scale(1.14); }
+  30%  { transform: translate(-50%, -50%) scale(1.06); }
+  60%  { transform: translate(-50%, -50%) scale(0.98); }
   100% { transform: translate(-50%, -50%) scale(1); }
-}
-.lore-ekg {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0.7;
 }
 .lore-ekg-path {
   fill: none;
   stroke: #ED008C;
-  stroke-width: 2;
+  stroke-width: 3;
   stroke-linecap: round;
-  filter: drop-shadow(0 0 6px #ED008C) drop-shadow(0 0 14px rgba(237,0,140,0.6));
+  filter: drop-shadow(0 0 8px #ED008C) drop-shadow(0 0 18px rgba(237,0,140,0.75));
   stroke-dasharray: 1200;
   stroke-dashoffset: 0;
   animation: lore-ekg-sweep 4s linear infinite;
@@ -2447,32 +2520,17 @@ html, body {
 }
 .lore-pill {
   position: absolute;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: #e8609a !important;
-  background-color: #e8609a !important;
+  width: 72px;
+  height: 72px;
   touch-action: manipulation;
   cursor: pointer;
   user-select: none;
   transform-origin: center;
   animation: lore-pill-pop 0.32s cubic-bezier(.34,1.56,.64,1) forwards;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  font-size: 36px;
-  line-height: 1;
-  font-family: 'Segoe UI Symbol', 'Apple Color Emoji', Arial, sans-serif;
-  text-align: center;
-  font-weight: bold;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.25);
-}
-.lore-pill-heart {
-  color: #ffffff;
-  pointer-events: none;
-  font-size: inherit;
-  line-height: 1;
+  filter: drop-shadow(0 4px 14px rgba(237,0,140,0.6)) drop-shadow(0 0 22px rgba(237,0,140,0.35));
+  -webkit-user-drag: none;
+  object-fit: contain;
+  pointer-events: auto;
 }
 .lore-pill.hit {
   animation: lore-pill-hit 0.30s ease-out forwards !important;
@@ -2644,6 +2702,39 @@ html, body {
   padding: 30px 20px;
   justify-content: center;
 }
+/* Scene 6A overrides — final "finish lore" slide is all-white */
+#screen-lore [data-lore-scene="6a"] {
+  background: linear-gradient(180deg, #ffffff 0%, #f5f5f5 100%);
+}
+#screen-lore [data-lore-scene="6a"] .lore-result-text {
+  color: #1a1a1a;
+}
+#screen-lore [data-lore-scene="6a"] .lore-result-text > div + div {
+  color: #555;
+}
+#screen-lore [data-lore-scene="6a"] .lore-bubble {
+  background: #ffffff;
+  border: 2px solid #d8d8d8;
+  color: #1a1a1a;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+#screen-lore [data-lore-scene="6a"] .lore-bubble > div + div {
+  color: #555;
+}
+#screen-lore [data-lore-scene="6a"] .lore-bubble::before {
+  background: #ffffff;
+  border-left: 2px solid #d8d8d8;
+  border-top: 2px solid #d8d8d8;
+}
+#screen-lore [data-lore-scene="6a"] .lore-play-btn {
+  background: #ffffff;
+  color: #1a1a1a;
+  border: 3px solid #1a1a1a;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.18), 0 0 0 4px rgba(0,0,0,0.06);
+}
+#screen-lore [data-lore-scene="6a"] .lore-play-btn:hover {
+  box-shadow: 0 12px 32px rgba(0,0,0,0.25), 0 0 0 6px rgba(0,0,0,0.08);
+}
 .lore-result-img {
   max-width: 72%;
   max-height: 44%;
@@ -2752,7 +2843,7 @@ html, body {
 
 @media (max-width: 380px) {
   .lore-scene1-text { font-size: 17px; }
-  .lore-crawl p { font-size: 24px; }
+  .lore-wormhole-text p { font-size: 24px; }
   .lore-tap-btn { width: 140px; height: 140px; font-size: 19px; }
   .lore-result-text { font-size: 17px; }
   .lore-bubble { font-size: 14px; }
@@ -3013,8 +3104,18 @@ html, body {
     </div>
 
     <div class="lore-scene" data-lore-scene="2">
-      <div class="lore-crawl-wrap">
-        <div class="lore-crawl" id="lore-crawl"></div>
+      <div class="lore-wormhole-wrap" id="lore-wormhole-wrap">
+        <div class="lore-wormhole-stage" id="lore-wormhole-stage">
+          <div class="lore-wormhole-layer" style="--wh-i:0" data-img="1.jpg"></div>
+          <div class="lore-wormhole-layer" style="--wh-i:1" data-img="2.JPG"></div>
+          <div class="lore-wormhole-layer" style="--wh-i:2" data-img="3.JPG"></div>
+          <div class="lore-wormhole-layer" style="--wh-i:3" data-img="4.JPG"></div>
+          <div class="lore-wormhole-layer" style="--wh-i:4" data-img="5.PNG"></div>
+          <div class="lore-wormhole-layer" style="--wh-i:5" data-img="%D0%B6%D1%89.png"></div>
+          <div class="lore-wormhole-layer" style="--wh-i:6" data-img="%D1%8E%D0%BB%D0%B4%D1%8E.png"></div>
+        </div>
+        <div class="lore-wormhole-core" id="lore-wormhole-core"></div>
+        <div class="lore-wormhole-text" id="lore-wormhole-text"></div>
       </div>
       <div class="lore-crawl-progress" id="lore-crawl-progress"></div>
       <div class="lore-crawl-tap-hint" id="lore-crawl-hint" data-lore-i18n="tap_screen"></div>
@@ -3022,9 +3123,6 @@ html, body {
 
     <div class="lore-scene" data-lore-scene="3">
       <div class="lore-pink-bg"></div>
-      <svg class="lore-heart-bg" id="lore-heart-bg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M16 28 C 32 18, 27 4, 16 12 C 5 4, 0 18, 16 28 Z" fill="#ED008C"/>
-      </svg>
       <svg class="lore-ekg" viewBox="0 0 400 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <path class="lore-ekg-path" d="M 0 100 L 60 100 L 75 100 L 85 70 L 95 130 L 105 60 L 115 140 L 125 100 L 200 100 L 215 100 L 225 70 L 235 130 L 245 60 L 255 140 L 265 100 L 400 100"/>
       </svg>
@@ -5395,6 +5493,10 @@ const Lore = (() => {
     { base: '#f0c030', light: '#fae39a', dark: '#8a6a14' },
     { base: '#9060cc', light: '#c4a6e3', dark: '#4c3173' }
   ];
+  const PILL_IMAGES = [
+    'assets/story/%D0%B6%D1%89.png',
+    'assets/story/%D1%8E%D0%BB%D0%B4%D1%8E.png'
+  ];
   const MAX_LIVE_PILLS = 4;
   const SCENE4_MIN_MS = 5000;
   const SCENE4_AUTO_MS = 7000;
@@ -5727,35 +5829,73 @@ const Lore = (() => {
     }
   }
 
-  // ---- Scene 2 (tap to reveal each paragraph) ----
+  // ---- Scene 2 (wormhole zoom-in, tap-stepped, dive into pill game) ----
   function runScene2() {
     clearListeners();
     clearTimers();
     showScene('2');
-    const crawl = document.getElementById('lore-crawl');
-    const paragraphs = L[getLang()].crawl;
-    crawl.innerHTML = paragraphs.map((p, i) => '<p data-cstep="' + i + '">' + p + '</p>').join('');
+
+    const wrap = document.getElementById('lore-wormhole-wrap');
+    const stage = document.getElementById('lore-wormhole-stage');
+    const textEl = document.getElementById('lore-wormhole-text');
     const progress = document.getElementById('lore-crawl-progress');
-    if (progress) {
-      progress.innerHTML = paragraphs.map(() => '<span></span>').join('');
-    }
     const hint = document.getElementById('lore-crawl-hint');
+
+    if (wrap) wrap.classList.remove('diving');
+
+    // Wire up image backgrounds (each layer carries a data-img filename)
+    if (stage) {
+      stage.querySelectorAll('.lore-wormhole-layer').forEach((layer, i) => {
+        const f = layer.getAttribute('data-img');
+        if (f) layer.style.backgroundImage = "url('assets/story/" + f + "')";
+        layer.classList.remove('on');
+        timers.push(setTimeout(() => layer.classList.add('on'), 80 + i * 110));
+      });
+    }
+
+    const paragraphs = L[getLang()].crawl;
+    // Find the paragraph that mentions pills — dive into pill game on that step
+    const pillIdx = (() => {
+      const re = /pill|таблет/i;
+      for (let i = 0; i < paragraphs.length; i++) if (re.test(paragraphs[i])) return i;
+      return paragraphs.length - 1;
+    })();
+    // Trim narration to end at the pill paragraph
+    const lines = paragraphs.slice(0, pillIdx + 1);
+
+    if (textEl) {
+      textEl.innerHTML = lines.map((p, i) => '<p data-cstep="' + i + '">' + p + '</p>').join('');
+    }
+    if (progress) {
+      progress.innerHTML = lines.map(() => '<span></span>').join('');
+    }
     if (hint) hint.classList.add('show');
 
     let step = -1;
     let lock = false;
+
+    function diveAndAdvance() {
+      // Final tap on the pill paragraph: collapse wormhole and jump to pill game
+      if (hint) hint.classList.remove('show');
+      const cur = textEl && textEl.querySelector('[data-cstep="' + step + '"]');
+      if (cur) { cur.classList.remove('show'); cur.classList.add('gone'); }
+      if (wrap) wrap.classList.add('diving');
+      timers.push(setTimeout(() => { clearListeners(); runScene3(); }, 1300));
+    }
+
     function advance() {
-      if (step >= 0 && step < paragraphs.length) {
-        const cur = crawl.querySelector('[data-cstep="' + step + '"]');
+      // Mark current line gone
+      if (step >= 0 && step < lines.length) {
+        const cur = textEl && textEl.querySelector('[data-cstep="' + step + '"]');
         if (cur) { cur.classList.remove('show'); cur.classList.add('gone'); }
       }
       step++;
-      if (step >= paragraphs.length) {
-        if (hint) hint.classList.remove('show');
-        timers.push(setTimeout(() => { clearListeners(); runScene3(); }, 500));
+      if (step >= lines.length) {
+        // shouldn't normally hit this — diveAndAdvance handles final
+        diveAndAdvance();
         return;
       }
-      const nxt = crawl.querySelector('[data-cstep="' + step + '"]');
+      const nxt = textEl && textEl.querySelector('[data-cstep="' + step + '"]');
       if (nxt) { nxt.classList.remove('gone'); nxt.classList.add('show'); }
       if (progress) {
         progress.querySelectorAll('span').forEach((d, i) => {
@@ -5765,15 +5905,20 @@ const Lore = (() => {
       if (step === 0 && hint) hint.classList.remove('show');
     }
 
-    timers.push(setTimeout(advance, 500));
+    timers.push(setTimeout(advance, 600));
 
     const scene = document.querySelector('#screen-lore [data-lore-scene="2"]');
     on(scene, 'click', () => {
       if (lock) return;
       lock = true;
-      setTimeout(() => { lock = false; }, 380);
+      setTimeout(() => { lock = false; }, 420);
       tap('light');
-      advance();
+      // If we're on the final (pill) line, dive into pill game
+      if (step >= lines.length - 1) {
+        diveAndAdvance();
+      } else {
+        advance();
+      }
     });
   }
 
@@ -5783,11 +5928,11 @@ const Lore = (() => {
     if (heartDecay) { clearInterval(heartDecay); heartDecay = null; }
   }
   function beatPulse() {
-    const heart = document.getElementById('lore-heart-bg');
-    if (heart) {
-      heart.classList.remove('beat');
-      void heart.offsetWidth;
-      heart.classList.add('beat');
+    const ekg = document.querySelector('#screen-lore [data-lore-scene="3"] .lore-ekg');
+    if (ekg) {
+      ekg.classList.remove('beat');
+      void ekg.offsetWidth;
+      ekg.classList.add('beat');
     }
     Music.heartBeat(heartBPM);
     const interval = Math.max(220, 60000 / heartBPM);
@@ -5878,27 +6023,24 @@ const Lore = (() => {
     const rect = zone.getBoundingClientRect();
     const w = rect.width || window.innerWidth;
     const h = rect.height || window.innerHeight;
-    const size = 60;
+    const size = 72;
     const padX = 16, padTop = 120, padBot = 90;
     const x = padX + Math.random() * Math.max(20, w - 2 * padX - size);
     const y = padTop + Math.random() * Math.max(20, h - padTop - padBot - size);
-    const pal = PILL_PALETTE[Math.floor(Math.random() * PILL_PALETTE.length)];
-    const pill = document.createElement('div');
+    const src = PILL_IMAGES[Math.floor(Math.random() * PILL_IMAGES.length)];
+    const pill = document.createElement('img');
     pill.className = 'lore-pill';
+    pill.src = src;
+    pill.alt = '';
+    pill.draggable = false;
     pill.setAttribute('style',
       'position:absolute;' +
       'left:' + x + 'px;' +
       'top:' + y + 'px;' +
-      'width:60px;height:60px;border-radius:50%;' +
-      'background:' + pal.base + ' !important;' +
-      'background-color:' + pal.base + ' !important;' +
-      'box-shadow:0 0 16px ' + pal.base + ',0 0 32px rgba(255,255,255,0.18);' +
-      'display:flex;align-items:center;justify-content:center;' +
-      'color:#ffffff;font-size:36px;line-height:1;font-weight:bold;' +
+      'width:' + size + 'px;height:' + size + 'px;' +
       'animation:lore-pill-pop 0.32s cubic-bezier(.34,1.56,.64,1) forwards;' +
       'cursor:pointer;user-select:none;'
     );
-    pill.innerHTML = '<span class="lore-pill-heart" style="color:#ffffff !important;">♥</span>';
     zone.appendChild(pill);
     livePills++;
 
