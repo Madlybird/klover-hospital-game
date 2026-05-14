@@ -5702,14 +5702,17 @@ const Game = (() => {
     if (!walletAddress) { walletAccess = null; return false; }
     walletVerifying = true;
     renderWalletGateState();
+    let data = null;
     try {
       const r = await fetch('/api/verify-access', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ wallet: walletAddress }),
+        body: JSON.stringify({ wallet: walletAddress, debug: isAdminBypass() }),
       });
-      const data = await r.json().catch(() => ({}));
+      data = await r.json().catch(() => ({}));
       walletAccess = !!data.hasAccess;
+      console.log('[verify-access] result', data);
+      window.__lastAccessCheck = data;
     } catch (e) {
       console.warn('[verify-access] request failed:', e);
       walletAccess = false;
@@ -5718,6 +5721,16 @@ const Game = (() => {
     renderWalletGateState();
     updateMenuUI();
     return walletAccess === true;
+  }
+
+  // Admin helper — open the diagnostic URL in console:
+  //   Game.debugAccess() → fetches /api/verify-access?debug=1&wallet=<connected>
+  async function debugAccess() {
+    if (!walletAddress) { console.warn('Connect a wallet first'); return null; }
+    const r = await fetch('/api/verify-access?debug=1&wallet=' + encodeURIComponent(walletAddress));
+    const data = await r.json();
+    console.log('[debugAccess]', JSON.stringify(data, null, 2));
+    return data;
   }
 
   async function toggleTonConnect() {
@@ -6018,6 +6031,7 @@ const Game = (() => {
     requireWalletGate,
     closeWalletGate,
     connectWalletGate,
+    debugAccess,
   };
 })();
 
