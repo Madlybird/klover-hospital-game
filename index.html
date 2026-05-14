@@ -2799,80 +2799,63 @@ html, body {
 .lore-tarot-card {
   position: absolute;
   bottom: 0;
-  width: 96px;
-  height: 156px;
+  width: 100px;
+  height: 160px;
   border-radius: 12px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transform-style: preserve-3d;
-  transition: transform 0.45s cubic-bezier(.34,1.56,.64,1), filter 0.3s;
+  transition: transform 0.5s cubic-bezier(.34,1.56,.64,1), filter 0.3s, opacity 0.3s;
   user-select: none;
-  filter: drop-shadow(0 8px 18px rgba(0,0,0,0.75));
   transform-origin: bottom center;
-}
-.lore-tarot-card .face {
-  position: absolute;
-  inset: 0;
-  border-radius: 12px;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px;
-  text-align: center;
-  font-family: 'Barlow Condensed', sans-serif;
-}
-.lore-tarot-card .back {
-  background:
-    radial-gradient(circle at 50% 30%, rgba(255,255,255,0.15) 0%, transparent 60%),
-    linear-gradient(135deg, #1a3160 0%, #0a1a3a 50%, #2c1448 100%);
-  border: 2px solid var(--color-primary, #e8609a);
-  color: #fff;
-  font-size: 42px;
-  text-shadow: 0 0 12px var(--color-primary, #e8609a), 0 0 24px rgba(232,96,154,0.6);
-  box-shadow: inset 0 0 24px rgba(232,96,154,0.2);
-}
-.lore-tarot-card .front {
   background:
     radial-gradient(circle at 50% 25%, rgba(255,255,255,0.22) 0%, transparent 70%),
     linear-gradient(135deg, #0a1a3a 0%, #061226 100%);
   border: 2px solid var(--color-blue, #5b9de8);
-  color: #fff;
-  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  text-align: center;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 15px;
   line-height: 1.2;
   letter-spacing: 0.5px;
   font-weight: 600;
   text-transform: uppercase;
-  transform: rotateY(180deg);
+  color: #fff;
   text-shadow: 0 0 8px var(--color-blue, #5b9de8), 0 0 16px rgba(91,157,232,0.5);
-  box-shadow: inset 0 0 26px rgba(91,157,232,0.35);
+  box-shadow:
+    inset 0 0 24px rgba(91,157,232,0.35),
+    0 8px 18px rgba(0,0,0,0.75);
 }
-.lore-tarot-card.flipped { transform: rotateY(180deg); }
-.lore-tarot-card.flipped.lifted { transform: rotateY(180deg) translateY(-28px) scale(1.06); }
+.lore-tarot-card:hover {
+  filter: drop-shadow(0 0 18px rgba(232,96,154,0.6));
+}
 .lore-tarot-card.chosen {
   z-index: 20;
-  filter:
-    drop-shadow(0 0 26px var(--color-primary, #e8609a))
-    drop-shadow(0 0 70px rgba(232,96,154,0.6));
-  transition: transform 0.7s cubic-bezier(.34,1.4,.4,1), filter 0.4s;
-  width: 200px;
+  width: 220px;
   height: 320px;
-  margin-left: -100px;
-  margin-bottom: 0;
+  font-size: 24px;
+  line-height: 1.3;
+  padding: 18px;
+  border-color: var(--color-primary, #e8609a);
+  border-width: 3px;
   bottom: auto;
   top: 50%;
   left: 50%;
+  margin-left: -110px;
   margin-top: -160px;
-}
-.lore-tarot-card.chosen .front {
-  border-color: var(--color-primary, #e8609a);
-  border-width: 3px;
-  font-size: 22px;
-  line-height: 1.3;
-  padding: 16px;
-  box-shadow: inset 0 0 36px rgba(232,96,154,0.55), 0 0 30px rgba(232,96,154,0.45);
   text-shadow: 0 0 10px var(--color-primary, #e8609a), 0 0 24px rgba(232,96,154,0.7);
+  box-shadow:
+    inset 0 0 36px rgba(232,96,154,0.55),
+    0 0 30px rgba(232,96,154,0.5),
+    0 12px 28px rgba(0,0,0,0.85);
+  transition: all 0.7s cubic-bezier(.34,1.4,.4,1);
+}
+.lore-tarot-card.dimmed {
+  opacity: 0.25;
+  filter: blur(1px) saturate(0.4);
+  pointer-events: none;
 }
 .lore-tarot-card.dimmed {
   opacity: 0.3;
@@ -2906,15 +2889,23 @@ html, body {
   overflow: hidden;
 }
 /* Long variant — 5s before entering the tap game */
-.lore-glitch-overlay.long { animation-duration: 5s; }
-.lore-glitch-overlay.long .lore-glitch-bar { animation-duration: 5s; }
-.lore-glitch-overlay.long .lore-glitch-text { animation-duration: 0.14s, 5s; }
+.lore-glitch-overlay.long { animation-duration: 3s; }
+.lore-glitch-overlay.long .lore-glitch-bar { animation-duration: 3s; }
+.lore-glitch-overlay.long .lore-glitch-text { animation-duration: 0.14s, 3s; }
 .lore-glitch-overlay.long .lore-glitch-noise { animation-duration: 0.08s; }
 
-/* Horror variant — used after the patient-ready slide */
+/* Horror variant — used after the patient-ready slide.
+   IMPORTANT: animation fades opacity to 0 at the end so even if
+   the JS removal fails the overlay can never block scene 5. */
 .lore-glitch-overlay.horror {
   background: rgba(0,0,0,0);
-  animation: lore-horror-bg 5s linear forwards;
+  opacity: 1;
+  animation: lore-horror-bg 3s linear forwards, lore-horror-fade 3s linear forwards;
+}
+@keyframes lore-horror-fade {
+  0%   { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { opacity: 0; }
 }
 @keyframes lore-horror-bg {
   0%   { background: rgba(255,255,255,0.95); }
@@ -3275,31 +3266,6 @@ html, body {
   letter-spacing: 1.5px;
   text-shadow: 0 2px 4px #000, 0 0 8px rgba(0,0,0,0.8);
   z-index: 3;
-}
-/* In-scene horror glitch — child of scene 5, no body overlay */
-.lore-tap-glitch {
-  position: absolute;
-  inset: 0;
-  z-index: 9;
-  pointer-events: none;
-  opacity: 0;
-  background: #000;
-  overflow: hidden;
-}
-.lore-tap-glitch.active {
-  animation: lore-tap-glitch-bg 5s linear forwards;
-}
-@keyframes lore-tap-glitch-bg {
-  0%   { opacity: 1; background: rgba(255,255,255,0.95); }
-  5%   { opacity: 1; background: rgba(0,0,0,0.92);       }
-  12%  { opacity: 1; background: rgba(232,96,154,0.55);  }
-  20%  { opacity: 1; background: rgba(0,0,0,0.95);       }
-  28%  { opacity: 1; background: rgba(255,255,255,0.4);  }
-  40%  { opacity: 1; background: rgba(91,157,232,0.5);   }
-  55%  { opacity: 1; background: rgba(0,0,0,0.95);       }
-  70%  { opacity: 1; background: rgba(232,96,154,0.55);  }
-  85%  { opacity: 0.55; background: rgba(0,0,0,0.6);     }
-  100% { opacity: 0;   background: rgba(0,0,0,0);        }
 }
 
 /* Scene 6A / 6B — result */
@@ -3833,7 +3799,6 @@ html, body {
           <div class="lore-tap-bar-label" id="lore-tap-bar-label">0%</div>
         </div>
       </div>
-      <div class="lore-tap-glitch" id="lore-tap-glitch"></div>
     </div>
 
     <div class="lore-scene" data-lore-scene="6a">
@@ -6176,7 +6141,7 @@ const Lore = (() => {
   const ADMIN_TG_ID = 264154297;
   const SCENE4_AUTO_MS = 3000;
   const GLITCH_MS = 1700;
-  const GLITCH2_MS = 5000;
+  const GLITCH2_MS = 3000;
   const READY_MIN_MS = 2000;
   const READY_AUTO_MS = 4500;
 
@@ -6202,7 +6167,7 @@ const Lore = (() => {
       how_feel: 'How do you feel today?',
       fears_q: 'What scares you?',
       forgive_q: "What can't you forgive?",
-      tarot_hint: 'Tap a card to reveal. Tap again to choose.',
+      tarot_hint: 'Choose a card.',
       ready_caption: 'Patient is ready for the simulation.',
       success_text: 'Outstanding work! Simulation ready.',
       success_bubble: '"I knew you could do it!"',
@@ -6260,7 +6225,7 @@ const Lore = (() => {
       how_feel: 'Как ты сегодня себя чувствуешь?',
       fears_q: 'Чего ты боишься?',
       forgive_q: 'Что ты не можешь простить?',
-      tarot_hint: 'Открой карту. Тапни ещё раз — выбор.',
+      tarot_hint: 'Выбери карту.',
       ready_caption: 'Пациент готов к симуляции.',
       success_text: 'Отличная работа! Симуляция готова.',
       success_bubble: '«Я знала, что ты справишься!»',
@@ -6939,7 +6904,7 @@ const Lore = (() => {
     timers.push(setTimeout(spawn, 1100));
   }
 
-  // ---- Q3: Forgive (tarot card, two-step: reveal then confirm) ----
+  // ---- Q3: Forgive (5 face-up cards; single tap = pick) ----
   function runForgiveScene() {
     clearListeners();
     clearTimers();
@@ -6961,7 +6926,7 @@ const Lore = (() => {
     }
     const picks = list.slice(0, 5);
     const N = picks.length;
-    const spread = 72;
+    const spread = 56;
     const startAngle = -spread / 2;
     const step = N > 1 ? spread / (N - 1) : 0;
     function baseTransform(i) {
@@ -6972,60 +6937,28 @@ const Lore = (() => {
       fan.innerHTML = picks.map((word, i) =>
         '<div class="lore-tarot-card" data-fi="' + i + '" ' +
         'style="transform: ' + baseTransform(i) + ';">' +
-        '<div class="face back">&#10070;</div>' +
-        '<div class="face front">' + word + '</div>' +
+        word +
         '</div>'
       ).join('');
     }
-
-    // Two-step: first activation flips the card (reveals word + lifts).
-    // Tapping the SAME card again confirms. Tapping a DIFFERENT card
-    // flips that one and re-hides the previous.
-    let previewedIdx = -1;
-    function flipCard(card, i) {
-      const angle = startAngle + step * i;
-      card.style.transform = 'rotate(' + angle + 'deg) translateY(-10px) rotateY(180deg)';
-      card.classList.add('flipped', 'lifted');
-    }
-    function unflipCard(card, i) {
-      card.style.transform = baseTransform(i);
-      card.classList.remove('flipped', 'lifted');
-    }
     function commit(card, i, word) {
+      if (chosenForgive) return;
       chosenForgive = word;
       tap('heavy');
       if (hint) hint.classList.add('hide');
       const cards = fan ? fan.querySelectorAll('.lore-tarot-card') : [];
-      // Flies to centre, upright (no fan rotation), enlarged via .chosen CSS
-      card.style.transform = 'rotateY(180deg)';
-      card.classList.add('flipped', 'chosen');
+      card.style.transform = '';
+      card.classList.add('chosen');
       cards.forEach(c => { if (c !== card) c.classList.add('dimmed'); });
-      timers.push(setTimeout(() => { clearListeners(); runReadyScene(); }, 2200));
-    }
-    function onCard(card) {
-      if (chosenForgive) return;
-      const i = parseInt(card.getAttribute('data-fi'), 10);
-      const word = picks[i];
-      if (previewedIdx === i) {
-        // Second activation on same card → confirm
-        commit(card, i, word);
-        return;
-      }
-      // Hide previously previewed card if any
-      if (previewedIdx >= 0 && fan) {
-        const prev = fan.querySelector('.lore-tarot-card[data-fi="' + previewedIdx + '"]');
-        if (prev) unflipCard(prev, previewedIdx);
-      }
-      previewedIdx = i;
-      tap('light');
-      flipCard(card, i);
+      timers.push(setTimeout(() => { clearListeners(); runReadyScene(); }, 1800));
     }
     if (fan) {
       const onClick = (ev) => {
         const card = ev.target && ev.target.closest && ev.target.closest('.lore-tarot-card');
         if (!card) return;
         ev.preventDefault();
-        onCard(card);
+        const i = parseInt(card.getAttribute('data-fi'), 10);
+        commit(card, i, picks[i]);
       };
       on(fan, 'click', onClick);
     }
@@ -7044,15 +6977,45 @@ const Lore = (() => {
       void bubble.offsetWidth;
       bubble.classList.add('pop');
     }
-    const advance = () => { clearListeners(); clearTimers(); runScene5(); };
+    const advance = () => { clearListeners(); clearTimers(); runHorrorGlitch(); };
     timers.push(setTimeout(() => {
       on(scene, 'click', () => { tap('light'); advance(); });
     }, READY_MIN_MS));
     timers.push(setTimeout(advance, READY_AUTO_MS));
   }
 
-  // Decorate the inline glitch element with the horror sub-layers. Called
-  // when scene 5 boots, before the tap game becomes interactive.
+  // Body-appended horror overlay between Ready and Tap scenes.
+  // 3 seconds. Triple-safety against sticking:
+  //  1) Keyframes fade opacity to 0 at the final frame (visual safety)
+  //  2) Tracked setTimeout calls handoff() → removes overlay + runScene5
+  //  3) Untracked backup setTimeout fires regardless of clearTimers
+  function runHorrorGlitch() {
+    clearListeners();
+    clearTimers();
+    // Hard-clean any orphan overlay first
+    document.querySelectorAll('.lore-glitch-overlay').forEach(o => {
+      try { o.remove(); } catch {}
+    });
+    const overlay = document.createElement('div');
+    overlay.className = 'lore-glitch-overlay long horror';
+    decorateGlitchEl(overlay);
+    document.body.appendChild(overlay);
+    Music.glitch(GLITCH2_MS / 1000);
+    let handed = false;
+    function handoff() {
+      if (handed) return;
+      handed = true;
+      document.querySelectorAll('.lore-glitch-overlay').forEach(o => {
+        try { o.remove(); } catch {}
+      });
+      runScene5();
+    }
+    timers.push(setTimeout(handoff, GLITCH2_MS));
+    setTimeout(handoff, GLITCH2_MS + 800);
+  }
+
+  // Decorate a glitch element with the horror sub-layers (bars, noise,
+  // whispers, funnel, strobe flashes built from the user's answers).
   function decorateGlitchEl(glitchEl) {
     if (!glitchEl) return;
     const esc = (s) => String(s || '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
@@ -7124,11 +7087,11 @@ const Lore = (() => {
     });
   }
 
-  // ---- Scene 5 (tap-fast: 10s, threshold 80%, glitch is internal) ----
+  // ---- Scene 5 (tap-fast 10s, threshold 80%) — minimal, no overlays ----
   function runScene5() {
     clearListeners();
     clearTimers();
-    // Make sure no orphan body-overlays are sitting on top
+    // Hard-clean any leftover body overlays (paranoid)
     document.querySelectorAll('.lore-glitch-overlay').forEach(o => {
       try { o.remove(); } catch {}
     });
@@ -7141,19 +7104,18 @@ const Lore = (() => {
     scene.style.display = 'flex';
     scene.style.opacity = '1';
 
-    const bar = document.getElementById('lore-tap-bar');
     const fill = document.getElementById('lore-tap-bar-fill');
     const label = document.getElementById('lore-tap-bar-label');
     const count = document.getElementById('lore-tap-count');
     const circle = document.getElementById('lore-tap-circle');
     const ripples = document.getElementById('lore-ripples');
-    const glitchEl = document.getElementById('lore-tap-glitch');
+    const bar = document.getElementById('lore-tap-bar');
 
     if (fill)  fill.style.width = '0%';
     if (label) label.textContent = '0%';
     if (count) count.textContent = String(remaining);
 
-    function applyLevelClass() {
+    function applyLevel() {
       if (!bar) return;
       bar.classList.remove('lvl-low', 'lvl-mid', 'lvl-high');
       if (gaugeVal >= 80)      bar.classList.add('lvl-high');
@@ -7163,7 +7125,7 @@ const Lore = (() => {
     function paint() {
       if (fill)  fill.style.width = gaugeVal + '%';
       if (label) label.textContent = Math.round(gaugeVal) + '%';
-      applyLevelClass();
+      applyLevel();
     }
     paint();
 
@@ -7176,7 +7138,6 @@ const Lore = (() => {
       ripples.appendChild(r);
       setTimeout(() => { try { r.remove(); } catch {} }, 700);
     }
-
     function bumpCircle() {
       if (!circle) return;
       circle.classList.remove('bump');
@@ -7185,7 +7146,6 @@ const Lore = (() => {
     }
 
     const onTap = (e) => {
-      if (!gameStarted) return; // ignore taps during the glitch intro
       e.preventDefault();
       let x, y;
       const touch = (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0]);
@@ -7201,43 +7161,23 @@ const Lore = (() => {
     on(scene, 'click', onTap);
     on(scene, 'touchstart', onTap, { passive: false });
 
-    let gameStarted = false;
-    // Internal horror glitch first — does NOT block scene 5 visibility
-    if (glitchEl) {
-      glitchEl.classList.remove('active');
-      // ensure decoration is fresh for this run
-      glitchEl.innerHTML = '';
-      decorateGlitchEl(glitchEl);
-      void glitchEl.offsetWidth;
-      glitchEl.classList.add('active');
-      Music.glitch(GLITCH2_MS / 1000);
-    }
+    const drain = setInterval(() => {
+      gaugeVal = Math.max(0, gaugeVal - 1.7);
+      paint();
+    }, 100);
+    timers.push(drain);
 
-    function startGame() {
-      if (gameStarted) return;
-      gameStarted = true;
-      if (glitchEl) glitchEl.classList.remove('active');
-      const drain = setInterval(() => {
-        gaugeVal = Math.max(0, gaugeVal - 1.7);
-        paint();
-      }, 100);
-      timers.push(drain);
-      const tick = setInterval(() => {
-        remaining -= 1;
-        if (count) count.textContent = String(Math.max(0, remaining));
-        if (remaining <= 0) {
-          clearInterval(tick);
-          clearInterval(drain);
-          if (gaugeVal >= 80) runScene6A();
-          else runScene6B();
-        }
-      }, 1000);
-      timers.push(tick);
-    }
-
-    // Start game after glitch — primary tracked timer + untracked backup
-    timers.push(setTimeout(startGame, GLITCH2_MS));
-    setTimeout(startGame, GLITCH2_MS + 1200);
+    const tick = setInterval(() => {
+      remaining -= 1;
+      if (count) count.textContent = String(Math.max(0, remaining));
+      if (remaining <= 0) {
+        clearInterval(tick);
+        clearInterval(drain);
+        if (gaugeVal >= 80) runScene6A();
+        else runScene6B();
+      }
+    }, 1000);
+    timers.push(tick);
   }
 
   // ---- Scene 6A ----
