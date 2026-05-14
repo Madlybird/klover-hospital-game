@@ -2507,6 +2507,37 @@ html, body {
 .lore-manga-bubble.pop {
   animation: lore-manga-pop 0.6s cubic-bezier(.2,1.5,.4,1) forwards;
 }
+/* Manga speed-lines that radiate behind the bubble on pop */
+.lore-manga-bubble::after,
+.lore-emotion-bubble::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 640px;
+  height: 640px;
+  transform: translate(-50%, -50%) scale(0.3) rotate(0deg);
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgba(0,0,0,0.85) 0deg 1.3deg,
+    transparent 1.3deg 5deg
+  );
+  -webkit-mask-image: radial-gradient(circle at center, transparent 110px, #000 220px, transparent 330px);
+  mask-image: radial-gradient(circle at center, transparent 110px, #000 220px, transparent 330px);
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+  will-change: transform, opacity;
+}
+.lore-manga-bubble.pop::after,
+.lore-emotion-bubble.pop::after {
+  animation: lore-speed-lines 0.7s ease-out forwards;
+}
+@keyframes lore-speed-lines {
+  0%   { opacity: 0;   transform: translate(-50%, -50%) scale(0.35) rotate(0deg); }
+  45%  { opacity: 0.9; transform: translate(-50%, -50%) scale(1.05) rotate(6deg); }
+  100% { opacity: 0;   transform: translate(-50%, -50%) scale(1.45) rotate(14deg); }
+}
 @keyframes lore-manga-pop {
   0%   { opacity: 0; transform: translateX(-50%) scale(0.3) rotate(-6deg); }
   60%  { opacity: 1; transform: translateX(-50%) scale(1.08) rotate(1deg); }
@@ -2822,13 +2853,38 @@ html, body {
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 0 18px rgba(55,138,221,0.4), inset 0 2px 4px rgba(0,0,0,0.5);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.lore-gauge-wrap.lvl-low {
+  border-color: #ff3b5c;
+  box-shadow: 0 0 22px rgba(255,59,92,0.55), inset 0 2px 4px rgba(0,0,0,0.5);
+}
+.lore-gauge-wrap.lvl-mid {
+  border-color: #ffb02a;
+  box-shadow: 0 0 22px rgba(255,176,42,0.5), inset 0 2px 4px rgba(0,0,0,0.5);
+}
+.lore-gauge-wrap.lvl-high {
+  border-color: #1dd16a;
+  box-shadow: 0 0 26px rgba(29,209,106,0.65), inset 0 2px 4px rgba(0,0,0,0.5);
 }
 .lore-gauge-fill {
   height: 100%;
   width: 0%;
   background: linear-gradient(90deg, #185FA5 0%, #378ADD 55%, #ED008C 100%);
-  transition: width 0.1s linear;
+  transition: width 0.1s linear, background 0.25s ease, box-shadow 0.25s ease;
   box-shadow: 0 0 16px rgba(237,0,140,0.65);
+}
+.lore-gauge-wrap.lvl-low .lore-gauge-fill {
+  background: linear-gradient(90deg, #8a1424 0%, #ff3b5c 100%);
+  box-shadow: 0 0 16px rgba(255,59,92,0.7);
+}
+.lore-gauge-wrap.lvl-mid .lore-gauge-fill {
+  background: linear-gradient(90deg, #b8761d 0%, #ffb02a 100%);
+  box-shadow: 0 0 16px rgba(255,176,42,0.65);
+}
+.lore-gauge-wrap.lvl-high .lore-gauge-fill {
+  background: linear-gradient(90deg, #0f7a3f 0%, #1dd16a 100%);
+  box-shadow: 0 0 20px rgba(29,209,106,0.75);
 }
 .lore-gauge-percent {
   position: absolute;
@@ -5914,7 +5970,98 @@ const Lore = (() => {
         });
       } catch (e) {}
     }
-    return { start, stop, tapSfx, chord, heartBeat, get live() { return live; } };
+    // Trippy bad-trip glitch: noise burst + dissonant detuned sweeps + sub rumble
+    function glitch(dur) {
+      try {
+        const c = ctx || ensureCtx();
+        if (!c) return;
+        const t0 = c.currentTime;
+        const total = Math.max(0.4, dur || 1.3);
+
+        // 1) White-noise burst, gated by a fast-flutter LFO so it stutters
+        const noiseLen = total;
+        const buf = c.createBuffer(1, Math.ceil(c.sampleRate * noiseLen), c.sampleRate);
+        const data = buf.getChannelData(0);
+        for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+        const noise = c.createBufferSource();
+        noise.buffer = buf;
+        const noiseGain = c.createGain();
+        const noiseFilt = c.createBiquadFilter();
+        noiseFilt.type = 'bandpass';
+        noiseFilt.frequency.value = 1800;
+        noiseFilt.Q.value = 2.2;
+        noiseFilt.frequency.exponentialRampToValueAtTime(220, t0 + total);
+        noiseGain.gain.setValueAtTime(0.0, t0);
+        noiseGain.gain.linearRampToValueAtTime(0.22, t0 + 0.04);
+        noiseGain.gain.exponentialRampToValueAtTime(0.001, t0 + total);
+        // Flutter LFO on noise gain
+        const lfo = c.createOscillator();
+        const lfoG = c.createGain();
+        lfo.type = 'square';
+        lfo.frequency.setValueAtTime(14, t0);
+        lfo.frequency.exponentialRampToValueAtTime(40, t0 + total);
+        lfoG.gain.value = 0.18;
+        lfo.connect(lfoG); lfoG.connect(noiseGain.gain);
+        noise.connect(noiseFilt); noiseFilt.connect(noiseGain); noiseGain.connect(c.destination);
+        noise.start(t0);
+        noise.stop(t0 + total + 0.05);
+        lfo.start(t0);
+        lfo.stop(t0 + total + 0.05);
+
+        // 2) Two detuned sawtooth voices doing a downward pitch sweep — dissonant
+        [{ base: 660, det: -32, vol: 0.10 }, { base: 415, det: 22, vol: 0.08 }].forEach((v) => {
+          const osc = c.createOscillator();
+          const g = c.createGain();
+          osc.type = 'sawtooth';
+          osc.detune.value = v.det;
+          osc.frequency.setValueAtTime(v.base, t0);
+          osc.frequency.exponentialRampToValueAtTime(Math.max(40, v.base * 0.18), t0 + total);
+          g.gain.setValueAtTime(0, t0);
+          g.gain.linearRampToValueAtTime(v.vol, t0 + 0.06);
+          g.gain.exponentialRampToValueAtTime(0.001, t0 + total);
+          // Slight chorus/wobble
+          const wob = c.createOscillator();
+          wob.type = 'sine';
+          wob.frequency.value = 7.5;
+          const wobG = c.createGain();
+          wobG.gain.value = 18;
+          wob.connect(wobG); wobG.connect(osc.frequency);
+          osc.connect(g); g.connect(c.destination);
+          osc.start(t0); osc.stop(t0 + total + 0.05);
+          wob.start(t0); wob.stop(t0 + total + 0.05);
+        });
+
+        // 3) Sub rumble that swells in
+        const sub = c.createOscillator();
+        const subG = c.createGain();
+        sub.type = 'sine';
+        sub.frequency.setValueAtTime(38, t0);
+        sub.frequency.linearRampToValueAtTime(22, t0 + total);
+        subG.gain.setValueAtTime(0, t0);
+        subG.gain.linearRampToValueAtTime(0.28, t0 + total * 0.7);
+        subG.gain.exponentialRampToValueAtTime(0.001, t0 + total);
+        sub.connect(subG); subG.connect(c.destination);
+        sub.start(t0); sub.stop(t0 + total + 0.05);
+
+        // 4) Reverse-cymbal-ish riser using high-pass filtered noise
+        const riserBuf = c.createBuffer(1, Math.ceil(c.sampleRate * total), c.sampleRate);
+        const rd = riserBuf.getChannelData(0);
+        for (let i = 0; i < rd.length; i++) rd[i] = (Math.random() * 2 - 1) * (i / rd.length);
+        const riser = c.createBufferSource();
+        riser.buffer = riserBuf;
+        const rhp = c.createBiquadFilter();
+        rhp.type = 'highpass';
+        rhp.frequency.setValueAtTime(800, t0);
+        rhp.frequency.exponentialRampToValueAtTime(6000, t0 + total);
+        const rG = c.createGain();
+        rG.gain.setValueAtTime(0.0, t0);
+        rG.gain.linearRampToValueAtTime(0.18, t0 + total * 0.85);
+        rG.gain.exponentialRampToValueAtTime(0.001, t0 + total);
+        riser.connect(rhp); rhp.connect(rG); rG.connect(c.destination);
+        riser.start(t0); riser.stop(t0 + total + 0.05);
+      } catch (e) {}
+    }
+    return { start, stop, tapSfx, chord, heartBeat, glitch, get live() { return live; } };
   })();
 
   function tap(strength) {
@@ -6231,8 +6378,7 @@ const Lore = (() => {
       '<div class="lore-glitch-noise"></div>' +
       '<div class="lore-glitch-text">' + (chosenEmotion || '') + '</div>';
     root.appendChild(overlay);
-    Music.chord([220, 277, 311], 0.35);
-    timers.push(setTimeout(() => Music.chord([110, 233, 415], 0.45), 350));
+    Music.glitch(GLITCH_MS / 1000);
     timers.push(setTimeout(() => {
       try { overlay.remove(); } catch {}
       runReadyScene();
@@ -6268,6 +6414,7 @@ const Lore = (() => {
     let remaining = 10;
     let tapCount = 0;
     const scene = document.querySelector('#screen-lore [data-lore-scene="5"]');
+    const wrapEl = scene && scene.querySelector('.lore-gauge-wrap');
     const fill = document.getElementById('lore-gauge-fill');
     const pct = document.getElementById('lore-gauge-percent');
     const timerEl = document.getElementById('lore-gauge-timer');
@@ -6277,6 +6424,20 @@ const Lore = (() => {
     pct.textContent = '0%';
     timerEl.textContent = '10';
     if (hint) hint.classList.remove('hide');
+
+    function applyLevelClass() {
+      if (!wrapEl) return;
+      wrapEl.classList.remove('lvl-low', 'lvl-mid', 'lvl-high');
+      if (gaugeVal >= 80) wrapEl.classList.add('lvl-high');
+      else if (gaugeVal >= 50) wrapEl.classList.add('lvl-mid');
+      else wrapEl.classList.add('lvl-low');
+    }
+    function paint() {
+      fill.style.width = gaugeVal + '%';
+      pct.textContent = Math.round(gaugeVal) + '%';
+      applyLevelClass();
+    }
+    paint();
 
     function spawnRipple(x, y) {
       if (!ripples) return;
@@ -6289,7 +6450,6 @@ const Lore = (() => {
     }
 
     const onTap = (e) => {
-      // Ignore taps on UI chrome — though the scene only has non-interactive overlays
       e.preventDefault();
       let x, y;
       const touch = (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0]);
@@ -6298,8 +6458,7 @@ const Lore = (() => {
       const rect = scene.getBoundingClientRect();
       spawnRipple(x - rect.left, y - rect.top);
       gaugeVal = Math.min(100, gaugeVal + 4.8);
-      fill.style.width = gaugeVal + '%';
-      pct.textContent = Math.round(gaugeVal) + '%';
+      paint();
       tap('light');
       tapCount++;
       if (hint && tapCount === 1) hint.classList.add('hide');
@@ -6309,8 +6468,7 @@ const Lore = (() => {
 
     const drain = setInterval(() => {
       gaugeVal = Math.max(0, gaugeVal - 1.6);
-      fill.style.width = gaugeVal + '%';
-      pct.textContent = Math.round(gaugeVal) + '%';
+      paint();
     }, 100);
     timers.push(drain);
 
