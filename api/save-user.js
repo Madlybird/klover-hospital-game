@@ -19,7 +19,7 @@ async function notifyChannel(user, referredBy, supabaseStatus) {
       (user.language_code ? ` · ${esc(user.language_code)}` : ''),
   ];
   if (referredBy) lines.push(`↳ ref: <code>${esc(referredBy)}</code>`);
-  if (supabaseStatus !== 'ok') lines.push(`<i>db: ${esc(supabaseStatus)}</i>`);
+  // db status intentionally not shown — only matters for backend health
   try {
     await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
       method: 'POST',
