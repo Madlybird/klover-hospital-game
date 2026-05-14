@@ -5732,18 +5732,21 @@ const Game = (() => {
   }
 
   // Server-verified holder check via /api/verify-access.
-  // Goodies API credentials live only in Vercel env vars.
+  // The server reads the validated Telegram user ID from initData and
+  // calls Goodies' partner API. No wallet required.
   async function verifyWalletAccess() {
-    if (!walletAddress) { walletAccess = null; return false; }
     walletVerifying = true;
     renderWalletGateState();
     let data = null;
+    const initData = (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData) || '';
     try {
       const r = await fetch('/api/verify-access', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        // Always request debug data so we can show it on the denied state.
-        body: JSON.stringify({ wallet: walletAddress, debug: true }),
+        headers: {
+          'Content-Type': 'application/json',
+          'Telegram-Init-Data': initData,
+        },
+        body: JSON.stringify({ debug: true }),
       });
       data = await r.json().catch(() => ({}));
       walletAccess = !!data.hasAccess;
@@ -5764,24 +5767,24 @@ const Game = (() => {
   function writeGateDiag(obj) {
     const pre = document.getElementById('gate-diag');
     if (!pre) return;
-    try {
-      pre.textContent = JSON.stringify(obj, null, 2);
-    } catch {
-      pre.textContent = String(obj);
-    }
+    try { pre.textContent = JSON.stringify(obj, null, 2); }
+    catch { pre.textContent = String(obj); }
   }
 
   function toggleGateDiag() {
     const pre = document.getElementById('gate-diag');
-    if (!pre) return;
-    pre.classList.toggle('show');
+    if (pre) pre.classList.toggle('show');
   }
 
-  // Admin helper — open the diagnostic URL in console:
-  //   Game.debugAccess() → fetches /api/verify-access?debug=1&wallet=<connected>
+  // Admin helper exposed via Game.debugAccess() — re-runs the check
+  // with debug:true and prints full attempts trace.
   async function debugAccess() {
-    if (!walletAddress) { console.warn('Connect a wallet first'); return null; }
-    const r = await fetch('/api/verify-access?debug=1&wallet=' + encodeURIComponent(walletAddress));
+    const initData = (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData) || '';
+    const r = await fetch('/api/verify-access', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Telegram-Init-Data': initData },
+      body: JSON.stringify({ debug: true }),
+    });
     const data = await r.json();
     console.log('[debugAccess]', JSON.stringify(data, null, 2));
     return data;
@@ -5813,7 +5816,7 @@ const Game = (() => {
   }
 
   function requireWalletGate(target) {
-    // Admins always pass — and a previously-verified wallet keeps access
+    // Admins always pass — and a previously-verified session keeps access
     // for this session so we don't re-hit the API on every nav.
     if (isAdminBypass() || walletAccess === true) {
       runGateAction(target);
@@ -5822,6 +5825,17 @@ const Game = (() => {
     pendingGateAction = target;
     renderWalletGateState();
     document.getElementById('overlay-wallet-gate').classList.add('active');
+    // Verification is by Telegram user ID — no wallet needed. Kick off
+    // automatically the moment the gate opens.
+    if (walletAccess !== false && !walletVerifying) {
+      verifyWalletAccess().then((ok) => {
+        if (ok && pendingGateAction) {
+          const action = pendingGateAction;
+          closeWalletGate();
+          runGateAction(action);
+        }
+      });
+    }
   }
 
   function closeWalletGate() {
@@ -5839,26 +5853,13 @@ const Game = (() => {
   }
 
   async function connectWalletGate() {
-    if (isAdminBypass()) {
+    if (isAdminBypass() || walletAccess === true) {
       const action = pendingGateAction;
       closeWalletGate();
       runGateAction(action);
       return;
     }
-    if (walletAccess === true) {
-      const action = pendingGateAction;
-      closeWalletGate();
-      runGateAction(action);
-      return;
-    }
-    if (!walletAddress) {
-      // Need to connect a wallet first — onStatusChange will trigger verify
-      if (tonUI) {
-        try { await tonUI.openModal(); } catch (e) { console.warn(e); }
-      }
-      return;
-    }
-    // Wallet connected but not verified yet (or denied) — retry
+    // Re-verify by Telegram user ID. No wallet flow required.
     await verifyWalletAccess();
     if (walletAccess === true && pendingGateAction) {
       const action = pendingGateAction;
