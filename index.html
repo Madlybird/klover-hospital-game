@@ -4317,6 +4317,18 @@ const Game = (() => {
     showReferralWelcomeIfPending();
     hydrateFromRemote();
 
+    // Warm access state on app boot: trust persistent cache, otherwise
+    // run verify in the background so by the time the user taps a gated
+    // button we already know the answer.
+    const cachedAccess = readAccessCache();
+    if (cachedAccess && cachedAccess.hasAccess) {
+      walletAccess = true;
+    } else if (!cachedAccess) {
+      setTimeout(() => {
+        if (walletAccess === null) verifyWalletAccess();
+      }, 600);
+    }
+
     // Loading -> menu after 1.4s
     setTimeout(() => {
       showScreen('menu');
@@ -5687,6 +5699,7 @@ const Game = (() => {
         } else {
           walletAddress = null;
           walletAccess = null;
+          clearAccessCache();
         }
         updateMenuUI();
         if (currentScreen === 'settings') updateSettingsUI();
@@ -5696,33 +5709,89 @@ const Game = (() => {
     }
   }
 
+  // Cache verified access in localStorage so a confirmed holder is
+  // never re-checked over the network unless the cache is stale or
+  // they got denied. Transient failures (HMAC, network) are NEVER
+  // cached so the next attempt can succeed.
+  const ACCESS_CACHE_KEY = 'klover_access_v1';
+  const ACCESS_CACHE_OK_MS  = 24 * 3600 * 1000;  // 24h for verified holders
+  const ACCESS_CACHE_NO_MS  = 10 * 60 * 1000;    // 10m for confirmed non-holders
+
+  function readAccessCache() {
+    try {
+      const raw = localStorage.getItem(ACCESS_CACHE_KEY);
+      if (!raw) return null;
+      const c = JSON.parse(raw);
+      const ttl = c.hasAccess ? ACCESS_CACHE_OK_MS : ACCESS_CACHE_NO_MS;
+      if (Date.now() - c.ts > ttl) return null;
+      return c;
+    } catch { return null; }
+  }
+  function writeAccessCache(hasAccess) {
+    try {
+      localStorage.setItem(ACCESS_CACHE_KEY, JSON.stringify({ ts: Date.now(), hasAccess: !!hasAccess }));
+    } catch {}
+  }
+  function clearAccessCache() {
+    try { localStorage.removeItem(ACCESS_CACHE_KEY); } catch {}
+  }
+
   // Server-verified holder check via /api/verify-access.
   // The server runs TWO paths in parallel:
   //  - Goodies API by Telegram user ID (validated from initData header)
   //  - On-chain TonAPI check by wallet address (if wallet is connected)
   // Either path granting ownership unlocks access.
-  async function verifyWalletAccess() {
+  //
+  // Retries once on transient failures (HMAC fail, network, 5xx) so
+  // a flaky reload doesn't lock the user out.
+  async function verifyWalletAccess(opts) {
+    opts = opts || {};
     walletVerifying = true;
     renderWalletGateState();
     let data = null;
     const initData = (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData) || '';
-    try {
-      const r = await fetch('/api/verify-access', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Telegram-Init-Data': initData,
-        },
-        body: JSON.stringify({ wallet: walletAddress || null }),
-      });
-      data = await r.json().catch(() => ({}));
-      walletAccess = !!data.hasAccess;
-      console.log('[verify-access] result', data);
-      window.__lastAccessCheck = data;
-    } catch (e) {
-      console.warn('[verify-access] request failed:', e);
-      walletAccess = false;
+
+    async function doRequest() {
+      try {
+        const r = await fetch('/api/verify-access', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Telegram-Init-Data': initData,
+          },
+          body: JSON.stringify({ wallet: walletAddress || null }),
+        });
+        const json = await r.json().catch(() => ({}));
+        return { status: r.status, data: json };
+      } catch (e) {
+        return { status: 0, data: { error: e.message || 'network' } };
+      }
     }
+
+    let res = await doRequest();
+    // Auto-retry once on transient outcomes (network, 5xx, server says
+    // goodies_unavailable). Not for clean 'not_holder' results.
+    const transient = res.status === 0 || res.status >= 500
+                   || res.data?.reason === 'goodies_unavailable';
+    if (transient && !opts.noRetry) {
+      await new Promise(r => setTimeout(r, 800));
+      res = await doRequest();
+    }
+    data = res.data || {};
+    walletAccess = !!data.hasAccess;
+    console.log('[verify-access] result', { status: res.status, ...data });
+    window.__lastAccessCheck = data;
+
+    // Cache decisions but only when result is conclusive.
+    // Transient errors (no auth / goodies down) are NOT cached so the
+    // next reopen can succeed cleanly.
+    if (walletAccess === true) {
+      writeAccessCache(true);
+    } else if (data.reason === 'not_holder') {
+      writeAccessCache(false);
+    }
+    // reason in {no_auth, goodies_unavailable} → leave cache alone
+
     walletVerifying = false;
     renderWalletGateState();
     updateMenuUI();
@@ -5749,6 +5818,7 @@ const Game = (() => {
       await tonUI.disconnect();
       walletAddress = null;
       walletAccess = null;
+      clearAccessCache();
     } else {
       try {
         await tonUI.openModal();
@@ -5769,17 +5839,21 @@ const Game = (() => {
   }
 
   function requireWalletGate(target) {
-    // Admins always pass — and a previously-verified session keeps access
-    // for this session so we don't re-hit the API on every nav.
-    if (isAdminBypass() || walletAccess === true) {
+    // Admins always pass.
+    if (isAdminBypass()) { runGateAction(target); return; }
+    // In-memory session result: already verified
+    if (walletAccess === true) { runGateAction(target); return; }
+    // Persistent localStorage cache — verified ≤24h ago → pass instantly
+    const cached = readAccessCache();
+    if (cached && cached.hasAccess) {
+      walletAccess = true;
       runGateAction(target);
       return;
     }
     pendingGateAction = target;
     renderWalletGateState();
     document.getElementById('overlay-wallet-gate').classList.add('active');
-    // Verification is by Telegram user ID — no wallet needed. Kick off
-    // automatically the moment the gate opens.
+    // Kick off verification if we don't already have a fresh "no" result
     if (walletAccess !== false && !walletVerifying) {
       verifyWalletAccess().then((ok) => {
         if (ok && pendingGateAction) {
