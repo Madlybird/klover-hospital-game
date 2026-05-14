@@ -2283,9 +2283,9 @@ html, body {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse at center, #06170c 0%, #02080a 60%, #000 100%);
+    radial-gradient(ellipse at center, #061320 0%, #020810 60%, #000 100%);
   font-family: 'Courier New', 'Lucida Console', monospace;
-  color: #6dff9b;
+  color: #6dc1ff;
   overflow: hidden;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -2315,7 +2315,7 @@ html, body {
 .lore-crt-flicker {
   position: absolute;
   inset: 0;
-  background: rgba(109, 255, 155, 0.04);
+  background: rgba(109, 193, 255, 0.04);
   pointer-events: none;
   z-index: 3;
   animation: lore-crt-flicker 0.18s steps(2) infinite;
@@ -2333,10 +2333,10 @@ html, body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: #6dff9b;
+  color: #6dc1ff;
   font-size: 12px;
   letter-spacing: 2.5px;
-  text-shadow: 0 0 6px rgba(109,255,155,0.7);
+  text-shadow: 0 0 6px rgba(109,193,255,0.7);
   pointer-events: none;
 }
 .lore-crt-brand { font-weight: bold; }
@@ -2358,10 +2358,10 @@ html, body {
   left: 18px;
   right: 18px;
   z-index: 6;
-  color: rgba(109,255,155,0.55);
+  color: rgba(109,193,255,0.55);
   font-size: 10.5px;
   letter-spacing: 1.6px;
-  text-shadow: 0 0 4px rgba(109,255,155,0.4);
+  text-shadow: 0 0 4px rgba(109,193,255,0.4);
   display: flex;
   justify-content: space-between;
   pointer-events: none;
@@ -2379,10 +2379,10 @@ html, body {
   gap: 14px;
   font-size: 18px;
   line-height: 1.45;
-  color: #aef7c8;
+  color: #c8e4ff;
   text-shadow:
-    0 0 4px rgba(109,255,155,0.85),
-    0 0 14px rgba(109,255,155,0.5);
+    0 0 4px rgba(109,193,255,0.85),
+    0 0 14px rgba(109,193,255,0.5);
   pointer-events: none;
   overflow: hidden;
 }
@@ -2391,7 +2391,7 @@ html, body {
   word-break: break-word;
 }
 .lore-crt-line .lore-crt-tag {
-  color: #6dff9b;
+  color: #6dc1ff;
   opacity: 0.7;
   font-size: 13px;
   letter-spacing: 1.5px;
@@ -2409,17 +2409,17 @@ html, body {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  color: #6dff9b;
+  color: #6dc1ff;
   font-size: 13px;
   letter-spacing: 2px;
-  text-shadow: 0 0 6px rgba(109,255,155,0.6);
+  text-shadow: 0 0 6px rgba(109,193,255,0.6);
   pointer-events: none;
 }
 .lore-crt-cursor {
   display: inline-block;
-  color: #6dff9b;
+  color: #6dc1ff;
   animation: lore-crt-cursor 0.9s steps(2) infinite;
-  text-shadow: 0 0 8px rgba(109,255,155,0.9);
+  text-shadow: 0 0 8px rgba(109,193,255,0.9);
 }
 @keyframes lore-crt-cursor {
   0%, 50% { opacity: 1; }
@@ -2446,11 +2446,11 @@ html, body {
   align-items: center;
   justify-content: center;
   z-index: 7;
-  color: #6dff9b;
+  color: #6dc1ff;
   font-family: 'Courier New', monospace;
   font-size: 22px;
   letter-spacing: 5px;
-  text-shadow: 0 0 12px rgba(109,255,155,0.9), 0 0 28px rgba(109,255,155,0.55);
+  text-shadow: 0 0 12px rgba(109,193,255,0.9), 0 0 28px rgba(109,193,255,0.55);
   animation: lore-crt-dive 1.1s ease-out forwards;
 }
 @keyframes lore-crt-dive {
@@ -2473,12 +2473,12 @@ html, body {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: rgba(109,255,155,0.25);
+  background: rgba(109,193,255,0.25);
   transition: background 0.3s;
 }
 .lore-crawl-progress span.on {
-  background: #6dff9b;
-  box-shadow: 0 0 6px #6dff9b;
+  background: #6dc1ff;
+  box-shadow: 0 0 6px #6dc1ff;
 }
 
 /* Shared — round bottom-right timer pill (used by scene 5 gauge) */
@@ -2899,8 +2899,8 @@ html, body {
   46%  { background: rgba(60,0,80,0.7);      }
   60%  { background: rgba(0,0,0,1);          }
   72%  { background: rgba(180,0,40,0.55);    }
-  84%  { background: rgba(0,0,0,1);          }
-  100% { background: rgba(0,0,0,1);          }
+  88%  { background: rgba(0,0,0,0.7);        }
+  100% { background: rgba(0,0,0,0);          }
 }
 .lore-horror-whispers {
   position: absolute;
@@ -3098,7 +3098,7 @@ html, body {
   position: absolute; inset: 0;
   z-index: 2;
   background:
-    linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.1) 30%, rgba(0,0,0,0.55) 75%, rgba(0,0,0,0.85) 100%);
+    linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(10,26,58,0.15) 30%, rgba(10,26,58,0.25) 70%, rgba(0,0,0,0.55) 100%);
   pointer-events: none;
 }
 .lore-tap-title {
@@ -7053,21 +7053,40 @@ const Lore = (() => {
       timers.push(setTimeout(flashOne, t));
     });
 
-    timers.push(setTimeout(() => {
-      try { overlay.remove(); } catch {}
+    // Bullet-proof handoff to scene 5: primary timer in `timers` (can be
+    // cancelled), plus an UNTRACKED backup timer that always fires so even
+    // if the main schedule is throttled / cleared we still advance.
+    let handed = false;
+    function handoff() {
+      if (handed) return;
+      handed = true;
+      try {
+        document.querySelectorAll('.lore-glitch-overlay').forEach(o => o.remove());
+      } catch {}
       runScene5();
-    }, GLITCH2_MS));
+    }
+    timers.push(setTimeout(handoff, GLITCH2_MS));
+    setTimeout(handoff, GLITCH2_MS + 1500);
   }
 
   // ---- Scene 5 (rewritten tap-fast: 10s, threshold 80%) ----
   function runScene5() {
     clearListeners();
     clearTimers();
+    // Safety net: a previous overlay may still be sitting on top if its
+    // own removal timer was throttled (mobile background tab, etc.).
+    document.querySelectorAll('.lore-glitch-overlay').forEach(o => {
+      try { o.remove(); } catch {}
+    });
     showScene('5');
     gaugeVal = 0;
     let remaining = 10;
     const scene = document.querySelector('#screen-lore [data-lore-scene="5"]');
     if (!scene) { runScene6B(); return; }
+    // Force the scene to be visible even if any external state interferes
+    scene.classList.add('active');
+    scene.style.display = 'flex';
+    scene.style.opacity = '1';
 
     const bar = document.getElementById('lore-tap-bar');
     const fill = document.getElementById('lore-tap-bar-fill');
