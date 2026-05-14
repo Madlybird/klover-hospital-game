@@ -3152,30 +3152,6 @@ html, body {
   background: #ff4fb0;
   box-shadow: 0 0 12px #ff4fb0, 0 0 24px rgba(255,79,176,0.7);
 }
-/* Body-level diagnostic — always visible at the top of the
-   viewport so we can confirm the lore flow regardless of which
-   scene is rendering. */
-#lore-hud {
-  position: fixed;
-  top: 4px;
-  left: 4px;
-  right: 4px;
-  z-index: 99999;
-  background: rgba(0,0,0,0.92);
-  color: #6dff9b;
-  font-family: 'Courier New', monospace;
-  font-size: 11px;
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid #6dff9b;
-  pointer-events: none;
-  line-height: 1.4;
-  letter-spacing: 0.5px;
-  white-space: pre-line;
-  box-shadow: 0 0 12px rgba(109,255,155,0.55);
-  display: none;
-}
-#lore-hud.show { display: block; }
 
 /* Scene 6A / 6B — result */
 #screen-lore [data-lore-scene="6a"],
@@ -3216,33 +3192,6 @@ html, body {
 }
 #screen-lore [data-lore-scene="6a"] .lore-play-btn:hover {
   box-shadow: 0 12px 32px rgba(0,0,0,0.25), 0 0 0 6px rgba(0,0,0,0.08);
-}
-/* Scene 6B overrides — fail slide is all-black with white text */
-#screen-lore [data-lore-scene="6b"] {
-  background: #000;
-}
-#screen-lore [data-lore-scene="6b"] .lore-result-img {
-  box-shadow: 0 12px 36px rgba(255,255,255,0.12);
-}
-#screen-lore [data-lore-scene="6b"] .lore-result-text {
-  color: #fff;
-}
-#screen-lore [data-lore-scene="6b"] .lore-result-text > div + div {
-  color: #ccc;
-}
-#screen-lore [data-lore-scene="6b"] .lore-bubble {
-  background: #111;
-  border: 2px solid #fff;
-  color: #fff;
-  box-shadow: 0 6px 16px rgba(255,255,255,0.08);
-}
-#screen-lore [data-lore-scene="6b"] .lore-bubble > div + div {
-  color: #ccc;
-}
-#screen-lore [data-lore-scene="6b"] .lore-bubble::before {
-  background: #111;
-  border-left: 2px solid #fff;
-  border-top: 2px solid #fff;
 }
 .lore-result-img {
   max-width: 72%;
@@ -3371,7 +3320,6 @@ html, body {
 </head>
 <body>
 <canvas id="particle-canvas"></canvas>
-<div id="lore-hud">HUD ready</div>
 <div id="app">
 
   <!-- LOADING -->
@@ -6450,27 +6398,6 @@ const Lore = (() => {
   let chosenFear = null;
   let chosenForgive = null;
 
-  // ---- Body-level HUD (diagnostic, kept visible while lore runs) ----
-  const LORE_BUILD = 'b4a5ff3+hud2';
-  function setHud(lines) {
-    try {
-      const h = document.getElementById('lore-hud');
-      if (!h) return;
-      h.classList.add('show');
-      const stamp = new Date().toISOString().slice(11, 19);
-      h.textContent =
-        '[' + stamp + '] ' + LORE_BUILD + '\n' +
-        (typeof lines === 'string' ? lines : (lines || []).join('\n'));
-    } catch {}
-  }
-  function hideHud() {
-    try { const h = document.getElementById('lore-hud'); if (h) h.classList.remove('show'); } catch {}
-  }
-  // Surface runtime errors on HUD so we can see them on mobile
-  window.addEventListener('error', (ev) => {
-    setHud('ERROR: ' + (ev && ev.message ? ev.message : 'unknown'));
-  });
-
   function clearTimers() {
     timers.forEach(t => { try { clearTimeout(t); clearInterval(t); } catch {} });
     timers = [];
@@ -6523,7 +6450,6 @@ const Lore = (() => {
     });
     document.getElementById('screen-lore').classList.add('active');
     Music.start();
-    setHud('phase: lore-start');
     runScene1();
   }
 
@@ -6537,7 +6463,6 @@ const Lore = (() => {
       root.classList.remove('active');
       root.querySelectorAll('.lore-scene').forEach(s => s.classList.remove('active'));
     }
-    hideHud();
     const cb = onComplete;
     onComplete = null;
     if (cb) cb();
@@ -6935,121 +6860,85 @@ const Lore = (() => {
 
   // ---- Scene 8 (tap game): 3s intro then 10s tap, 80% threshold ----
   function runScene5(opts) {
-    try {
-      opts = opts || {};
-      const skipIntro = !!opts.skipIntro;
-      clearListeners();
-      clearTimers();
-      setHud([
-        'phase: runScene5 entry',
-        'skipIntro: ' + skipIntro,
-        'CHOSEN: ' + (chosenFear || '?') + ' / ' + (chosenForgive || '?')
-      ]);
-      showScene('5');
+    opts = opts || {};
+    const skipIntro = !!opts.skipIntro;
+    clearListeners();
+    clearTimers();
+    showScene('5');
 
-      const scene = document.querySelector('#screen-lore [data-lore-scene="5"]');
-      if (!scene) {
-        setHud('ERROR: data-lore-scene="5" element missing');
-        runScene6B();
-        return;
-      }
-      scene.classList.add('active');
-      scene.style.display = 'flex';
-      scene.style.opacity = '1';
+    const scene = document.querySelector('#screen-lore [data-lore-scene="5"]');
+    if (!scene) { runScene6B(); return; }
+    scene.classList.add('active');
 
-      const intro = document.getElementById('tg-intro');
-      const fearWord = document.getElementById('tg-intro-fear');
-      const forgiveWord = document.getElementById('tg-intro-forgive');
-      const fill   = document.getElementById('tg-bar-fill');
-      const pct    = document.getElementById('tg-pct');
-      const count  = document.getElementById('tg-count');
-      const button = document.getElementById('tg-button');
+    const intro = document.getElementById('tg-intro');
+    const fearWord = document.getElementById('tg-intro-fear');
+    const forgiveWord = document.getElementById('tg-intro-forgive');
+    const fill   = document.getElementById('tg-bar-fill');
+    const pct    = document.getElementById('tg-pct');
+    const count  = document.getElementById('tg-count');
+    const button = document.getElementById('tg-button');
 
-      gaugeVal = 0;
-      let remaining = 10;
-      let tapCount = 0;
-      if (fill)  fill.style.width = '0%';
-      if (pct)   pct.textContent = '0%';
-      if (count) count.textContent = String(remaining);
+    gaugeVal = 0;
+    let remaining = 10;
+    if (fill)  fill.style.width = '0%';
+    if (pct)   pct.textContent = '0%';
+    if (count) count.textContent = String(remaining);
 
-      function dump(phase) {
-        setHud([
-          'phase: ' + phase,
-          'gauge: ' + Math.round(gaugeVal) + '%   taps: ' + tapCount + '   time: ' + remaining + 's',
-          'scene.active=' + scene.classList.contains('active') +
-            '  scene.display=' + getComputedStyle(scene).display +
-            '  scene.bg=' + getComputedStyle(scene).backgroundColor,
-          'btn=' + (button ? 'ok' : 'MISSING') +
-            '  fill=' + (fill ? 'ok' : 'MISSING') +
-            '  intro=' + (intro ? 'ok' : 'MISSING')
-        ]);
-      }
-      dump(skipIntro ? 'tap-start' : 'intro');
+    function paint() {
+      if (fill) fill.style.width = gaugeVal + '%';
+      if (pct)  pct.textContent = Math.round(gaugeVal) + '%';
+    }
+    function bumpButton() {
+      if (!button) return;
+      button.classList.remove('bump');
+      void button.offsetWidth;
+      button.classList.add('bump');
+    }
+    paint();
 
-      function paint() {
-        if (fill) fill.style.width = gaugeVal + '%';
-        if (pct)  pct.textContent = Math.round(gaugeVal) + '%';
-      }
-      function bumpButton() {
-        if (!button) return;
-        button.classList.remove('bump');
-        void button.offsetWidth;
-        button.classList.add('bump');
-      }
-      paint();
+    function startTap() {
+      if (intro) intro.classList.remove('show');
+      const onTap = (e) => {
+        e.preventDefault();
+        gaugeVal = Math.min(100, gaugeVal + 10);
+        paint();
+        bumpButton();
+        tap('light');
+      };
+      on(scene, 'click', onTap);
+      on(scene, 'touchstart', onTap, { passive: false });
 
-      function startTap() {
-        if (intro) intro.classList.remove('show');
-        dump('tap');
-        const onTap = (e) => {
-          try {
-            e.preventDefault();
-            tapCount++;
-            gaugeVal = Math.min(100, gaugeVal + 9);
-            paint();
-            bumpButton();
-            tap('light');
-            dump('tap');
-          } catch (err) { setHud('TAP ERROR: ' + err.message); }
-        };
-        on(scene, 'click', onTap);
-        on(scene, 'touchstart', onTap, { passive: false });
+      const drain = setInterval(() => {
+        gaugeVal = Math.max(0, gaugeVal - 1.0);
+        paint();
+      }, 100);
+      timers.push(drain);
 
-        const drain = setInterval(() => {
-          gaugeVal = Math.max(0, gaugeVal - 1.3);
-          paint();
-        }, 100);
-        timers.push(drain);
-
-        const tick = setInterval(() => {
-          remaining -= 1;
-          if (count) count.textContent = String(Math.max(0, remaining));
-          dump('tap');
-          if (remaining <= 0) {
-            clearInterval(tick);
-            clearInterval(drain);
-            if (gaugeVal >= 80) { dump('WIN'); runScene6A(); }
-            else                { dump('FAIL'); runScene6B(); }
-          }
-        }, 1000);
-        timers.push(tick);
-      }
-
-      if (skipIntro) {
-        if (intro) intro.classList.remove('show');
-        startTap();
-      } else {
-        if (fearWord)    fearWord.textContent    = (chosenFear    || '').toString().toUpperCase();
-        if (forgiveWord) forgiveWord.textContent = (chosenForgive || '').toString().toUpperCase();
-        if (intro) {
-          intro.classList.remove('show');
-          void intro.offsetWidth;
-          intro.classList.add('show');
+      const tick = setInterval(() => {
+        remaining -= 1;
+        if (count) count.textContent = String(Math.max(0, remaining));
+        if (remaining <= 0) {
+          clearInterval(tick);
+          clearInterval(drain);
+          if (gaugeVal >= 80) runScene6A();
+          else runScene6B();
         }
-        timers.push(setTimeout(startTap, 3000));
+      }, 1000);
+      timers.push(tick);
+    }
+
+    if (skipIntro) {
+      if (intro) intro.classList.remove('show');
+      startTap();
+    } else {
+      if (fearWord)    fearWord.textContent    = (chosenFear    || '').toString().toUpperCase();
+      if (forgiveWord) forgiveWord.textContent = (chosenForgive || '').toString().toUpperCase();
+      if (intro) {
+        intro.classList.remove('show');
+        void intro.offsetWidth;
+        intro.classList.add('show');
       }
-    } catch (err) {
-      setHud('runScene5 EXCEPTION: ' + (err && err.message ? err.message : err));
+      timers.push(setTimeout(startTap, 3000));
     }
   }
 
