@@ -2617,32 +2617,35 @@ html, body {
 .lore-emotion-bubble .lore-manga-bubble-inner { font-size: 24px; padding: 16px 22px; }
 .lore-emotion-list {
   position: absolute;
-  top: 38%;
-  bottom: 80px;
+  top: 34%;
+  bottom: 40px;
   left: 0; right: 0;
   z-index: 4;
-  overflow: hidden;
-  mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 86%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 86%, transparent 100%);
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 8%, #000 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 8%, #000 92%, transparent 100%);
   transition: opacity 0.4s ease;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(237,0,140,0.55) transparent;
 }
-.lore-emotion-list.chosen { opacity: 0.5; }
+.lore-emotion-list::-webkit-scrollbar { width: 6px; }
+.lore-emotion-list::-webkit-scrollbar-track { background: transparent; }
+.lore-emotion-list::-webkit-scrollbar-thumb { background: rgba(237,0,140,0.55); border-radius: 3px; }
+.lore-emotion-list.chosen {
+  opacity: 0.55;
+  overflow-y: hidden;
+  pointer-events: none;
+}
 .lore-emotion-track {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  padding: 12px 0;
-  animation: lore-emotion-scroll 22s linear infinite;
-  will-change: transform;
-}
-@keyframes lore-emotion-scroll {
-  from { transform: translateY(0); }
-  to   { transform: translateY(-50%); }
+  padding: 18px 0 26px;
+  min-height: 100%;
 }
 .lore-emotion {
   background: rgba(255,255,255,0.06);
@@ -2672,82 +2675,97 @@ html, body {
   box-shadow: 0 0 32px rgba(255,255,255,0.85);
 }
 
-/* Glitch overlay */
+/* Glitch overlay — bad-trip transition */
 .lore-glitch-overlay {
   position: fixed;
   inset: 0;
-  z-index: 200;
+  z-index: 9999;
   pointer-events: none;
-  background: #000;
-  animation: lore-glitch-bg 1.3s linear forwards;
+  background: #ffffff;
+  animation: lore-glitch-bg 1.7s linear forwards;
   overflow: hidden;
-  mix-blend-mode: normal;
 }
 @keyframes lore-glitch-bg {
-  0%   { background: rgba(0,0,0,0); }
-  10%  { background: rgba(255,0,80,0.25); }
-  20%  { background: rgba(0,200,255,0.18); }
-  30%  { background: rgba(255,255,255,0.4); }
-  45%  { background: rgba(0,0,0,0.9); }
-  60%  { background: rgba(237,0,140,0.35); }
-  80%  { background: rgba(0,0,0,0.95); }
-  100% { background: rgba(0,0,0,1); }
+  0%   { background: rgba(255,255,255,1);    }
+  5%   { background: rgba(255,255,255,0.95); }
+  10%  { background: rgba(255,0,80,0.85);    }
+  18%  { background: rgba(0,225,255,0.78);   }
+  25%  { background: rgba(255,255,255,0.92); }
+  35%  { background: rgba(20,0,40,0.9);      }
+  45%  { background: rgba(237,0,140,0.75);   }
+  55%  { background: rgba(0,0,0,0.92);       }
+  65%  { background: rgba(255,255,255,0.55); }
+  75%  { background: rgba(40,0,60,0.95);     }
+  90%  { background: rgba(0,0,0,1);          }
+  100% { background: rgba(0,0,0,1);          }
 }
 .lore-glitch-bar {
   position: absolute;
   left: -10%;
   width: 120%;
-  height: 26px;
+  height: 36px;
   top: var(--y);
-  background: linear-gradient(90deg, rgba(255,0,120,0) 0%, rgba(255,0,120,0.8) 35%, rgba(0,200,255,0.8) 65%, rgba(255,255,255,0) 100%);
+  background: linear-gradient(90deg, rgba(255,0,120,0) 0%, rgba(255,0,120,1) 35%, rgba(0,225,255,1) 65%, rgba(255,255,255,0) 100%);
   mix-blend-mode: screen;
-  filter: blur(2px);
-  animation: lore-glitch-bar 1.3s steps(14) forwards;
-  opacity: 0.85;
+  filter: blur(1.5px) contrast(1.4);
+  animation: lore-glitch-bar 1.7s steps(20) forwards;
+  opacity: 0.95;
 }
 @keyframes lore-glitch-bar {
-  0%   { transform: translateX(0) scaleY(1);    opacity: 0; }
-  10%  { transform: translateX(-60px) scaleY(3); opacity: 1; }
-  25%  { transform: translateX(80px) scaleY(0.4); }
-  40%  { transform: translateX(-30px) scaleY(2.2); }
-  55%  { transform: translateX(50px) scaleY(0.5); }
-  75%  { transform: translateX(0) scaleY(1.6); opacity: 0.9; }
+  0%   { transform: translateX(0) scaleY(0.5);   opacity: 0; }
+  6%   { transform: translateX(-90px) scaleY(4); opacity: 1; }
+  18%  { transform: translateX(110px) scaleY(0.3); }
+  30%  { transform: translateX(-50px) scaleY(2.6); }
+  45%  { transform: translateX(70px) scaleY(0.5); }
+  60%  { transform: translateX(-20px) scaleY(2.2); opacity: 1; }
+  80%  { transform: translateX(0) scaleY(1.4); opacity: 0.85; }
   100% { transform: translateX(0) scaleY(0.2); opacity: 0; }
 }
 .lore-glitch-noise {
   position: absolute;
   inset: -20%;
   background:
-    repeating-linear-gradient(90deg, rgba(255,255,255,0.06) 0 2px, transparent 2px 4px),
-    repeating-linear-gradient(0deg, rgba(0,0,0,0.25) 0 1px, transparent 1px 3px);
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.12) 0 2px, transparent 2px 4px),
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.4) 0 1px, transparent 1px 3px);
   mix-blend-mode: overlay;
-  animation: lore-glitch-shake 0.12s steps(2) infinite;
+  animation: lore-glitch-shake 0.08s steps(2) infinite;
+  opacity: 0.85;
 }
 @keyframes lore-glitch-shake {
   0%   { transform: translate(0, 0); }
-  50%  { transform: translate(-6px, 4px); }
-  100% { transform: translate(4px, -3px); }
+  50%  { transform: translate(-10px, 6px); }
+  100% { transform: translate(7px, -5px); }
 }
 .lore-glitch-text {
   position: absolute;
   top: 50%; left: 50%;
   transform: translate(-50%, -50%);
-  color: #ED008C;
+  color: #fff;
   font-family: 'Courier New', monospace;
-  font-size: 42px;
+  font-size: 44px;
   font-weight: 900;
   letter-spacing: 6px;
   text-transform: uppercase;
   text-shadow:
-    3px 0 0 #00e1ff,
-    -3px 0 0 #ff003c,
-    0 0 14px rgba(255,255,255,0.6);
-  animation: lore-glitch-text 0.18s steps(2) infinite;
+    4px 0 0 #00e1ff,
+    -4px 0 0 #ff003c,
+    0 0 18px rgba(255,255,255,0.9);
+  animation: lore-glitch-text 0.14s steps(2) infinite, lore-glitch-text-fade 1.7s ease-in forwards;
+  white-space: nowrap;
+  max-width: 90vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 @keyframes lore-glitch-text {
   0%   { transform: translate(-50%, -50%) skewX(0deg); }
-  50%  { transform: translate(-48%, -52%) skewX(-12deg); }
-  100% { transform: translate(-52%, -48%) skewX(8deg); }
+  50%  { transform: translate(-46%, -54%) skewX(-14deg); }
+  100% { transform: translate(-54%, -47%) skewX(10deg); }
+}
+@keyframes lore-glitch-text-fade {
+  0%   { opacity: 0;   }
+  10%  { opacity: 1;   }
+  70%  { opacity: 1;   }
+  100% { opacity: 0;   }
 }
 
 /* Patient ready scene */
@@ -2768,15 +2786,17 @@ html, body {
   position: relative;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  background: #0a1a3a; /* fallback if image fails */
 }
 .lore-scene5-bg {
   position: absolute; inset: 0;
-  background: #000 url("assets/story/3.JPG") center/cover no-repeat;
+  background: #0a1a3a url("assets/story/3.JPG") center/cover no-repeat;
+  z-index: 0;
 }
 .lore-scene5-bg::after {
   content: '';
   position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(10,26,58,0.35) 0%, rgba(10,26,58,0.85) 100%);
+  background: linear-gradient(180deg, rgba(10,26,58,0.15) 0%, rgba(10,26,58,0.65) 100%);
 }
 .lore-gauge-instruction {
   position: absolute;
@@ -3360,7 +3380,6 @@ html, body {
         <div class="lore-manga-bubble-inner" data-lore-i18n="staff_caption"></div>
         <div class="lore-manga-tail"></div>
       </div>
-      <div class="lore-manga-tap-hint" data-lore-i18n="tap_screen"></div>
     </div>
 
     <div class="lore-scene" data-lore-scene="emotion">
@@ -5733,12 +5752,10 @@ const Game = (() => {
 const Lore = (() => {
   const KEY = 'klover_lore_seen';
   const ADMIN_TG_ID = 264154297;
-  const SCENE4_MIN_MS = 4500;
-  const SCENE4_AUTO_MS = 8500;
-  const EMOTION_LOOP_MS = 22000;
-  const GLITCH_MS = 1300;
-  const READY_MIN_MS = 2400;
-  const READY_AUTO_MS = 5500;
+  const SCENE4_AUTO_MS = 3000;
+  const GLITCH_MS = 1700;
+  const READY_MIN_MS = 2000;
+  const READY_AUTO_MS = 4500;
 
   const L = {
     en: {
@@ -6292,27 +6309,24 @@ const Lore = (() => {
     });
   }
 
-  // ---- Scene 4 (staff manga popup, new2.JPG) ----
+  // ---- Scene 4 (staff manga popup, new2.JPG, auto-advance) ----
   function runScene4() {
     clearListeners();
     clearTimers();
     showScene('4');
     Music.chord([392, 523, 659], 1.6);
-    const scene = document.querySelector('#screen-lore [data-lore-scene="4"]');
     const bubble = document.getElementById('lore-manga-bubble');
     if (bubble) {
       bubble.classList.remove('pop');
       void bubble.offsetWidth;
       bubble.classList.add('pop');
     }
-    const advance = () => { clearListeners(); clearTimers(); runEmotionScene(); };
     timers.push(setTimeout(() => {
-      on(scene, 'click', () => { tap('light'); advance(); });
-    }, SCENE4_MIN_MS));
-    timers.push(setTimeout(advance, SCENE4_AUTO_MS));
+      clearListeners(); clearTimers(); runEmotionScene();
+    }, SCENE4_AUTO_MS));
   }
 
-  // ---- Emotion picker scene ----
+  // ---- Emotion picker scene (manual scroll, tap to pick) ----
   function runEmotionScene() {
     clearListeners();
     clearTimers();
@@ -6327,37 +6341,28 @@ const Lore = (() => {
       bubble.classList.add('pop');
     }
     const emotions = L[getLang()].emotions;
-    // Duplicate the list to enable seamless infinite scroll
     if (track) {
-      const html = emotions.map((e, i) => '<button type="button" class="lore-emotion" data-emo="' + i + '">' + e + '</button>').join('');
-      track.innerHTML = html + html;
-      track.style.animation = 'none';
-      void track.offsetWidth;
-      track.style.animation = 'lore-emotion-scroll ' + EMOTION_LOOP_MS + 'ms linear infinite';
+      track.innerHTML = emotions.map((e, i) =>
+        '<button type="button" class="lore-emotion" data-emo="' + i + '">' + e + '</button>'
+      ).join('');
     }
-    function pick(emoText) {
+    if (list) list.scrollTop = 0;
+    function pick(emoText, btnEl) {
       if (chosenEmotion) return;
       chosenEmotion = emoText;
       tap('heavy');
+      if (btnEl) btnEl.classList.add('chosen');
       if (list) list.classList.add('chosen');
-      // Highlight chosen button
-      if (track) {
-        track.querySelectorAll('.lore-emotion').forEach(b => {
-          if (b.textContent === emoText) b.classList.add('chosen');
-        });
-        track.style.animationPlayState = 'paused';
-      }
-      timers.push(setTimeout(() => { clearListeners(); runGlitchThenReady(); }, 900));
+      timers.push(setTimeout(() => { clearListeners(); runGlitchThenReady(); }, 450));
     }
     if (track) {
-      const onClick = (ev) => {
-        const btn = ev.target.closest('.lore-emotion');
+      const onActivate = (ev) => {
+        const btn = ev.target && ev.target.closest && ev.target.closest('.lore-emotion');
         if (!btn) return;
         ev.preventDefault();
-        pick(btn.textContent);
+        pick(btn.textContent, btn);
       };
-      on(track, 'click', onClick);
-      on(track, 'touchstart', onClick, { passive: false });
+      on(track, 'click', onActivate);
     }
   }
 
@@ -6365,19 +6370,19 @@ const Lore = (() => {
   function runGlitchThenReady() {
     clearListeners();
     clearTimers();
-    // Glitch is a transient overlay over the current screen
-    const root = document.getElementById('screen-lore');
-    if (!root) { runReadyScene(); return; }
     const overlay = document.createElement('div');
     overlay.className = 'lore-glitch-overlay';
+    const safeEmo = String(chosenEmotion || '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
     overlay.innerHTML =
-      '<div class="lore-glitch-bar" style="--y:18%"></div>' +
-      '<div class="lore-glitch-bar" style="--y:42%"></div>' +
-      '<div class="lore-glitch-bar" style="--y:67%"></div>' +
-      '<div class="lore-glitch-bar" style="--y:81%"></div>' +
+      '<div class="lore-glitch-bar" style="--y:12%"></div>' +
+      '<div class="lore-glitch-bar" style="--y:31%"></div>' +
+      '<div class="lore-glitch-bar" style="--y:48%"></div>' +
+      '<div class="lore-glitch-bar" style="--y:66%"></div>' +
+      '<div class="lore-glitch-bar" style="--y:83%"></div>' +
       '<div class="lore-glitch-noise"></div>' +
-      '<div class="lore-glitch-text">' + (chosenEmotion || '') + '</div>';
-    root.appendChild(overlay);
+      '<div class="lore-glitch-text">' + safeEmo + '</div>';
+    // Append to body so it overlays everything regardless of stacking context
+    document.body.appendChild(overlay);
     Music.glitch(GLITCH_MS / 1000);
     timers.push(setTimeout(() => {
       try { overlay.remove(); } catch {}
@@ -6414,15 +6419,16 @@ const Lore = (() => {
     let remaining = 10;
     let tapCount = 0;
     const scene = document.querySelector('#screen-lore [data-lore-scene="5"]');
-    const wrapEl = scene && scene.querySelector('.lore-gauge-wrap');
+    if (!scene) { runScene6B(); return; }
+    const wrapEl = scene.querySelector('.lore-gauge-wrap');
     const fill = document.getElementById('lore-gauge-fill');
     const pct = document.getElementById('lore-gauge-percent');
     const timerEl = document.getElementById('lore-gauge-timer');
     const ripples = document.getElementById('lore-ripples');
     const hint = document.getElementById('lore-tap-hint-pulse');
-    fill.style.width = '0%';
-    pct.textContent = '0%';
-    timerEl.textContent = '10';
+    if (fill) fill.style.width = '0%';
+    if (pct) pct.textContent = '0%';
+    if (timerEl) timerEl.textContent = '10';
     if (hint) hint.classList.remove('hide');
 
     function applyLevelClass() {
@@ -6433,8 +6439,8 @@ const Lore = (() => {
       else wrapEl.classList.add('lvl-low');
     }
     function paint() {
-      fill.style.width = gaugeVal + '%';
-      pct.textContent = Math.round(gaugeVal) + '%';
+      if (fill) fill.style.width = gaugeVal + '%';
+      if (pct) pct.textContent = Math.round(gaugeVal) + '%';
       applyLevelClass();
     }
     paint();
@@ -6474,7 +6480,7 @@ const Lore = (() => {
 
     const tick = setInterval(() => {
       remaining -= 1;
-      timerEl.textContent = String(remaining);
+      if (timerEl) timerEl.textContent = String(remaining);
       if (remaining <= 0) {
         clearInterval(tick);
         clearInterval(drain);
