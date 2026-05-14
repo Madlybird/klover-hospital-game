@@ -2700,6 +2700,174 @@ html, body {
   box-shadow: 0 0 32px rgba(255,255,255,0.85);
 }
 
+/* Fears scene — falling-words rain */
+#screen-lore [data-lore-scene="fears"] { background: #000; padding: 0; }
+.lore-fears-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at top, rgba(80,0,0,0.35) 0%, rgba(0,0,0,0.9) 60%, #000 100%),
+    repeating-linear-gradient(0deg, rgba(255,0,0,0.04) 0 1px, transparent 1px 3px);
+  z-index: 0;
+}
+.lore-fears-rain {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  overflow: hidden;
+  pointer-events: auto;
+}
+.lore-fear-drop {
+  position: absolute;
+  top: -10%;
+  color: #ffeaea;
+  font-family: Georgia, serif;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: 0.6px;
+  text-shadow:
+    0 0 6px rgba(255,90,90,0.55),
+    0 0 18px rgba(255,0,40,0.35),
+    0 0 36px rgba(255,0,40,0.18);
+  white-space: nowrap;
+  user-select: none;
+  cursor: pointer;
+  padding: 4px 12px;
+  border-radius: 8px;
+  -webkit-tap-highlight-color: transparent;
+  animation: lore-fear-fall var(--fall-dur, 5.5s) linear forwards;
+  will-change: transform;
+  transition: color 0.2s, text-shadow 0.2s, transform 0.2s;
+}
+.lore-fear-drop:hover {
+  color: #fff;
+  text-shadow: 0 0 8px #fff, 0 0 22px rgba(255,80,80,0.85);
+}
+.lore-fear-drop.chosen {
+  animation: none !important;
+  transform: scale(1.35);
+  color: #fff;
+  text-shadow: 0 0 12px #fff, 0 0 30px #ff3366, 0 0 60px rgba(255,40,80,0.8);
+}
+@keyframes lore-fear-fall {
+  0%   { transform: translateY(0); opacity: 0; }
+  10%  { opacity: 0.95; }
+  85%  { opacity: 0.9; }
+  100% { transform: translateY(120vh); opacity: 0; }
+}
+
+/* Forgive scene — tarot fan */
+#screen-lore [data-lore-scene="forgive"] { background: #000; padding: 0; }
+.lore-forgive-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at center, rgba(40,10,80,0.55) 0%, rgba(0,0,0,0.95) 70%, #000 100%);
+  z-index: 0;
+}
+.lore-forgive-bg::after {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    repeating-conic-gradient(from 0deg, rgba(255,255,255,0.04) 0deg 0.6deg, transparent 0.6deg 8deg);
+  -webkit-mask-image: radial-gradient(circle at center, #000 30%, transparent 70%);
+  mask-image: radial-gradient(circle at center, #000 30%, transparent 70%);
+  animation: lore-forgive-rays 26s linear infinite;
+}
+@keyframes lore-forgive-rays { to { transform: rotate(360deg); } }
+.lore-tarot-stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 80px;
+  z-index: 4;
+}
+.lore-tarot-fan {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  height: 280px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+.lore-tarot-card {
+  position: absolute;
+  bottom: 0;
+  width: 90px;
+  height: 150px;
+  border-radius: 10px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transform-style: preserve-3d;
+  transition: transform 0.45s cubic-bezier(.34,1.56,.64,1), filter 0.3s;
+  user-select: none;
+  filter: drop-shadow(0 8px 18px rgba(0,0,0,0.75));
+  transform-origin: bottom center;
+}
+.lore-tarot-card .face {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  text-align: center;
+  font-family: Georgia, serif;
+}
+.lore-tarot-card .back {
+  background:
+    radial-gradient(circle at 50% 30%, rgba(255,255,255,0.12) 0%, transparent 60%),
+    linear-gradient(135deg, #2a0a3a 0%, #0a0418 50%, #2a0a3a 100%);
+  border: 2px solid #6d4080;
+  color: #b787d8;
+  font-size: 36px;
+  text-shadow: 0 0 12px rgba(183,135,216,0.8);
+}
+.lore-tarot-card .front {
+  background:
+    radial-gradient(circle at 50% 30%, rgba(255,255,255,0.18) 0%, transparent 70%),
+    linear-gradient(135deg, #1a0030 0%, #000 100%);
+  border: 2px solid #b787d8;
+  color: #fff;
+  font-size: 14px;
+  line-height: 1.25;
+  letter-spacing: 0.3px;
+  font-weight: 600;
+  transform: rotateY(180deg);
+  text-shadow: 0 0 8px rgba(183,135,216,0.8);
+  box-shadow: inset 0 0 26px rgba(183,135,216,0.4);
+}
+.lore-tarot-card.flipped { transform: rotateY(180deg); }
+.lore-tarot-card.chosen {
+  z-index: 10;
+  filter: drop-shadow(0 0 24px rgba(183,135,216,0.95)) drop-shadow(0 0 60px rgba(183,135,216,0.55));
+}
+.lore-tarot-card.dimmed {
+  opacity: 0.25;
+  filter: blur(1.5px);
+  pointer-events: none;
+}
+.lore-tarot-hint {
+  margin-top: 16px;
+  color: rgba(183,135,216,0.8);
+  font-family: Georgia, serif;
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-shadow: 0 0 8px rgba(183,135,216,0.55);
+  opacity: 0;
+  animation: lore-tarot-hint-in 1.2s ease 0.7s forwards;
+}
+@keyframes lore-tarot-hint-in {
+  to { opacity: 0.85; }
+}
+.lore-tarot-hint.hide { opacity: 0; transition: opacity 0.4s ease; }
+
 /* Glitch overlay — bad-trip transition */
 .lore-glitch-overlay {
   position: fixed;
@@ -2715,6 +2883,111 @@ html, body {
 .lore-glitch-overlay.long .lore-glitch-bar { animation-duration: 5s; }
 .lore-glitch-overlay.long .lore-glitch-text { animation-duration: 0.14s, 5s; }
 .lore-glitch-overlay.long .lore-glitch-noise { animation-duration: 0.08s; }
+
+/* Horror variant — used after the patient-ready slide */
+.lore-glitch-overlay.horror {
+  background: rgba(0,0,0,0);
+  animation: lore-horror-bg 5s linear forwards;
+}
+@keyframes lore-horror-bg {
+  0%   { background: rgba(255,255,255,0.95); }
+  4%   { background: rgba(0,0,0,0.85);       }
+  10%  { background: rgba(120,0,0,0.55);     }
+  16%  { background: rgba(0,0,0,0.95);       }
+  24%  { background: rgba(255,255,255,0.4);  }
+  30%  { background: rgba(0,0,0,0.95);       }
+  46%  { background: rgba(60,0,80,0.7);      }
+  60%  { background: rgba(0,0,0,1);          }
+  72%  { background: rgba(180,0,40,0.55);    }
+  84%  { background: rgba(0,0,0,1);          }
+  100% { background: rgba(0,0,0,1);          }
+}
+.lore-horror-whispers {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  overflow: hidden;
+}
+.lore-whisper {
+  position: absolute;
+  color: rgba(255,255,255,0.4);
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 18px;
+  white-space: nowrap;
+  text-shadow: 0 0 8px rgba(255,255,255,0.4), 0 0 18px rgba(120,0,40,0.6);
+  filter: blur(0.5px);
+  animation: lore-whisper-drift 4.2s ease-in-out forwards;
+}
+@keyframes lore-whisper-drift {
+  0%   { opacity: 0;   transform: translate(0, 0) scale(0.85); filter: blur(2px); }
+  20%  { opacity: 0.9; transform: translate(var(--wx, 10px), var(--wy, -20px)) scale(1); filter: blur(0); }
+  80%  { opacity: 0.8; transform: translate(calc(var(--wx, 10px) * 2), calc(var(--wy, -20px) * 2)) scale(1.1); }
+  100% { opacity: 0;   transform: translate(calc(var(--wx, 10px) * 3), calc(var(--wy, -20px) * 3)) scale(1.25); filter: blur(4px); }
+}
+.lore-horror-funnel {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 200vmax;
+  height: 200vmax;
+  margin-left: -100vmax;
+  margin-top: -100vmax;
+  z-index: 3;
+  pointer-events: none;
+  animation: lore-funnel-spin 5s linear forwards;
+}
+@keyframes lore-funnel-spin {
+  from { transform: rotate(0deg)   scale(0.4); }
+  to   { transform: rotate(720deg) scale(1.4); }
+}
+.lore-funnel-word {
+  position: absolute;
+  top: 50%; left: 50%;
+  color: rgba(255,80,80,0.85);
+  font-family: Georgia, serif;
+  font-weight: bold;
+  font-size: 22px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  white-space: nowrap;
+  text-shadow: 0 0 8px rgba(255,40,40,0.8), 0 0 18px rgba(120,0,0,0.8);
+  /* angle and radius set inline */
+  transform-origin: 0 0;
+  opacity: 0;
+  animation: lore-funnel-word 5s ease-in forwards;
+}
+@keyframes lore-funnel-word {
+  0%   { opacity: 0;   }
+  10%  { opacity: 0.95; }
+  90%  { opacity: 0.85; }
+  100% { opacity: 0;   }
+}
+.lore-horror-strobe {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  overflow: hidden;
+}
+.lore-strobe-word {
+  position: absolute;
+  font-family: 'Courier New', monospace;
+  font-weight: 900;
+  white-space: nowrap;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  text-shadow: 4px 0 0 #00e1ff, -4px 0 0 #ff003c, 0 0 14px rgba(255,255,255,0.9);
+  color: #fff;
+  opacity: 0;
+  animation: lore-strobe-flash 0.18s steps(2) forwards;
+}
+@keyframes lore-strobe-flash {
+  0%   { opacity: 0;   transform: scale(0.7); }
+  20%  { opacity: 1;   transform: scale(1.05); }
+  80%  { opacity: 0.95; transform: scale(1); }
+  100% { opacity: 0;   transform: scale(1.15); }
+}
 @keyframes lore-glitch-bg {
   0%   { background: rgba(255,255,255,1);    }
   5%   { background: rgba(255,255,255,0.95); }
@@ -2811,141 +3084,170 @@ html, body {
   background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.85) 100%);
 }
 
-/* Scene 5 — tap anywhere */
+/* Scene 5 — tap-fast rewrite */
 #screen-lore [data-lore-scene="5"] {
   position: relative;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   background: #0a1a3a;
   padding: 0;
+  user-select: none;
 }
-#screen-lore [data-lore-scene="5"] .lore-fullscreen-img {
-  z-index: 1;
-}
-.lore-scene5-shade {
+.lore-tap-bg { z-index: 1; }
+.lore-tap-shade {
   position: absolute; inset: 0;
   z-index: 2;
-  background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.6) 100%);
+  background:
+    linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.1) 30%, rgba(0,0,0,0.55) 75%, rgba(0,0,0,0.85) 100%);
   pointer-events: none;
 }
-.lore-gauge-instruction {
+.lore-tap-title {
   position: absolute;
-  top: 70px;
+  top: 56px;
   left: 0; right: 0;
-  z-index: 5;
-  color: #EBF5FF;
-  font-size: 19px;
+  z-index: 6;
+  color: #fff;
+  font-family: Georgia, serif;
+  font-size: 22px;
   font-weight: bold;
+  letter-spacing: 1px;
   text-align: center;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.85);
+  text-shadow: 0 2px 10px rgba(0,0,0,0.95), 0 0 24px rgba(237,0,140,0.55);
   padding: 0 24px;
   pointer-events: none;
 }
-.lore-tap-hint-pulse {
+.lore-tap-circle {
   position: absolute;
   top: 50%; left: 50%;
-  width: 120px; height: 120px;
-  margin-left: -60px; margin-top: -60px;
+  width: 180px; height: 180px;
+  margin-left: -90px; margin-top: -90px;
+  z-index: 5;
   border-radius: 50%;
-  z-index: 4;
-  pointer-events: none;
-  background: radial-gradient(circle, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 60%);
-  border: 2px solid rgba(255,255,255,0.7);
-  box-shadow: 0 0 28px rgba(255,255,255,0.35), inset 0 0 24px rgba(255,255,255,0.15);
-  animation: lore-tap-hint-pulse 1.4s ease-in-out infinite;
-  transition: opacity 0.5s ease;
+  background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.35), rgba(237,0,140,0.45) 60%, rgba(0,0,0,0.6) 100%);
+  border: 4px solid rgba(255,255,255,0.85);
+  box-shadow:
+    0 0 40px rgba(237,0,140,0.6),
+    0 0 90px rgba(237,0,140,0.35),
+    inset 0 -10px 18px rgba(0,0,0,0.35),
+    inset 0 8px 14px rgba(255,255,255,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  animation: lore-tap-circle-pulse 1.2s ease-in-out infinite;
+  transition: transform 0.08s ease-out;
 }
-.lore-tap-hint-pulse.hide { opacity: 0; }
-@keyframes lore-tap-hint-pulse {
-  0%, 100% { transform: scale(1);   opacity: 0.85; }
-  50%      { transform: scale(1.35); opacity: 0.3;  }
+.lore-tap-circle:active { transform: scale(0.93); }
+.lore-tap-circle.bump { animation: lore-tap-circle-bump 0.18s ease-out; }
+@keyframes lore-tap-circle-pulse {
+  0%, 100% { transform: scale(1);    box-shadow: 0 0 40px rgba(237,0,140,0.6), 0 0 90px rgba(237,0,140,0.35), inset 0 -10px 18px rgba(0,0,0,0.35), inset 0 8px 14px rgba(255,255,255,0.45); }
+  50%      { transform: scale(1.06); box-shadow: 0 0 60px rgba(237,0,140,0.85), 0 0 120px rgba(237,0,140,0.5), inset 0 -10px 18px rgba(0,0,0,0.35), inset 0 8px 14px rgba(255,255,255,0.6); }
+}
+@keyframes lore-tap-circle-bump {
+  0%   { transform: scale(0.93); }
+  50%  { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+.lore-tap-count {
+  font-family: Georgia, serif;
+  font-size: 72px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow:
+    0 2px 6px rgba(0,0,0,0.8),
+    0 0 18px rgba(237,0,140,0.85);
+  line-height: 1;
 }
 .lore-ripples {
   position: absolute;
   inset: 0;
-  z-index: 6;
+  z-index: 7;
   pointer-events: none;
   overflow: hidden;
 }
 .lore-ripple {
   position: absolute;
-  width: 16px;
-  height: 16px;
-  margin-left: -8px;
-  margin-top: -8px;
+  width: 18px;
+  height: 18px;
+  margin-left: -9px;
+  margin-top: -9px;
   border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.9);
-  background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%);
-  animation: lore-ripple 0.7s ease-out forwards;
+  border: 2px solid rgba(255,255,255,0.95);
+  background: radial-gradient(circle, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0) 70%);
+  animation: lore-ripple 0.65s ease-out forwards;
   will-change: transform, opacity;
 }
 @keyframes lore-ripple {
   0%   { transform: scale(0.5); opacity: 1; }
-  100% { transform: scale(7);   opacity: 0; }
+  100% { transform: scale(8);   opacity: 0; }
 }
-.lore-gauge-bottom {
+.lore-tap-bar-wrap {
   position: absolute;
   left: 0; right: 0;
-  bottom: 64px;
-  z-index: 5;
+  bottom: 56px;
+  z-index: 6;
   display: flex;
   justify-content: center;
   pointer-events: none;
 }
-.lore-gauge-wrap {
+.lore-tap-bar {
   position: relative;
-  z-index: 5;
-  width: 82%;
-  max-width: 360px;
-  height: 30px;
-  background: rgba(0,0,0,0.6);
-  border: 2px solid #378ADD;
-  border-radius: 16px;
+  width: 86%;
+  max-width: 380px;
+  height: 42px;
+  background: rgba(0,0,0,0.75);
+  border: 3px solid #378ADD;
+  border-radius: 22px;
   overflow: hidden;
-  box-shadow: 0 0 18px rgba(55,138,221,0.4), inset 0 2px 4px rgba(0,0,0,0.5);
+  box-shadow:
+    0 0 22px rgba(55,138,221,0.45),
+    inset 0 2px 6px rgba(0,0,0,0.65),
+    0 6px 18px rgba(0,0,0,0.55);
   transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
-.lore-gauge-wrap.lvl-low {
+.lore-tap-bar.lvl-low {
   border-color: #ff3b5c;
-  box-shadow: 0 0 22px rgba(255,59,92,0.55), inset 0 2px 4px rgba(0,0,0,0.5);
+  box-shadow: 0 0 26px rgba(255,59,92,0.55), inset 0 2px 6px rgba(0,0,0,0.65), 0 6px 18px rgba(0,0,0,0.55);
 }
-.lore-gauge-wrap.lvl-mid {
+.lore-tap-bar.lvl-mid {
   border-color: #ffb02a;
-  box-shadow: 0 0 22px rgba(255,176,42,0.5), inset 0 2px 4px rgba(0,0,0,0.5);
+  box-shadow: 0 0 26px rgba(255,176,42,0.55), inset 0 2px 6px rgba(0,0,0,0.65), 0 6px 18px rgba(0,0,0,0.55);
 }
-.lore-gauge-wrap.lvl-high {
+.lore-tap-bar.lvl-high {
   border-color: #1dd16a;
-  box-shadow: 0 0 26px rgba(29,209,106,0.65), inset 0 2px 4px rgba(0,0,0,0.5);
+  box-shadow: 0 0 32px rgba(29,209,106,0.7), inset 0 2px 6px rgba(0,0,0,0.65), 0 6px 18px rgba(0,0,0,0.55);
 }
-.lore-gauge-fill {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, #185FA5 0%, #378ADD 55%, #ED008C 100%);
-  transition: width 0.1s linear, background 0.25s ease, box-shadow 0.25s ease;
-  box-shadow: 0 0 16px rgba(237,0,140,0.65);
-}
-.lore-gauge-wrap.lvl-low .lore-gauge-fill {
-  background: linear-gradient(90deg, #8a1424 0%, #ff3b5c 100%);
-  box-shadow: 0 0 16px rgba(255,59,92,0.7);
-}
-.lore-gauge-wrap.lvl-mid .lore-gauge-fill {
-  background: linear-gradient(90deg, #b8761d 0%, #ffb02a 100%);
-  box-shadow: 0 0 16px rgba(255,176,42,0.65);
-}
-.lore-gauge-wrap.lvl-high .lore-gauge-fill {
-  background: linear-gradient(90deg, #0f7a3f 0%, #1dd16a 100%);
-  box-shadow: 0 0 20px rgba(29,209,106,0.75);
-}
-.lore-gauge-percent {
+.lore-tap-bar-fill {
   position: absolute;
   inset: 0;
-  text-align: center;
-  line-height: 30px;
+  width: 0%;
+  background: linear-gradient(90deg, #ff3b5c 0%, #ffb02a 50%, #1dd16a 100%);
+  transition: width 0.1s linear;
+  box-shadow: inset 0 -4px 8px rgba(0,0,0,0.25), inset 0 4px 8px rgba(255,255,255,0.18);
+}
+.lore-tap-bar-target {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 80%;
+  width: 3px;
+  background: #fff;
+  box-shadow: 0 0 8px #fff, 0 0 18px rgba(255,255,255,0.6);
+  z-index: 2;
+}
+.lore-tap-bar-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: #fff;
-  font-weight: bold;
-  font-size: 14px;
-  text-shadow: 0 1px 3px #000;
-  letter-spacing: 1px;
+  font-family: Georgia, serif;
+  font-weight: 900;
+  font-size: 18px;
+  letter-spacing: 1.5px;
+  text-shadow: 0 2px 4px #000, 0 0 8px rgba(0,0,0,0.8);
+  z-index: 3;
 }
 
 /* Scene 6A / 6B — result */
@@ -3128,7 +3430,9 @@ html, body {
   .lore-crt-meta { font-size: 9.5px; letter-spacing: 1.2px; }
   .lore-manga-bubble-inner { font-size: 18px; padding: 14px 18px; }
   .lore-emotion { font-size: 16px; padding: 8px 16px; }
-  .lore-gauge-instruction { font-size: 16px; top: 60px; }
+  .lore-tap-title { font-size: 18px; top: 46px; }
+  .lore-tap-circle { width: 150px; height: 150px; margin-left: -75px; margin-top: -75px; }
+  .lore-tap-count { font-size: 60px; }
   .lore-result-text { font-size: 17px; }
   .lore-bubble { font-size: 14px; }
 }
@@ -3432,6 +3736,27 @@ html, body {
       </div>
     </div>
 
+    <div class="lore-scene" data-lore-scene="fears">
+      <div class="lore-fears-bg"></div>
+      <div class="lore-emotion-bubble" id="lore-fears-bubble">
+        <div class="lore-manga-bubble-inner" data-lore-i18n="fears_q"></div>
+        <div class="lore-manga-tail"></div>
+      </div>
+      <div class="lore-fears-rain" id="lore-fears-rain"></div>
+    </div>
+
+    <div class="lore-scene" data-lore-scene="forgive">
+      <div class="lore-forgive-bg"></div>
+      <div class="lore-emotion-bubble" id="lore-forgive-bubble">
+        <div class="lore-manga-bubble-inner" data-lore-i18n="forgive_q"></div>
+        <div class="lore-manga-tail"></div>
+      </div>
+      <div class="lore-tarot-stage" id="lore-tarot-stage">
+        <div class="lore-tarot-fan" id="lore-tarot-fan"></div>
+        <div class="lore-tarot-hint" id="lore-tarot-hint" data-lore-i18n="tarot_hint"></div>
+      </div>
+    </div>
+
     <div class="lore-scene" data-lore-scene="ready">
       <div class="lore-ready-bg"></div>
       <div class="lore-manga-bubble" id="lore-ready-bubble">
@@ -3442,16 +3767,18 @@ html, body {
     </div>
 
     <div class="lore-scene" data-lore-scene="5">
-      <img class="lore-fullscreen-img" src="assets/story/3.JPG" alt="">
-      <div class="lore-scene5-shade"></div>
-      <div class="lore-timer" id="lore-gauge-timer">10</div>
-      <div class="lore-gauge-instruction" data-lore-i18n="gauge_inst"></div>
-      <div class="lore-tap-hint-pulse" id="lore-tap-hint-pulse"></div>
+      <img class="lore-fullscreen-img lore-tap-bg" src="assets/story/3.JPG" alt="">
+      <div class="lore-tap-shade"></div>
+      <div class="lore-tap-title" data-lore-i18n="gauge_inst"></div>
+      <div class="lore-tap-circle" id="lore-tap-circle">
+        <span class="lore-tap-count" id="lore-tap-count">10</span>
+      </div>
       <div class="lore-ripples" id="lore-ripples"></div>
-      <div class="lore-gauge-bottom">
-        <div class="lore-gauge-wrap">
-          <div class="lore-gauge-fill" id="lore-gauge-fill"></div>
-          <div class="lore-gauge-percent" id="lore-gauge-percent">0%</div>
+      <div class="lore-tap-bar-wrap">
+        <div class="lore-tap-bar" id="lore-tap-bar">
+          <div class="lore-tap-bar-fill" id="lore-tap-bar-fill"></div>
+          <div class="lore-tap-bar-target" aria-hidden="true"></div>
+          <div class="lore-tap-bar-label" id="lore-tap-bar-label">0%</div>
         </div>
       </div>
     </div>
@@ -3478,6 +3805,8 @@ html, body {
       <span class="lore-dot" data-dot="5"></span>
       <span class="lore-dot" data-dot="6"></span>
       <span class="lore-dot" data-dot="7"></span>
+      <span class="lore-dot" data-dot="8"></span>
+      <span class="lore-dot" data-dot="9"></span>
     </div>
   </div>
 
@@ -5818,6 +6147,9 @@ const Lore = (() => {
       tap_btn: 'TAP!',
       crt_continue: '[TAP TO CONTINUE]',
       how_feel: 'How do you feel today?',
+      fears_q: 'What scares you?',
+      forgive_q: "What can't you forgive?",
+      tarot_hint: 'Choose a card.',
       ready_caption: 'Patient is ready for the simulation.',
       success_text: 'Outstanding work! Simulation ready.',
       success_bubble: '"I knew you could do it!"',
@@ -5837,6 +6169,21 @@ const Lore = (() => {
         'Frozen','Melting','Solid','Liquid','Vibrating','Still','Trembling','Frantic','Serene','Wild',
         'Caged','Soaring','Crashing','Drifting','Anchored','Adrift','Rooted','Uprooted','Reborn','Awake',
         'Asleep','Dreaming','Waking','Forgetting','Remembering','Unsure','Certain','Wistful','Yearning','Content'
+      ],
+      fears: [
+        'Death','Drowning','Abandonment','The dark','Silence','Mirrors','Being forgotten','Blood',
+        'Hospitals','Needles','Judgment','Screaming','Doctors','My reflection','My mother','My father',
+        'Children','Time','Fire','Falling','Suffocation','Voices','Eyes','The future',
+        'The past','Choices','My own hands','Empty rooms','The truth','Loud noises','Heights','Crowds',
+        'Being alone','Being seen','Going home','Waking up','Sleeping','Tomorrow','Yesterday','Forever'
+      ],
+      forgive: [
+        'The choice I made','Leaving them','Staying silent','The broken promise','The words I said',
+        'The words I never said','Looking away','What I did to myself','What I did to them','The lie',
+        'The truth','That night','The morning after','Being afraid','Being weak','Surviving',
+        'Hating them','Hating me','Forgetting','Remembering','Hands that held me','Hands that did not',
+        'The closed door','The open door','Not running','Running too late','Being a child','Becoming this',
+        'Wanting more','Wanting less'
       ]
     },
     ru: {
@@ -5858,6 +6205,9 @@ const Lore = (() => {
       tap_btn: 'ТАП!',
       crt_continue: '[ТАПНИ ЧТОБЫ ПРОДОЛЖИТЬ]',
       how_feel: 'Как ты сегодня себя чувствуешь?',
+      fears_q: 'Чего ты боишься?',
+      forgive_q: 'Что ты не можешь простить?',
+      tarot_hint: 'Выбери карту.',
       ready_caption: 'Пациент готов к симуляции.',
       success_text: 'Отличная работа! Симуляция готова.',
       success_bubble: '«Я знала, что ты справишься!»',
@@ -5877,6 +6227,21 @@ const Lore = (() => {
         'Замёрзший','Тающий','Твёрдый','Жидкий','Вибрирующий','Неподвижный','Дрожащий','Лихорадочный','Безмятежный','Дикий',
         'В клетке','Взлетающий','Падающий','Дрейфующий','Заякоренный','Бесцельный','Укоренённый','Вырванный','Возрождённый','Бодрствующий',
         'Спящий','Видящий сны','Просыпающийся','Забывающий','Помнящий','Сомневающийся','Уверенный','Тоскующий','Жаждущий','Довольный'
+      ],
+      fears: [
+        'Смерть','Утопление','Заброшенность','Темнота','Тишина','Зеркала','Забвение','Кровь',
+        'Больницы','Иглы','Осуждение','Крик','Врачи','Моё отражение','Моя мать','Мой отец',
+        'Дети','Время','Огонь','Падение','Удушье','Голоса','Глаза','Будущее',
+        'Прошлое','Выборы','Мои руки','Пустые комнаты','Правда','Громкие звуки','Высота','Толпа',
+        'Одиночество','Быть увиденным','Возвращение домой','Просыпание','Сон','Завтра','Вчера','Навсегда'
+      ],
+      forgive: [
+        'Свой выбор','Что ушёл от них','Молчание','Нарушенное обещание','Сказанные слова',
+        'Несказанные слова','Отведённый взгляд','Что сделал с собой','Что сделал с ними','Ложь',
+        'Правду','Ту ночь','То утро после','Свой страх','Свою слабость','Что выжил',
+        'Ненависть к ним','Ненависть к себе','Забвение','Память','Руки что держали меня','Руки что не держали',
+        'Закрытую дверь','Открытую дверь','Не побег','Поздний побег','Что был ребёнком','Что стал этим',
+        'Желать большего','Желать меньшего'
       ]
     }
   };
@@ -6133,6 +6498,8 @@ const Lore = (() => {
   let listeners = [];
   let gaugeVal = 0;
   let chosenEmotion = null;
+  let chosenFear = null;
+  let chosenForgive = null;
 
   function clearTimers() {
     timers.forEach(t => { try { clearTimeout(t); clearInterval(t); } catch {} });
@@ -6154,17 +6521,32 @@ const Lore = (() => {
     root.querySelectorAll('.lore-scene').forEach(s => s.classList.remove('active'));
     const el = root.querySelector('[data-lore-scene="' + name + '"]');
     if (el) el.classList.add('active');
-    const dotMap = { '1':'1', '2':'2', '4':'3', 'emotion':'4', 'ready':'5', '5':'6', '6a':'7', '6b':'7' };
+    const dotMap = { '1':'1', '2':'2', '4':'3', 'emotion':'4', 'fears':'5', 'forgive':'6', 'ready':'7', '5':'8', '6a':'9', '6b':'9' };
     const want = dotMap[name];
     root.querySelectorAll('.lore-dot').forEach(d => {
       d.classList.toggle('active', d.dataset.dot === want);
     });
   }
 
+  function preloadAssets() {
+    // Force-cache images that appear later in the flow so they're ready
+    // when their scene activates (esp. the patient-ready slide and tap bg).
+    const files = [
+      'assets/story/new2.JPG',
+      'assets/story/new.jpg',
+      'assets/story/Untitled-20260513-213210-7729.png',
+      'assets/story/3.JPG',
+      'assets/story/5.PNG',
+      'assets/story/4.JPG'
+    ];
+    files.forEach(src => { try { const i = new Image(); i.src = src; } catch {} });
+  }
+
   function start(cb) {
     onComplete = cb;
     clearTimers();
     clearListeners();
+    preloadAssets();
     applyI18n();
     document.querySelectorAll('.screen').forEach(s => {
       if (s.id !== 'screen-lore') s.classList.remove('active');
@@ -6390,7 +6772,7 @@ const Lore = (() => {
     }, SCENE4_AUTO_MS));
   }
 
-  // ---- Emotion picker scene (manual scroll, tap to pick) ----
+  // ---- Q1: Emotion picker (manual scroll) ----
   function runEmotionScene() {
     clearListeners();
     clearTimers();
@@ -6417,7 +6799,7 @@ const Lore = (() => {
       tap('heavy');
       if (btnEl) btnEl.classList.add('chosen');
       if (list) list.classList.add('chosen');
-      timers.push(setTimeout(() => { clearListeners(); runGlitchThenReady(); }, 450));
+      timers.push(setTimeout(() => { clearListeners(); runFearsScene(); }, 450));
     }
     if (track) {
       const onActivate = (ev) => {
@@ -6430,28 +6812,141 @@ const Lore = (() => {
     }
   }
 
-  // ---- Glitch transition into Ready scene ----
-  function runGlitchThenReady() {
+  // ---- Q2: Fears (falling words rain) ----
+  function runFearsScene() {
     clearListeners();
     clearTimers();
-    const overlay = document.createElement('div');
-    overlay.className = 'lore-glitch-overlay';
-    const safeEmo = String(chosenEmotion || '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
-    overlay.innerHTML =
-      '<div class="lore-glitch-bar" style="--y:12%"></div>' +
-      '<div class="lore-glitch-bar" style="--y:31%"></div>' +
-      '<div class="lore-glitch-bar" style="--y:48%"></div>' +
-      '<div class="lore-glitch-bar" style="--y:66%"></div>' +
-      '<div class="lore-glitch-bar" style="--y:83%"></div>' +
-      '<div class="lore-glitch-noise"></div>' +
-      '<div class="lore-glitch-text">' + safeEmo + '</div>';
-    // Append to body so it overlays everything regardless of stacking context
-    document.body.appendChild(overlay);
-    Music.glitch(GLITCH_MS / 1000);
-    timers.push(setTimeout(() => {
-      try { overlay.remove(); } catch {}
-      runReadyScene();
-    }, GLITCH_MS));
+    chosenFear = null;
+    showScene('fears');
+    const bubble = document.getElementById('lore-fears-bubble');
+    const rain = document.getElementById('lore-fears-rain');
+    if (bubble) {
+      bubble.classList.remove('pop');
+      void bubble.offsetWidth;
+      bubble.classList.add('pop');
+    }
+    if (rain) rain.innerHTML = '';
+    const fears = L[getLang()].fears.slice();
+    // Fisher-Yates shuffle so the rain order varies each session
+    for (let i = fears.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [fears[i], fears[j]] = [fears[j], fears[i]];
+    }
+    let idx = 0;
+    let spawning = true;
+
+    function spawn() {
+      if (!spawning || !rain || !rain.isConnected) return;
+      const text = fears[idx % fears.length];
+      idx++;
+      const drop = document.createElement('div');
+      drop.className = 'lore-fear-drop';
+      drop.textContent = text;
+      // Random horizontal position with margin so text isn't clipped
+      const left = 6 + Math.random() * 70; // percent
+      const dur = 4.5 + Math.random() * 2.5; // seconds
+      const size = 18 + Math.random() * 12;
+      drop.style.left = left + '%';
+      drop.style.setProperty('--fall-dur', dur + 's');
+      drop.style.fontSize = size + 'px';
+      drop.style.animationDelay = '0s';
+      drop.style.opacity = '0';
+      rain.appendChild(drop);
+      // Force reflow + start
+      void drop.offsetWidth;
+      drop.style.opacity = '';
+      const onPick = (ev) => {
+        if (chosenFear) return;
+        if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+        chosenFear = text;
+        tap('heavy');
+        spawning = false;
+        drop.classList.add('chosen');
+        // Freeze other drops where they are
+        rain.querySelectorAll('.lore-fear-drop').forEach(d => {
+          if (d === drop) return;
+          const cs = getComputedStyle(d);
+          d.style.transform = cs.transform;
+          d.style.animation = 'none';
+          d.style.opacity = '0.25';
+        });
+        timers.push(setTimeout(() => { clearListeners(); runForgiveScene(); }, 1000));
+      };
+      drop.addEventListener('click', onPick);
+      drop.addEventListener('touchstart', onPick, { passive: false });
+      // Remove after fall
+      setTimeout(() => { if (!chosenFear) drop.remove(); }, dur * 1000 + 200);
+      // Schedule next spawn
+      const next = 380 + Math.random() * 380;
+      timers.push(setTimeout(spawn, next));
+    }
+    // Start with a small initial burst so screen is immediately populated
+    timers.push(setTimeout(spawn, 300));
+    timers.push(setTimeout(spawn, 700));
+    timers.push(setTimeout(spawn, 1100));
+  }
+
+  // ---- Q3: Forgive (tarot card pick) ----
+  function runForgiveScene() {
+    clearListeners();
+    clearTimers();
+    chosenForgive = null;
+    showScene('forgive');
+    const bubble = document.getElementById('lore-forgive-bubble');
+    const fan = document.getElementById('lore-tarot-fan');
+    const hint = document.getElementById('lore-tarot-hint');
+    if (bubble) {
+      bubble.classList.remove('pop');
+      void bubble.offsetWidth;
+      bubble.classList.add('pop');
+    }
+    if (hint) hint.classList.remove('hide');
+    const list = L[getLang()].forgive.slice();
+    // Shuffle and take 5 distinct
+    for (let i = list.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [list[i], list[j]] = [list[j], list[i]];
+    }
+    const picks = list.slice(0, 5);
+    const N = picks.length;
+    const spread = 72; // total fan width in deg
+    const startAngle = -spread / 2;
+    const step = N > 1 ? spread / (N - 1) : 0;
+    if (fan) {
+      fan.innerHTML = picks.map((word, i) => {
+        const angle = startAngle + step * i;
+        return '<div class="lore-tarot-card" data-fi="' + i + '" ' +
+               'style="transform: rotate(' + angle + 'deg) translateY(-10px);">' +
+               '<div class="face back">&#10070;</div>' +
+               '<div class="face front">' + word + '</div>' +
+               '</div>';
+      }).join('');
+    }
+    function pick(card) {
+      if (chosenForgive) return;
+      const i = parseInt(card.getAttribute('data-fi'), 10);
+      const word = picks[i];
+      chosenForgive = word;
+      tap('heavy');
+      if (hint) hint.classList.add('hide');
+      // Flip chosen, dim others
+      const cards = fan ? fan.querySelectorAll('.lore-tarot-card') : [];
+      const baseAngle = startAngle + step * i;
+      card.style.transform = 'rotate(' + baseAngle + 'deg) translateY(-30px) rotateY(180deg)';
+      card.classList.add('flipped', 'chosen');
+      cards.forEach(c => { if (c !== card) c.classList.add('dimmed'); });
+      timers.push(setTimeout(() => { clearListeners(); runReadyScene(); }, 1600));
+    }
+    if (fan) {
+      const onClick = (ev) => {
+        const card = ev.target && ev.target.closest && ev.target.closest('.lore-tarot-card');
+        if (!card) return;
+        ev.preventDefault();
+        pick(card);
+      };
+      on(fan, 'click', onClick);
+      on(fan, 'touchstart', onClick, { passive: false });
+    }
   }
 
   // ---- Patient ready scene ----
@@ -6467,68 +6962,134 @@ const Lore = (() => {
       void bubble.offsetWidth;
       bubble.classList.add('pop');
     }
-    const advance = () => { clearListeners(); clearTimers(); runGlitchThenScene5(); };
+    const advance = () => { clearListeners(); clearTimers(); runHorrorGlitch(); };
     timers.push(setTimeout(() => {
       on(scene, 'click', () => { tap('light'); advance(); });
     }, READY_MIN_MS));
     timers.push(setTimeout(advance, READY_AUTO_MS));
   }
 
-  // ---- 5s bad-trip glitch into the tap game ----
-  function runGlitchThenScene5() {
+  // ---- 5s bad-trip horror glitch into the tap game ----
+  function runHorrorGlitch() {
     clearListeners();
     clearTimers();
+    const esc = (s) => String(s || '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+    const answers = [chosenEmotion, chosenFear, chosenForgive].filter(Boolean);
+    if (!answers.length) answers.push('SIMULATION');
+
     const overlay = document.createElement('div');
-    overlay.className = 'lore-glitch-overlay long';
-    const safeEmo = String(chosenEmotion || 'SIMULATION').toUpperCase().replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
-    overlay.innerHTML =
+    overlay.className = 'lore-glitch-overlay long horror';
+
+    // Layer 1: base glitch bars + noise (reusing original look)
+    let html = '' +
       '<div class="lore-glitch-bar" style="--y:8%"></div>' +
       '<div class="lore-glitch-bar" style="--y:22%"></div>' +
       '<div class="lore-glitch-bar" style="--y:38%"></div>' +
       '<div class="lore-glitch-bar" style="--y:54%"></div>' +
       '<div class="lore-glitch-bar" style="--y:71%"></div>' +
       '<div class="lore-glitch-bar" style="--y:87%"></div>' +
-      '<div class="lore-glitch-noise"></div>' +
-      '<div class="lore-glitch-text">' + safeEmo + '</div>';
+      '<div class="lore-glitch-noise"></div>';
+
+    // Layer 2: whispers — answers drift across the screen, fading in/out
+    let whispers = '<div class="lore-horror-whispers">';
+    for (let i = 0; i < 14; i++) {
+      const word = answers[i % answers.length];
+      const x = Math.floor(5 + Math.random() * 80);
+      const y = Math.floor(8 + Math.random() * 80);
+      const dx = Math.round((Math.random() - 0.5) * 40);
+      const dy = Math.round((Math.random() - 0.5) * 40);
+      const delay = (Math.random() * 4).toFixed(2);
+      const size = 14 + Math.floor(Math.random() * 14);
+      whispers += '<div class="lore-whisper" style="' +
+        'left:' + x + '%;top:' + y + '%;' +
+        '--wx:' + dx + 'px;--wy:' + dy + 'px;' +
+        'animation-delay:' + delay + 's;' +
+        'font-size:' + size + 'px;">' + esc(word) + '</div>';
+    }
+    whispers += '</div>';
+
+    // Layer 3: funnel — words spiral around the center
+    let funnel = '<div class="lore-horror-funnel">';
+    const FN = 16;
+    for (let i = 0; i < FN; i++) {
+      const angle = (360 / FN) * i;
+      const radius = 80 + (i % 3) * 60;
+      const word = answers[i % answers.length];
+      const delay = (i * 0.07).toFixed(2);
+      funnel += '<div class="lore-funnel-word" style="' +
+        'transform: rotate(' + angle + 'deg) translate(' + radius + 'px, 0);' +
+        'animation-delay:' + delay + 's;">' + esc(word) + '</div>';
+    }
+    funnel += '</div>';
+
+    // Layer 4: strobe container (filled by JS over time so flashes appear at different moments)
+    let strobe = '<div class="lore-horror-strobe" id="lore-horror-strobe"></div>';
+
+    overlay.innerHTML = html + whispers + funnel + strobe;
     document.body.appendChild(overlay);
     Music.glitch(GLITCH2_MS / 1000);
+
+    // Random strobe word flashes over the 5s window
+    const fonts = ['Georgia, serif', "'Courier New', monospace", "'Arial Black', sans-serif", 'Impact, sans-serif'];
+    const colors = ['#fff', '#ff3b5c', '#ffe040', '#00e1ff', '#b787d8'];
+    const strobeEl = overlay.querySelector('#lore-horror-strobe');
+    function flashOne() {
+      if (!overlay.isConnected || !strobeEl) return;
+      const word = answers[Math.floor(Math.random() * answers.length)];
+      const el = document.createElement('div');
+      el.className = 'lore-strobe-word';
+      el.textContent = (word || '').toUpperCase();
+      el.style.left = (5 + Math.random() * 70) + '%';
+      el.style.top = (10 + Math.random() * 70) + '%';
+      el.style.fontSize = (24 + Math.random() * 26) + 'px';
+      el.style.fontFamily = fonts[Math.floor(Math.random() * fonts.length)];
+      el.style.color = colors[Math.floor(Math.random() * colors.length)];
+      el.style.transform = 'rotate(' + (Math.round((Math.random() - 0.5) * 12)) + 'deg)';
+      strobeEl.appendChild(el);
+      setTimeout(() => { try { el.remove(); } catch {} }, 240);
+    }
+    // Pulse flashes throughout the window — denser in the middle of the trip
+    [0, 180, 360, 540, 700, 880, 1100, 1320, 1600, 1900, 2200, 2500, 2800, 3100, 3400, 3700, 4100, 4400].forEach(t => {
+      timers.push(setTimeout(flashOne, t));
+    });
+
     timers.push(setTimeout(() => {
       try { overlay.remove(); } catch {}
       runScene5();
     }, GLITCH2_MS));
   }
 
-  // ---- Scene 5 (tap anywhere, gauge at bottom) ----
+  // ---- Scene 5 (rewritten tap-fast: 10s, threshold 80%) ----
   function runScene5() {
     clearListeners();
     clearTimers();
     showScene('5');
     gaugeVal = 0;
     let remaining = 10;
-    let tapCount = 0;
     const scene = document.querySelector('#screen-lore [data-lore-scene="5"]');
     if (!scene) { runScene6B(); return; }
-    const wrapEl = scene.querySelector('.lore-gauge-wrap');
-    const fill = document.getElementById('lore-gauge-fill');
-    const pct = document.getElementById('lore-gauge-percent');
-    const timerEl = document.getElementById('lore-gauge-timer');
+
+    const bar = document.getElementById('lore-tap-bar');
+    const fill = document.getElementById('lore-tap-bar-fill');
+    const label = document.getElementById('lore-tap-bar-label');
+    const count = document.getElementById('lore-tap-count');
+    const circle = document.getElementById('lore-tap-circle');
     const ripples = document.getElementById('lore-ripples');
-    const hint = document.getElementById('lore-tap-hint-pulse');
-    if (fill) fill.style.width = '0%';
-    if (pct) pct.textContent = '0%';
-    if (timerEl) timerEl.textContent = '10';
-    if (hint) hint.classList.remove('hide');
+
+    if (fill)  fill.style.width = '0%';
+    if (label) label.textContent = '0%';
+    if (count) count.textContent = String(remaining);
 
     function applyLevelClass() {
-      if (!wrapEl) return;
-      wrapEl.classList.remove('lvl-low', 'lvl-mid', 'lvl-high');
-      if (gaugeVal >= 80) wrapEl.classList.add('lvl-high');
-      else if (gaugeVal >= 50) wrapEl.classList.add('lvl-mid');
-      else wrapEl.classList.add('lvl-low');
+      if (!bar) return;
+      bar.classList.remove('lvl-low', 'lvl-mid', 'lvl-high');
+      if (gaugeVal >= 80)      bar.classList.add('lvl-high');
+      else if (gaugeVal >= 50) bar.classList.add('lvl-mid');
+      else                     bar.classList.add('lvl-low');
     }
     function paint() {
-      if (fill) fill.style.width = gaugeVal + '%';
-      if (pct) pct.textContent = Math.round(gaugeVal) + '%';
+      if (fill)  fill.style.width = gaugeVal + '%';
+      if (label) label.textContent = Math.round(gaugeVal) + '%';
       applyLevelClass();
     }
     paint();
@@ -6540,7 +7101,14 @@ const Lore = (() => {
       r.style.left = x + 'px';
       r.style.top = y + 'px';
       ripples.appendChild(r);
-      setTimeout(() => { try { r.remove(); } catch {} }, 750);
+      setTimeout(() => { try { r.remove(); } catch {} }, 700);
+    }
+
+    function bumpCircle() {
+      if (!circle) return;
+      circle.classList.remove('bump');
+      void circle.offsetWidth;
+      circle.classList.add('bump');
     }
 
     const onTap = (e) => {
@@ -6551,24 +7119,24 @@ const Lore = (() => {
       else { x = e.clientX; y = e.clientY; }
       const rect = scene.getBoundingClientRect();
       spawnRipple(x - rect.left, y - rect.top);
-      gaugeVal = Math.min(100, gaugeVal + 4.8);
+      gaugeVal = Math.min(100, gaugeVal + 5.2);
       paint();
+      bumpCircle();
       tap('light');
-      tapCount++;
-      if (hint && tapCount === 1) hint.classList.add('hide');
     };
+    // Whole-screen tap target
     on(scene, 'click', onTap);
     on(scene, 'touchstart', onTap, { passive: false });
 
     const drain = setInterval(() => {
-      gaugeVal = Math.max(0, gaugeVal - 1.6);
+      gaugeVal = Math.max(0, gaugeVal - 1.7);
       paint();
     }, 100);
     timers.push(drain);
 
     const tick = setInterval(() => {
       remaining -= 1;
-      if (timerEl) timerEl.textContent = String(remaining);
+      if (count) count.textContent = String(Math.max(0, remaining));
       if (remaining <= 0) {
         clearInterval(tick);
         clearInterval(drain);
