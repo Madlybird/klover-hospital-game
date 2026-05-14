@@ -2177,10 +2177,27 @@ html, body {
   cursor: pointer;
 }
 .cancel-gate-btn:hover { background: #eaf4ff; color: #3a8fd4; }
-.gate-coming { display: none; }
-.wallet-gate-modal.is-coming .gate-default { display: none; }
-.wallet-gate-modal.is-coming .gate-coming { display: block; }
-.wallet-gate-modal.is-coming .connect-wallet-btn { display: none; }
+.gate-verifying, .gate-denied { display: none; }
+.wallet-gate-modal.is-verifying .gate-default { display: none; }
+.wallet-gate-modal.is-verifying .gate-verifying { display: block; }
+.wallet-gate-modal.is-verifying .connect-wallet-btn {
+  opacity: 0.5;
+  pointer-events: none;
+}
+.wallet-gate-modal.is-denied .gate-default { display: none; }
+.wallet-gate-modal.is-denied .gate-denied { display: block; }
+.gate-spinner {
+  width: 36px;
+  height: 36px;
+  margin: 0 auto 12px;
+  border: 3px solid rgba(232,96,154,0.25);
+  border-top-color: var(--color-primary, #e8609a);
+  border-radius: 50%;
+  animation: gate-spin 0.9s linear infinite;
+}
+@keyframes gate-spin {
+  to { transform: rotate(360deg); }
+}
 
 /* Falling pills emitted on main-character tap */
 .falling-pill {
@@ -3278,7 +3295,7 @@ html, body {
       <button class="btn-primary" onclick="Game.requireWalletGate('levels')" data-i18n="menu_play">Ready for your treatment?</button>
       <button class="btn-secondary" onclick="Game.requireWalletGate('howto')" data-i18n="menu_howto">How to take your medicine</button>
       <button class="btn-secondary" onclick="Game.showScreen('referral')" data-i18n="menu_referral">Patient records</button>
-      <button class="btn-secondary" onclick="Game.showScreen('shop')" data-i18n="menu_shop">Medicine cabinet</button>
+      <button class="btn-secondary" onclick="Game.requireWalletGate('shop')" data-i18n="menu_shop">Medicine cabinet</button>
       <button class="btn-secondary" onclick="Game.showScreen('settings')" data-i18n="menu_settings">Settings</button>
     </div>
 
@@ -3643,13 +3660,18 @@ html, body {
       <div class="gate-content" id="wallet-gate-content">
         <div class="gate-default">
           <p data-i18n="gate_access">Access only for</p>
-          <p class="gate-strong" data-i18n="gate_holders">RIKANII Genesis stickers holders</p>
+          <p class="gate-strong" data-i18n="gate_holders">MAI Nurse or VI Rx holders</p>
           <img src="assets/character/image 268.png" alt="" class="gate-character">
         </div>
-        <div class="gate-coming">
-          <p data-i18n="gate_coming_title">🚧 Wallet verification</p>
-          <p class="gate-strong" data-i18n="gate_coming_subtitle">Coming soon!</p>
-          <p class="small-text" data-i18n="gate_coming_note">NFT collection address needed</p>
+        <div class="gate-verifying">
+          <div class="gate-spinner"></div>
+          <p class="gate-strong" data-i18n="gate_verifying">Verifying ownership...</p>
+          <p class="small-text" data-i18n="gate_verifying_note">Checking your wallet on the partner registry</p>
+        </div>
+        <div class="gate-denied">
+          <p data-i18n="gate_denied_title">No MAI / VI NFT found</p>
+          <p class="gate-strong" data-i18n="gate_denied_sub">in this wallet</p>
+          <p class="small-text" data-i18n="gate_denied_note">Try another wallet or get a sticker first</p>
         </div>
       </div>
       <div class="gate-buttons">
@@ -3834,14 +3856,16 @@ const I18N = {
     equipped_word: 'Equipped',
     equip_word: 'Equip',
     included_default: 'Included with default issue',
-    gate_title: '🪽 Beta Access',
+    gate_title: '🪽 Premium Access',
     gate_access: 'Access only for',
-    gate_holders: '🪽RIKANII Genesis holders',
-    gate_connect: '✓ Confirm',
+    gate_holders: 'MAI Nurse or VI Rx holders',
+    gate_connect: '✓ Connect & verify',
     gate_cancel: 'Cancel',
-    gate_coming_title: '🚫 Access denied',
-    gate_coming_subtitle: 'Not authorized',
-    gate_coming_note: 'Your account is not on the allowlist',
+    gate_verifying: 'Verifying ownership...',
+    gate_verifying_note: 'Checking your wallet on the partner registry',
+    gate_denied_title: 'No MAI / VI NFT found',
+    gate_denied_sub: 'in this wallet',
+    gate_denied_note: 'Try another wallet, or get a sticker first',
   },
   ru: {
     tagline: 'ИГРА-ГОЛОВОЛОМКА С ТАБЛЕТКАМИ',
@@ -3923,14 +3947,16 @@ const I18N = {
     equipped_word: 'Надето',
     equip_word: 'Надеть',
     included_default: 'Входит в стандартный набор',
-    gate_title: '🪽 Бета-доступ',
+    gate_title: '🪽 Премиум-доступ',
     gate_access: 'Доступ только для',
-    gate_holders: '🪽держателей RIKANII Genesis',
-    gate_connect: '✓ Подтвердить',
+    gate_holders: 'держателей MAI Nurse или VI Rx',
+    gate_connect: '✓ Подключить и проверить',
     gate_cancel: 'Отмена',
-    gate_coming_title: '🚫 Доступ запрещён',
-    gate_coming_subtitle: 'Не авторизован',
-    gate_coming_note: 'Ваш аккаунт не в списке доступа',
+    gate_verifying: 'Проверяю владение...',
+    gate_verifying_note: 'Сверяю кошелёк с партнёрским реестром',
+    gate_denied_title: 'NFT MAI / VI не найдены',
+    gate_denied_sub: 'в этом кошельке',
+    gate_denied_note: 'Попробуйте другой кошелёк или сначала получите стикер',
   },
 };
 
@@ -4222,6 +4248,9 @@ const Game = (() => {
   // TON Connect
   let tonUI = null;
   let walletAddress = null;
+  // null = not yet verified, true = verified holder, false = verified non-holder
+  let walletAccess = null;
+  let walletVerifying = false;
 
   // Touch state
   let touchStartX = 0, touchStartY = 0, touchStartTime = 0, lastTapTime = 0;
@@ -5640,12 +5669,24 @@ const Game = (() => {
         manifestUrl: window.location.origin + '/tonconnect-manifest.json',
         buttonRootId: null,
       });
-      tonUI.onStatusChange(wallet => {
+      tonUI.onStatusChange(async wallet => {
         if (wallet) {
           walletAddress = wallet.account.address;
           onChainReward(walletAddress, 0);
+          await verifyWalletAccess();
+          // Wallet just connected — if gate is open and access granted,
+          // auto-complete the gated action so user isn't left tapping
+          // Confirm again.
+          if (walletAccess === true && pendingGateAction) {
+            const action = pendingGateAction;
+            closeWalletGate();
+            runGateAction(action);
+            return;
+          }
+          if (walletAccess === false) renderWalletGateState();
         } else {
           walletAddress = null;
+          walletAccess = null;
         }
         updateMenuUI();
         if (currentScreen === 'settings') updateSettingsUI();
@@ -5655,11 +5696,36 @@ const Game = (() => {
     }
   }
 
+  // Server-verified holder check via /api/verify-access.
+  // Goodies API credentials live only in Vercel env vars.
+  async function verifyWalletAccess() {
+    if (!walletAddress) { walletAccess = null; return false; }
+    walletVerifying = true;
+    renderWalletGateState();
+    try {
+      const r = await fetch('/api/verify-access', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ wallet: walletAddress }),
+      });
+      const data = await r.json().catch(() => ({}));
+      walletAccess = !!data.hasAccess;
+    } catch (e) {
+      console.warn('[verify-access] request failed:', e);
+      walletAccess = false;
+    }
+    walletVerifying = false;
+    renderWalletGateState();
+    updateMenuUI();
+    return walletAccess === true;
+  }
+
   async function toggleTonConnect() {
     if (!tonUI) { showToast(tr('ton_unavailable')); return; }
     if (walletAddress) {
       await tonUI.disconnect();
       walletAddress = null;
+      walletAccess = null;
     } else {
       try {
         await tonUI.openModal();
@@ -5670,39 +5736,74 @@ const Game = (() => {
   }
 
   // ---- ACCESS GATE ----
-  // Beta gate: only an explicit Telegram-ID allowlist may proceed.
+  // Telegram-ID allowlist still bypasses the wallet verification (admins).
   const GATE_ALLOWED_TG_IDS = [881282443, 2133452507, 264154297, 18706277767];
   let pendingGateAction = null;
 
+  function isAdminBypass() {
+    const tgId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+    return GATE_ALLOWED_TG_IDS.includes(tgId);
+  }
+
   function requireWalletGate(target) {
+    // Admins always pass — and a previously-verified wallet keeps access
+    // for this session so we don't re-hit the API on every nav.
+    if (isAdminBypass() || walletAccess === true) {
+      runGateAction(target);
+      return;
+    }
     pendingGateAction = target;
-    const modal = document.getElementById('wallet-gate-modal');
-    if (modal) modal.classList.remove('is-coming');
+    renderWalletGateState();
     document.getElementById('overlay-wallet-gate').classList.add('active');
   }
 
   function closeWalletGate() {
     document.getElementById('overlay-wallet-gate').classList.remove('active');
-    const modal = document.getElementById('wallet-gate-modal');
-    if (modal) modal.classList.remove('is-coming');
     pendingGateAction = null;
   }
 
-  function connectWalletGate() {
-    const tgId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
-    if (GATE_ALLOWED_TG_IDS.includes(tgId)) {
+  // Reflect the current verification state on the gate modal
+  function renderWalletGateState() {
+    const modal = document.getElementById('wallet-gate-modal');
+    if (!modal) return;
+    modal.classList.remove('is-verifying', 'is-denied');
+    if (walletVerifying)      modal.classList.add('is-verifying');
+    else if (walletAccess === false) modal.classList.add('is-denied');
+  }
+
+  async function connectWalletGate() {
+    if (isAdminBypass()) {
       const action = pendingGateAction;
       closeWalletGate();
       runGateAction(action);
       return;
     }
-    const modal = document.getElementById('wallet-gate-modal');
-    if (modal) modal.classList.add('is-coming');
+    if (walletAccess === true) {
+      const action = pendingGateAction;
+      closeWalletGate();
+      runGateAction(action);
+      return;
+    }
+    if (!walletAddress) {
+      // Need to connect a wallet first — onStatusChange will trigger verify
+      if (tonUI) {
+        try { await tonUI.openModal(); } catch (e) { console.warn(e); }
+      }
+      return;
+    }
+    // Wallet connected but not verified yet (or denied) — retry
+    await verifyWalletAccess();
+    if (walletAccess === true && pendingGateAction) {
+      const action = pendingGateAction;
+      closeWalletGate();
+      runGateAction(action);
+    }
   }
 
   function runGateAction(target) {
     if (target === 'levels') goToLevels();
     else if (target === 'howto') showScreen('howto');
+    else if (target === 'shop')  showScreen('shop');
   }
 
   // Stub for future on-chain rewards
