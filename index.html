@@ -2783,79 +2783,90 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
-  padding-bottom: 80px;
+  justify-content: center;
+  padding: 130px 12px 80px;
   z-index: 4;
 }
 .lore-tarot-fan {
   position: relative;
   width: 100%;
   max-width: 420px;
-  height: 280px;
   display: flex;
+  flex-wrap: nowrap;
   justify-content: center;
-  align-items: flex-end;
+  align-items: center;
+  gap: 6px;
 }
 .lore-tarot-card {
-  position: absolute;
-  bottom: 0;
-  width: 100px;
-  height: 160px;
-  border-radius: 12px;
+  flex: 0 0 auto;
+  width: 64px;
+  height: 130px;
+  border-radius: 10px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 0.5s cubic-bezier(.34,1.56,.64,1), filter 0.3s, opacity 0.3s;
+  transition: transform 0.45s cubic-bezier(.34,1.4,.6,1), filter 0.3s, opacity 0.3s, border-color 0.2s, box-shadow 0.2s;
   user-select: none;
   transform-origin: bottom center;
+  transform: rotate(var(--ang, 0deg)) translateY(0);
   background:
-    radial-gradient(circle at 50% 25%, rgba(255,255,255,0.22) 0%, transparent 70%),
-    linear-gradient(135deg, #0a1a3a 0%, #061226 100%);
+    radial-gradient(circle at 50% 25%, rgba(255,255,255,0.25) 0%, transparent 70%),
+    linear-gradient(135deg, #1a3160 0%, #0a1a3a 60%, #2c1448 100%);
   border: 2px solid var(--color-blue, #5b9de8);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px;
+  padding: 6px 4px;
   text-align: center;
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 15px;
-  line-height: 1.2;
-  letter-spacing: 0.5px;
-  font-weight: 600;
+  font-size: 11px;
+  line-height: 1.15;
+  letter-spacing: 0.4px;
+  font-weight: 700;
   text-transform: uppercase;
   color: #fff;
-  text-shadow: 0 0 8px var(--color-blue, #5b9de8), 0 0 16px rgba(91,157,232,0.5);
+  text-shadow: 0 0 6px var(--color-blue, #5b9de8), 0 0 12px rgba(91,157,232,0.5);
   box-shadow:
-    inset 0 0 24px rgba(91,157,232,0.35),
-    0 8px 18px rgba(0,0,0,0.75);
+    inset 0 0 18px rgba(91,157,232,0.4),
+    0 6px 14px rgba(0,0,0,0.7);
+  word-break: break-word;
+  hyphens: auto;
 }
-.lore-tarot-card:hover {
-  filter: drop-shadow(0 0 18px rgba(232,96,154,0.6));
+.lore-tarot-card:hover,
+.lore-tarot-card:active {
+  transform: rotate(var(--ang, 0deg)) translateY(-12px) scale(1.08);
+  border-color: var(--color-primary, #e8609a);
+  box-shadow:
+    inset 0 0 24px rgba(232,96,154,0.5),
+    0 10px 22px rgba(232,96,154,0.5),
+    0 0 24px rgba(232,96,154,0.7);
 }
 .lore-tarot-card.chosen {
-  z-index: 20;
+  position: fixed;
+  z-index: 50;
   width: 220px;
   height: 320px;
-  font-size: 24px;
-  line-height: 1.3;
-  padding: 18px;
-  border-color: var(--color-primary, #e8609a);
-  border-width: 3px;
-  bottom: auto;
   top: 50%;
   left: 50%;
   margin-left: -110px;
   margin-top: -160px;
+  transform: none !important;
+  font-size: 22px;
+  line-height: 1.3;
+  padding: 18px;
+  border-color: var(--color-primary, #e8609a);
+  border-width: 3px;
   text-shadow: 0 0 10px var(--color-primary, #e8609a), 0 0 24px rgba(232,96,154,0.7);
   box-shadow:
     inset 0 0 36px rgba(232,96,154,0.55),
     0 0 30px rgba(232,96,154,0.5),
     0 12px 28px rgba(0,0,0,0.85);
-  transition: all 0.7s cubic-bezier(.34,1.4,.4,1);
+  transition: all 0.6s cubic-bezier(.34,1.4,.4,1);
 }
 .lore-tarot-card.dimmed {
-  opacity: 0.25;
+  opacity: 0.3;
   filter: blur(1px) saturate(0.4);
   pointer-events: none;
+  transform: rotate(var(--ang, 0deg)) translateY(20px) scale(0.85);
 }
 .lore-tarot-card.dimmed {
   opacity: 0.3;
@@ -3107,7 +3118,7 @@ html, body {
    ============================================================ */
 #screen-lore [data-lore-scene="5"] {
   position: relative;
-  background: linear-gradient(180deg, #1a3160 0%, #0a1a3a 50%, #1a0a30 100%);
+  background: linear-gradient(180deg, #ff4fb0 0%, #e8609a 45%, #b03470 100%);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   padding: 0;
@@ -3122,6 +3133,8 @@ html, body {
   object-fit: cover;
   z-index: 1;
   display: block;
+  opacity: 0.85;
+  mix-blend-mode: luminosity;
 }
 .tg-overlay {
   position: absolute;
@@ -3129,8 +3142,7 @@ html, body {
   z-index: 2;
   pointer-events: none;
   background:
-    radial-gradient(ellipse at center, rgba(0,0,0,0) 35%, rgba(0,0,0,0.55) 100%),
-    linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.2) 35%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0.8) 100%);
+    radial-gradient(circle at center, rgba(255,160,200,0.35) 0%, rgba(232,96,154,0) 60%);
 }
 .tg-title {
   position: absolute;
@@ -6949,7 +6961,7 @@ const Lore = (() => {
     timers.push(setTimeout(spawn, 1100));
   }
 
-  // ---- Q3: Forgive (5 face-up cards; single tap = pick) ----
+  // ---- Q3: Forgive (5 face-up cards in a row, single tap = pick) ----
   function runForgiveScene() {
     clearListeners();
     clearTimers();
@@ -6971,42 +6983,37 @@ const Lore = (() => {
     }
     const picks = list.slice(0, 5);
     const N = picks.length;
-    const spread = 56;
+    const spread = 18; // slight fan, mostly horizontal row
     const startAngle = -spread / 2;
     const step = N > 1 ? spread / (N - 1) : 0;
-    function baseTransform(i) {
+
+    if (!fan) return;
+    fan.innerHTML = '';
+    picks.forEach((word, i) => {
       const angle = startAngle + step * i;
-      return 'rotate(' + angle + 'deg) translateY(-10px)';
-    }
-    if (fan) {
-      fan.innerHTML = picks.map((word, i) =>
-        '<div class="lore-tarot-card" data-fi="' + i + '" ' +
-        'style="transform: ' + baseTransform(i) + ';">' +
-        word +
-        '</div>'
-      ).join('');
-    }
-    function commit(card, i, word) {
-      if (chosenForgive) return;
-      chosenForgive = word;
-      tap('heavy');
-      if (hint) hint.classList.add('hide');
-      const cards = fan ? fan.querySelectorAll('.lore-tarot-card') : [];
-      card.style.transform = '';
-      card.classList.add('chosen');
-      cards.forEach(c => { if (c !== card) c.classList.add('dimmed'); });
-      timers.push(setTimeout(() => { clearListeners(); runReadyScene(); }, 1800));
-    }
-    if (fan) {
-      const onClick = (ev) => {
-        const card = ev.target && ev.target.closest && ev.target.closest('.lore-tarot-card');
-        if (!card) return;
-        ev.preventDefault();
-        const i = parseInt(card.getAttribute('data-fi'), 10);
-        commit(card, i, picks[i]);
+      const card = document.createElement('div');
+      card.className = 'lore-tarot-card';
+      card.setAttribute('data-fi', String(i));
+      card.style.setProperty('--ang', angle + 'deg');
+      card.textContent = word;
+      const handler = (ev) => {
+        if (chosenForgive) return;
+        if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+        chosenForgive = word;
+        tap('heavy');
+        if (hint) hint.classList.add('hide');
+        // Style this card as chosen, dim others
+        const allCards = fan.querySelectorAll('.lore-tarot-card');
+        card.style.transform = '';
+        card.classList.add('chosen');
+        allCards.forEach(c => { if (c !== card) c.classList.add('dimmed'); });
+        timers.push(setTimeout(() => { clearListeners(); runReadyScene(); }, 1800));
       };
-      on(fan, 'click', onClick);
-    }
+      // Per-card direct handlers — both click and touchstart
+      on(card, 'click', handler);
+      on(card, 'touchstart', handler, { passive: false });
+      fan.appendChild(card);
+    });
   }
 
   // ---- Patient ready scene ----
@@ -7173,7 +7180,7 @@ const Lore = (() => {
 
     const onTap = (e) => {
       e.preventDefault();
-      gaugeVal = Math.min(100, gaugeVal + 5.5);
+      gaugeVal = Math.min(100, gaugeVal + 9);
       paint();
       bumpButton();
       tap('light');
@@ -7182,7 +7189,7 @@ const Lore = (() => {
     on(scene, 'touchstart', onTap, { passive: false });
 
     const drain = setInterval(() => {
-      gaugeVal = Math.max(0, gaugeVal - 1.7);
+      gaugeVal = Math.max(0, gaugeVal - 1.0);
       paint();
     }, 100);
     timers.push(drain);
