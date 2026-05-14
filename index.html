@@ -2700,195 +2700,79 @@ html, body {
   box-shadow: 0 0 32px rgba(255,255,255,0.85);
 }
 
-/* Fears scene — falling-words rain (game-palette: pink/blue) */
-#screen-lore [data-lore-scene="fears"] { background: #000; padding: 0; }
-.lore-fears-bg {
-  position: absolute; inset: 0;
-  background:
-    radial-gradient(ellipse at top, rgba(10,26,58,0.85) 0%, rgba(0,0,0,0.92) 60%, #000 100%),
-    repeating-linear-gradient(0deg, rgba(232,96,154,0.03) 0 1px, transparent 1px 3px);
-  z-index: 0;
-}
-.lore-fears-rain {
-  position: absolute;
-  inset: 0;
-  z-index: 4;
-  overflow: hidden;
-  pointer-events: auto;
-}
-.lore-fear-drop {
-  position: absolute;
-  top: -10%;
-  color: #fff;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 24px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  text-shadow:
-    0 0 8px rgba(255,255,255,0.5),
-    0 0 18px rgba(232,96,154,0.55),
-    0 0 36px rgba(91,157,232,0.25);
-  white-space: nowrap;
-  user-select: none;
-  cursor: pointer;
-  padding: 4px 12px;
-  border-radius: 8px;
-  -webkit-tap-highlight-color: transparent;
-  animation: lore-fear-fall var(--fall-dur, 5.5s) linear forwards;
-  will-change: transform;
-  transition: color 0.2s, text-shadow 0.2s, transform 0.2s;
-}
-.lore-fear-drop:hover {
-  color: #fff;
-  text-shadow: 0 0 10px #fff, 0 0 24px var(--color-primary, #e8609a), 0 0 40px rgba(91,157,232,0.5);
-}
-.lore-fear-drop.chosen {
-  animation: none !important;
-  transform: scale(1.4);
-  color: #fff;
-  text-shadow:
-    0 0 14px #fff,
-    0 0 30px var(--color-primary, #e8609a),
-    0 0 60px var(--color-blue, #5b9de8);
-}
-@keyframes lore-fear-fall {
-  0%   { transform: translateY(0); opacity: 0; }
-  10%  { opacity: 0.95; }
-  85%  { opacity: 0.9; }
-  100% { transform: translateY(120vh); opacity: 0; }
-}
-
-/* Forgive scene — tarot fan (game palette: pink/blue) */
-#screen-lore [data-lore-scene="forgive"] { background: #000; padding: 0; }
-.lore-forgive-bg {
-  position: absolute; inset: 0;
-  background:
-    radial-gradient(ellipse at center, rgba(10,26,58,0.85) 0%, rgba(0,0,0,0.95) 70%, #000 100%);
-  z-index: 0;
-}
-.lore-forgive-bg::after {
-  content: '';
-  position: absolute; inset: 0;
-  background:
-    repeating-conic-gradient(from 0deg, rgba(232,96,154,0.05) 0deg 0.6deg, transparent 0.6deg 8deg);
-  -webkit-mask-image: radial-gradient(circle at center, #000 30%, transparent 70%);
-  mask-image: radial-gradient(circle at center, #000 30%, transparent 70%);
-  animation: lore-forgive-rays 26s linear infinite;
-}
-@keyframes lore-forgive-rays { to { transform: rotate(360deg); } }
-.lore-tarot-stage {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 130px 12px 80px;
-  z-index: 4;
-}
-.lore-tarot-fan {
-  position: relative;
-  width: 100%;
-  max-width: 420px;
-  display: flex;
-  flex-wrap: nowrap;
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
-}
-.lore-tarot-card {
-  flex: 0 0 auto;
-  width: 68px;
-  height: 134px;
-  border-radius: 10px;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transition: transform 0.45s cubic-bezier(.34,1.4,.6,1), filter 0.3s, opacity 0.3s, border-color 0.2s, box-shadow 0.2s;
-  user-select: none;
-  transform-origin: bottom center;
-  transform: rotate(var(--ang, 0deg)) translateY(0);
-  background:
-    radial-gradient(circle at 50% 25%, rgba(255,255,255,0.18) 0%, transparent 70%),
-    linear-gradient(135deg, #1a3160 0%, #0a1a3a 60%, #2c1448 100%);
-  border: 1.5px solid rgba(91,157,232,0.85);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 5px;
-  text-align: center;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 12px;
-  line-height: 1.2;
-  letter-spacing: 0.5px;
-  font-weight: 400;
-  text-transform: none;
-  color: #fff;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.85);
-  box-shadow:
-    inset 0 0 14px rgba(91,157,232,0.18),
-    0 5px 12px rgba(0,0,0,0.7);
-  word-break: break-word;
-  hyphens: auto;
-}
-.lore-tarot-card:hover,
-.lore-tarot-card:active {
-  transform: rotate(var(--ang, 0deg)) translateY(-12px) scale(1.08);
-  border-color: var(--color-primary, #e8609a);
-  box-shadow:
-    inset 0 0 24px rgba(232,96,154,0.5),
-    0 10px 22px rgba(232,96,154,0.5),
-    0 0 24px rgba(232,96,154,0.7);
-}
-.lore-tarot-card.chosen {
+/* Emotion → Ready glitch (body-level overlay) */
+.lore-glitch {
   position: fixed;
-  z-index: 50;
-  width: 240px;
-  height: 340px;
-  top: 50%;
-  left: 50%;
-  margin-left: -120px;
-  margin-top: -170px;
-  transform: none !important;
-  font-size: 22px;
-  font-weight: 500;
-  line-height: 1.35;
-  padding: 24px;
-  border-color: var(--color-primary, #e8609a);
-  border-width: 2px;
-  text-shadow: 0 1px 6px rgba(0,0,0,0.85);
-  box-shadow:
-    inset 0 0 36px rgba(232,96,154,0.4),
-    0 0 30px rgba(232,96,154,0.5),
-    0 12px 28px rgba(0,0,0,0.85);
-  transition: all 0.6s cubic-bezier(.34,1.4,.4,1);
-}
-.lore-tarot-card.dimmed {
-  opacity: 0.3;
-  filter: blur(1px) saturate(0.4);
+  inset: 0;
+  z-index: 9999;
   pointer-events: none;
-  transform: rotate(var(--ang, 0deg)) translateY(20px) scale(0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: rgba(0,0,0,0);
+  animation: lore-glitch-bg 2.5s ease-out forwards;
 }
-.lore-tarot-card.dimmed {
-  opacity: 0.3;
-  filter: blur(1px) saturate(0.5);
-  pointer-events: none;
+@keyframes lore-glitch-bg {
+  0%   { background: rgba(255,255,255,0);    }
+  4%   { background: rgba(255,255,255,0.95); }
+  14%  { background: rgba(232,96,154,0.7);   }
+  30%  { background: rgba(0,0,0,0.92);       }
+  50%  { background: rgba(91,157,232,0.55);  }
+  70%  { background: rgba(0,0,0,0.95);       }
+  88%  { background: rgba(0,0,0,0.5);        }
+  100% { background: rgba(0,0,0,0);          }
 }
-.lore-tarot-hint {
-  margin-top: 16px;
-  color: rgba(255,255,255,0.75);
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 14px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  text-shadow: 0 0 8px rgba(91,157,232,0.6);
+.lore-glitch-bar {
+  position: absolute;
+  left: -10%; right: -10%;
+  height: 28px;
+  top: var(--y, 50%);
+  background: linear-gradient(90deg, rgba(255,0,120,0) 0%, rgba(255,0,120,1) 35%, rgba(0,225,255,1) 65%, rgba(255,255,255,0) 100%);
+  mix-blend-mode: screen;
+  filter: blur(1.5px);
+  animation: lore-glitch-bar 2.5s steps(14) forwards;
   opacity: 0;
-  animation: lore-tarot-hint-in 1.2s ease 0.7s forwards;
 }
-@keyframes lore-tarot-hint-in {
-  to { opacity: 0.85; }
+@keyframes lore-glitch-bar {
+  0%   { opacity: 0; transform: translateX(0); }
+  8%   { opacity: 1; transform: translateX(-70px); }
+  30%  { transform: translateX(60px); }
+  55%  { transform: translateX(-40px); opacity: 1; }
+  80%  { transform: translateX(20px); opacity: 0.85; }
+  100% { opacity: 0; transform: translateX(0); }
 }
-.lore-tarot-hint.hide { opacity: 0; transition: opacity 0.4s ease; }
+.lore-glitch-word {
+  position: relative;
+  z-index: 2;
+  color: #fff;
+  font-family: 'Courier New', monospace;
+  font-size: 44px;
+  font-weight: 900;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  max-width: 92vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  text-shadow:
+    3px 0 0 #00e1ff,
+    -3px 0 0 #ff003c,
+    0 0 16px rgba(255,255,255,0.9);
+  animation: lore-glitch-shake 0.13s steps(2) infinite, lore-glitch-fade 2.5s ease-in forwards;
+}
+@keyframes lore-glitch-shake {
+  0%   { transform: translateX(0)   skewX(0deg); }
+  50%  { transform: translateX(-4px) skewX(-10deg); }
+  100% { transform: translateX(4px)  skewX(8deg); }
+}
+@keyframes lore-glitch-fade {
+  0%   { opacity: 0; }
+  10%  { opacity: 1; }
+  75%  { opacity: 1; }
+  100% { opacity: 0; }
+}
 
 /* Patient ready scene */
 #screen-lore [data-lore-scene="ready"] { background: #000; padding: 0; }
@@ -3096,63 +2980,6 @@ html, body {
   font-size: 16px;
   text-shadow: 0 0 8px rgba(255,255,255,0.7);
 }
-/* Intro overlay shown for 3s before tap phase begins */
-.tg-intro {
-  position: absolute;
-  inset: 0;
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 18px;
-  pointer-events: none;
-  background:
-    radial-gradient(ellipse at center, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.95) 100%);
-  opacity: 0;
-  transition: opacity 0.5s ease;
-}
-.tg-intro.show {
-  animation: tg-intro-anim 3s ease-out forwards;
-}
-@keyframes tg-intro-anim {
-  0%   { opacity: 0; }
-  8%   { opacity: 1; }
-  85%  { opacity: 1; }
-  100% { opacity: 0; }
-}
-.tg-intro-word {
-  color: #fff;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 44px;
-  font-weight: 700;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  text-align: center;
-  padding: 0 20px;
-  text-shadow:
-    0 0 12px rgba(255,255,255,0.8),
-    0 0 26px rgba(232,96,154,0.85),
-    3px 0 0 #00e1ff,
-    -3px 0 0 #ff003c;
-  animation: tg-intro-shake 0.12s steps(2) infinite, tg-intro-pulse 1.2s ease-in-out infinite;
-}
-@keyframes tg-intro-shake {
-  0%   { transform: translateX(0)   skewX(0deg); }
-  50%  { transform: translateX(-4px) skewX(-3deg); }
-  100% { transform: translateX(4px)  skewX(3deg); }
-}
-@keyframes tg-intro-pulse {
-  0%, 100% { filter: drop-shadow(0 0 8px rgba(232,96,154,0.5)); }
-  50%      { filter: drop-shadow(0 0 18px rgba(232,96,154,0.95)); }
-}
-.tg-intro-divider {
-  width: 64px;
-  height: 2px;
-  background: #ff4fb0;
-  box-shadow: 0 0 12px #ff4fb0, 0 0 24px rgba(255,79,176,0.7);
-}
-
 /* Scene 6A / 6B — result */
 #screen-lore [data-lore-scene="6a"],
 #screen-lore [data-lore-scene="6b"] {
@@ -3616,27 +3443,6 @@ html, body {
       </div>
     </div>
 
-    <div class="lore-scene" data-lore-scene="fears">
-      <div class="lore-fears-bg"></div>
-      <div class="lore-emotion-bubble" id="lore-fears-bubble">
-        <div class="lore-manga-bubble-inner" data-lore-i18n="fears_q"></div>
-        <div class="lore-manga-tail"></div>
-      </div>
-      <div class="lore-fears-rain" id="lore-fears-rain"></div>
-    </div>
-
-    <div class="lore-scene" data-lore-scene="forgive">
-      <div class="lore-forgive-bg"></div>
-      <div class="lore-emotion-bubble" id="lore-forgive-bubble">
-        <div class="lore-manga-bubble-inner" data-lore-i18n="forgive_q"></div>
-        <div class="lore-manga-tail"></div>
-      </div>
-      <div class="lore-tarot-stage" id="lore-tarot-stage">
-        <div class="lore-tarot-fan" id="lore-tarot-fan"></div>
-        <div class="lore-tarot-hint" id="lore-tarot-hint" data-lore-i18n="tarot_hint"></div>
-      </div>
-    </div>
-
     <div class="lore-scene" data-lore-scene="ready">
       <div class="lore-ready-bg"></div>
       <div class="lore-manga-bubble" id="lore-ready-bubble">
@@ -3666,11 +3472,6 @@ html, body {
           <span class="tg-bar-target-num">80%</span>
         </div>
       </div>
-      <div class="tg-intro" id="tg-intro">
-        <div class="tg-intro-word" id="tg-intro-fear"></div>
-        <div class="tg-intro-divider"></div>
-        <div class="tg-intro-word" id="tg-intro-forgive"></div>
-      </div>
     </div>
 
     <div class="lore-scene" data-lore-scene="6a">
@@ -3694,8 +3495,6 @@ html, body {
       <span class="lore-dot" data-dot="4"></span>
       <span class="lore-dot" data-dot="5"></span>
       <span class="lore-dot" data-dot="6"></span>
-      <span class="lore-dot" data-dot="7"></span>
-      <span class="lore-dot" data-dot="8"></span>
     </div>
   </div>
 
@@ -6040,9 +5839,6 @@ const Lore = (() => {
       tg_target_label: 'TARGET',
       crt_continue: '[TAP TO CONTINUE]',
       how_feel: 'How do you feel today?',
-      fears_q: 'What scares you?',
-      forgive_q: "What can't you forgive?",
-      tarot_hint: 'Choose a card.',
       ready_caption: 'Patient is ready for the simulation.',
       success_text: 'Outstanding work! Simulation ready.',
       success_bubble: '"I knew you could do it!"',
@@ -6062,21 +5858,6 @@ const Lore = (() => {
         'Frozen','Melting','Solid','Liquid','Vibrating','Still','Trembling','Frantic','Serene','Wild',
         'Caged','Soaring','Crashing','Drifting','Anchored','Adrift','Rooted','Uprooted','Reborn','Awake',
         'Asleep','Dreaming','Waking','Forgetting','Remembering','Unsure','Certain','Wistful','Yearning','Content'
-      ],
-      fears: [
-        'Death','Drowning','Abandonment','The dark','Silence','Mirrors','Being forgotten','Blood',
-        'Hospitals','Needles','Judgment','Screaming','Doctors','My reflection','My mother','My father',
-        'Children','Time','Fire','Falling','Suffocation','Voices','Eyes','The future',
-        'The past','Choices','My own hands','Empty rooms','The truth','Loud noises','Heights','Crowds',
-        'Being alone','Being seen','Going home','Waking up','Sleeping','Tomorrow','Yesterday','Forever'
-      ],
-      forgive: [
-        'The choice I made','Leaving them','Staying silent','The broken promise','The words I said',
-        'The words I never said','Looking away','What I did to myself','What I did to them','The lie',
-        'The truth','That night','The morning after','Being afraid','Being weak','Surviving',
-        'Hating them','Hating me','Forgetting','Remembering','Hands that held me','Hands that did not',
-        'The closed door','The open door','Not running','Running too late','Being a child','Becoming this',
-        'Wanting more','Wanting less'
       ]
     },
     ru: {
@@ -6102,9 +5883,6 @@ const Lore = (() => {
       tg_target_label: 'ЦЕЛЬ',
       crt_continue: '[ТАПНИ ЧТОБЫ ПРОДОЛЖИТЬ]',
       how_feel: 'Как ты сегодня себя чувствуешь?',
-      fears_q: 'Чего ты боишься?',
-      forgive_q: 'Что ты не можешь простить?',
-      tarot_hint: 'Выбери карту.',
       ready_caption: 'Пациент готов к симуляции.',
       success_text: 'Отличная работа! Симуляция готова.',
       success_bubble: '«Я знала, что ты справишься!»',
@@ -6124,21 +5902,6 @@ const Lore = (() => {
         'Замёрзший','Тающий','Твёрдый','Жидкий','Вибрирующий','Неподвижный','Дрожащий','Лихорадочный','Безмятежный','Дикий',
         'В клетке','Взлетающий','Падающий','Дрейфующий','Заякоренный','Бесцельный','Укоренённый','Вырванный','Возрождённый','Бодрствующий',
         'Спящий','Видящий сны','Просыпающийся','Забывающий','Помнящий','Сомневающийся','Уверенный','Тоскующий','Жаждущий','Довольный'
-      ],
-      fears: [
-        'Смерть','Утопление','Заброшенность','Темнота','Тишина','Зеркала','Забвение','Кровь',
-        'Больницы','Иглы','Осуждение','Крик','Врачи','Моё отражение','Моя мать','Мой отец',
-        'Дети','Время','Огонь','Падение','Удушье','Голоса','Глаза','Будущее',
-        'Прошлое','Выборы','Мои руки','Пустые комнаты','Правда','Громкие звуки','Высота','Толпа',
-        'Одиночество','Быть увиденным','Возвращение домой','Просыпание','Сон','Завтра','Вчера','Навсегда'
-      ],
-      forgive: [
-        'Выбор','Уход','Молчание','Обещание','Слова',
-        'Недосказанность','Взгляд','Себя','Других','Ложь',
-        'Правду','Ночь','Утро','Страх','Слабость',
-        'Выживание','Ненависть','Презрение','Забвение','Память',
-        'Прикосновение','Холод','Дверь','Свет','Замок',
-        'Опоздание','Детство','Превращение','Жадность','Покой'
       ]
     }
   };
@@ -6395,8 +6158,6 @@ const Lore = (() => {
   let listeners = [];
   let gaugeVal = 0;
   let chosenEmotion = null;
-  let chosenFear = null;
-  let chosenForgive = null;
 
   function clearTimers() {
     timers.forEach(t => { try { clearTimeout(t); clearInterval(t); } catch {} });
@@ -6418,7 +6179,7 @@ const Lore = (() => {
     root.querySelectorAll('.lore-scene').forEach(s => s.classList.remove('active'));
     const el = root.querySelector('[data-lore-scene="' + name + '"]');
     if (el) el.classList.add('active');
-    const dotMap = { '1':'1', '2':'2', '4':'3', 'emotion':'4', 'fears':'5', 'forgive':'6', 'ready':'7', '5':'8', '6a':'8', '6b':'8' };
+    const dotMap = { '1':'1', '2':'2', '4':'3', 'emotion':'4', 'ready':'5', '5':'6', '6a':'6', '6b':'6' };
     const want = dotMap[name];
     root.querySelectorAll('.lore-dot').forEach(d => {
       d.classList.toggle('active', d.dataset.dot === want);
@@ -6696,7 +6457,7 @@ const Lore = (() => {
       tap('heavy');
       if (btnEl) btnEl.classList.add('chosen');
       if (list) list.classList.add('chosen');
-      timers.push(setTimeout(() => { clearListeners(); runFearsScene(); }, 450));
+      timers.push(setTimeout(() => { clearListeners(); runEmotionGlitch(); }, 450));
     }
     if (track) {
       const onActivate = (ev) => {
@@ -6709,133 +6470,30 @@ const Lore = (() => {
     }
   }
 
-  // ---- Q2: Fears (falling words rain) ----
-  function runFearsScene() {
+  // ---- Glitch transition after emotion pick (body-level overlay) ----
+  function runEmotionGlitch() {
     clearListeners();
     clearTimers();
-    chosenFear = null;
-    showScene('fears');
-    const bubble = document.getElementById('lore-fears-bubble');
-    const rain = document.getElementById('lore-fears-rain');
-    if (bubble) {
-      bubble.classList.remove('pop');
-      void bubble.offsetWidth;
-      bubble.classList.add('pop');
+    document.querySelectorAll('.lore-glitch').forEach(o => { try { o.remove(); } catch {} });
+    const safe = String(chosenEmotion || 'SIMULATION').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+    const overlay = document.createElement('div');
+    overlay.className = 'lore-glitch';
+    overlay.innerHTML =
+      '<div class="lore-glitch-bar" style="--y:14%"></div>' +
+      '<div class="lore-glitch-bar" style="--y:34%"></div>' +
+      '<div class="lore-glitch-bar" style="--y:56%"></div>' +
+      '<div class="lore-glitch-bar" style="--y:78%"></div>' +
+      '<div class="lore-glitch-word">' + safe + '</div>';
+    document.body.appendChild(overlay);
+    let handed = false;
+    function next() {
+      if (handed) return;
+      handed = true;
+      document.querySelectorAll('.lore-glitch').forEach(o => { try { o.remove(); } catch {} });
+      runReadyScene();
     }
-    if (rain) rain.innerHTML = '';
-    const fears = L[getLang()].fears.slice();
-    // Fisher-Yates shuffle so the rain order varies each session
-    for (let i = fears.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [fears[i], fears[j]] = [fears[j], fears[i]];
-    }
-    let idx = 0;
-    let spawning = true;
-
-    function spawn() {
-      if (!spawning || !rain || !rain.isConnected) return;
-      const text = fears[idx % fears.length];
-      idx++;
-      const drop = document.createElement('div');
-      drop.className = 'lore-fear-drop';
-      drop.textContent = text;
-      // Random horizontal position with margin so text isn't clipped
-      const left = 6 + Math.random() * 70; // percent
-      const dur = 4.5 + Math.random() * 2.5; // seconds
-      const size = 18 + Math.random() * 12;
-      drop.style.left = left + '%';
-      drop.style.setProperty('--fall-dur', dur + 's');
-      drop.style.fontSize = size + 'px';
-      drop.style.animationDelay = '0s';
-      drop.style.opacity = '0';
-      rain.appendChild(drop);
-      // Force reflow + start
-      void drop.offsetWidth;
-      drop.style.opacity = '';
-      const onPick = (ev) => {
-        if (chosenFear) return;
-        if (ev) { ev.preventDefault(); ev.stopPropagation(); }
-        chosenFear = text;
-        tap('heavy');
-        spawning = false;
-        drop.classList.add('chosen');
-        // Freeze other drops where they are
-        rain.querySelectorAll('.lore-fear-drop').forEach(d => {
-          if (d === drop) return;
-          const cs = getComputedStyle(d);
-          d.style.transform = cs.transform;
-          d.style.animation = 'none';
-          d.style.opacity = '0.25';
-        });
-        timers.push(setTimeout(() => { clearListeners(); runForgiveScene(); }, 1000));
-      };
-      drop.addEventListener('click', onPick);
-      drop.addEventListener('touchstart', onPick, { passive: false });
-      // Remove after fall
-      setTimeout(() => { if (!chosenFear) drop.remove(); }, dur * 1000 + 200);
-      // Schedule next spawn
-      const next = 380 + Math.random() * 380;
-      timers.push(setTimeout(spawn, next));
-    }
-    // Start with a small initial burst so screen is immediately populated
-    timers.push(setTimeout(spawn, 300));
-    timers.push(setTimeout(spawn, 700));
-    timers.push(setTimeout(spawn, 1100));
-  }
-
-  // ---- Q3: Forgive (5 face-up cards in a row, single tap = pick) ----
-  function runForgiveScene() {
-    clearListeners();
-    clearTimers();
-    chosenForgive = null;
-    showScene('forgive');
-    const bubble = document.getElementById('lore-forgive-bubble');
-    const fan = document.getElementById('lore-tarot-fan');
-    const hint = document.getElementById('lore-tarot-hint');
-    if (bubble) {
-      bubble.classList.remove('pop');
-      void bubble.offsetWidth;
-      bubble.classList.add('pop');
-    }
-    if (hint) hint.classList.remove('hide');
-    const list = L[getLang()].forgive.slice();
-    for (let i = list.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [list[i], list[j]] = [list[j], list[i]];
-    }
-    const picks = list.slice(0, 5);
-    const N = picks.length;
-    const spread = 18; // slight fan, mostly horizontal row
-    const startAngle = -spread / 2;
-    const step = N > 1 ? spread / (N - 1) : 0;
-
-    if (!fan) return;
-    fan.innerHTML = '';
-    picks.forEach((word, i) => {
-      const angle = startAngle + step * i;
-      const card = document.createElement('div');
-      card.className = 'lore-tarot-card';
-      card.setAttribute('data-fi', String(i));
-      card.style.setProperty('--ang', angle + 'deg');
-      card.textContent = word;
-      const handler = (ev) => {
-        if (chosenForgive) return;
-        if (ev) { ev.preventDefault(); ev.stopPropagation(); }
-        chosenForgive = word;
-        tap('heavy');
-        if (hint) hint.classList.add('hide');
-        // Style this card as chosen, dim others
-        const allCards = fan.querySelectorAll('.lore-tarot-card');
-        card.style.transform = '';
-        card.classList.add('chosen');
-        allCards.forEach(c => { if (c !== card) c.classList.add('dimmed'); });
-        timers.push(setTimeout(() => { clearListeners(); runReadyScene(); }, 1800));
-      };
-      // Per-card direct handlers — both click and touchstart
-      on(card, 'click', handler);
-      on(card, 'touchstart', handler, { passive: false });
-      fan.appendChild(card);
-    });
+    timers.push(setTimeout(next, 2500));
+    setTimeout(next, 3000); // untracked backup
   }
 
   // ---- Patient ready scene ----
@@ -6858,10 +6516,8 @@ const Lore = (() => {
     timers.push(setTimeout(advance, READY_AUTO_MS));
   }
 
-  // ---- Scene 8 (tap game): 3s intro then 10s tap, 80% threshold ----
-  function runScene5(opts) {
-    opts = opts || {};
-    const skipIntro = !!opts.skipIntro;
+  // ---- Scene 8 (tap game): 10s tap, 80% threshold ----
+  function runScene5() {
     clearListeners();
     clearTimers();
     showScene('5');
@@ -6870,9 +6526,6 @@ const Lore = (() => {
     if (!scene) { runScene6B(); return; }
     scene.classList.add('active');
 
-    const intro = document.getElementById('tg-intro');
-    const fearWord = document.getElementById('tg-intro-fear');
-    const forgiveWord = document.getElementById('tg-intro-forgive');
     const fill   = document.getElementById('tg-bar-fill');
     const pct    = document.getElementById('tg-pct');
     const count  = document.getElementById('tg-count');
@@ -6896,50 +6549,33 @@ const Lore = (() => {
     }
     paint();
 
-    function startTap() {
-      if (intro) intro.classList.remove('show');
-      const onTap = (e) => {
-        e.preventDefault();
-        gaugeVal = Math.min(100, gaugeVal + 10);
-        paint();
-        bumpButton();
-        tap('light');
-      };
-      on(scene, 'click', onTap);
-      on(scene, 'touchstart', onTap, { passive: false });
+    const onTap = (e) => {
+      e.preventDefault();
+      gaugeVal = Math.min(100, gaugeVal + 10);
+      paint();
+      bumpButton();
+      tap('light');
+    };
+    on(scene, 'click', onTap);
+    on(scene, 'touchstart', onTap, { passive: false });
 
-      const drain = setInterval(() => {
-        gaugeVal = Math.max(0, gaugeVal - 1.0);
-        paint();
-      }, 100);
-      timers.push(drain);
+    const drain = setInterval(() => {
+      gaugeVal = Math.max(0, gaugeVal - 1.0);
+      paint();
+    }, 100);
+    timers.push(drain);
 
-      const tick = setInterval(() => {
-        remaining -= 1;
-        if (count) count.textContent = String(Math.max(0, remaining));
-        if (remaining <= 0) {
-          clearInterval(tick);
-          clearInterval(drain);
-          if (gaugeVal >= 80) runScene6A();
-          else runScene6B();
-        }
-      }, 1000);
-      timers.push(tick);
-    }
-
-    if (skipIntro) {
-      if (intro) intro.classList.remove('show');
-      startTap();
-    } else {
-      if (fearWord)    fearWord.textContent    = (chosenFear    || '').toString().toUpperCase();
-      if (forgiveWord) forgiveWord.textContent = (chosenForgive || '').toString().toUpperCase();
-      if (intro) {
-        intro.classList.remove('show');
-        void intro.offsetWidth;
-        intro.classList.add('show');
+    const tick = setInterval(() => {
+      remaining -= 1;
+      if (count) count.textContent = String(Math.max(0, remaining));
+      if (remaining <= 0) {
+        clearInterval(tick);
+        clearInterval(drain);
+        if (gaugeVal >= 80) runScene6A();
+        else runScene6B();
       }
-      timers.push(setTimeout(startTap, 3000));
-    }
+    }, 1000);
+    timers.push(tick);
   }
 
   // ---- Scene 6A ----
@@ -6976,7 +6612,7 @@ const Lore = (() => {
     showScene('6b');
     tap('medium');
     Music.chord([294, 349, 415], 1.4);
-    timers.push(setTimeout(() => runScene5({ skipIntro: true }), 2000));
+    timers.push(setTimeout(runScene5, 2000));
   }
 
   function isAdmin() {
