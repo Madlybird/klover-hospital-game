@@ -19,6 +19,22 @@ const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
 const ADMIN_SECRET = process.env.ADMIN_DEBUG_SECRET;
 const GOODIES_USERNAME = process.env.GOODIES_USERNAME;
 const GOODIES_PASSWORD = process.env.GOODIES_PASSWORD;
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+
+async function botSendMessage(chatId, text) {
+  if (!BOT_TOKEN) return { ok: false, error: 'bot_token_missing' };
+  try {
+    const r = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML', disable_web_page_preview: true }),
+    });
+    const data = await r.json().catch(() => ({}));
+    return { ok: !!data.ok, status: r.status, response: data };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+}
 
 const sb = SUPABASE_URL && SUPABASE_SERVICE_KEY
   ? createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, { auth: { persistSession: false } })
@@ -55,9 +71,11 @@ export default async function handler(req, res) {
   if (!ADMIN_SECRET || (req.query?.secret || '') !== ADMIN_SECRET) {
     return res.status(401).json({ error: 'unauthorized' });
   }
-  if (!sb) return res.status(500).json({ error: 'supabase_not_configured' });
+  // sb may be null (Supabase env removed) — POST/notify still work,
+  // GET list/sync need Supabase. Each branch handles its own check.
 
   if (req.method === 'GET') {
+    if (!sb) return res.status(200).json({ ok: false, error: 'supabase_unconfigured' });
     // Sync mode — pull all Goodies holders and upsert has_access=true
     if (req.query?.sync === '1' || req.query?.sync === 'true') {
       if (!GOODIES_USERNAME || !GOODIES_PASSWORD) {
@@ -100,17 +118,42 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     const body = readBody(req);
     const grant = body.grant !== false; // default true
+    const notify = body.notify !== false; // default true
+    const message = typeof body.message === 'string' && body.message.length
+      ? body.message
+      : '✅ Access granted to Klover Hospital. Open the mini-app and tap any button — you\'re in.';
     const tgIds = Array.isArray(body.tg_ids) ? body.tg_ids.map(Number).filter(Number.isFinite) : [];
     if (!tgIds.length) return res.status(400).json({ error: 'no_tg_ids' });
-    const rows = tgIds.map(telegram_id => ({ telegram_id, has_access: grant }));
-    const { error } = await sb
-      .from('users')
-      .upsert(rows, { onConflict: 'telegram_id', ignoreDuplicates: false });
-    return res.status(error ? 500 : 200).json({
-      ok: !error,
-      error: error?.message || null,
-      modified: rows.length,
+
+    // Persist in Supabase (soft-fail if unreachable)
+    let dbError = null;
+    if (sb) {
+      try {
+        const rows = tgIds.map(telegram_id => ({ telegram_id, has_access: grant }));
+        const { error } = await sb
+          .from('users')
+          .upsert(rows, { onConflict: 'telegram_id', ignoreDuplicates: false });
+        if (error) dbError = error.message;
+      } catch (e) { dbError = e.message; }
+    } else {
+      dbError = 'supabase_unconfigured';
+    }
+
+    // Notify each user via Telegram bot
+    const notifications = [];
+    if (notify && grant) {
+      for (const tgId of tgIds) {
+        const r = await botSendMessage(tgId, message);
+        notifications.push({ tg: tgId, ok: r.ok, error: r.error || (r.response && r.response.description) || null });
+      }
+    }
+
+    return res.status(200).json({
+      ok: true,
+      modified: tgIds.length,
       grant,
+      dbError,
+      notifications,
     });
   }
 
