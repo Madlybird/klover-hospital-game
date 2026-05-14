@@ -3102,170 +3102,198 @@ html, body {
   background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.85) 100%);
 }
 
-/* Scene 5 — tap-fast rewrite */
+/* ============================================================
+   Scene 5 — TAP GAME (fresh tg-* namespace, no legacy collisions)
+   ============================================================ */
 #screen-lore [data-lore-scene="5"] {
   position: relative;
+  background: linear-gradient(180deg, #1a3160 0%, #0a1a3a 50%, #1a0a30 100%);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  background: #0a1a3a;
   padding: 0;
+  overflow: hidden;
   user-select: none;
 }
-.lore-tap-bg { z-index: 1; }
-.lore-tap-shade {
-  position: absolute; inset: 0;
-  z-index: 2;
-  background:
-    linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(10,26,58,0.15) 30%, rgba(10,26,58,0.25) 70%, rgba(0,0,0,0.55) 100%);
-  pointer-events: none;
-}
-.lore-tap-title {
-  position: absolute;
-  top: 56px;
-  left: 0; right: 0;
-  z-index: 6;
-  color: #fff;
-  font-family: Georgia, serif;
-  font-size: 22px;
-  font-weight: bold;
-  letter-spacing: 1px;
-  text-align: center;
-  text-shadow: 0 2px 10px rgba(0,0,0,0.95), 0 0 24px rgba(237,0,140,0.55);
-  padding: 0 24px;
-  pointer-events: none;
-}
-.lore-tap-circle {
-  position: absolute;
-  top: 50%; left: 50%;
-  width: 180px; height: 180px;
-  margin-left: -90px; margin-top: -90px;
-  z-index: 5;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.35), rgba(237,0,140,0.45) 60%, rgba(0,0,0,0.6) 100%);
-  border: 4px solid rgba(255,255,255,0.85);
-  box-shadow:
-    0 0 40px rgba(237,0,140,0.6),
-    0 0 90px rgba(237,0,140,0.35),
-    inset 0 -10px 18px rgba(0,0,0,0.35),
-    inset 0 8px 14px rgba(255,255,255,0.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  animation: lore-tap-circle-pulse 1.2s ease-in-out infinite;
-  transition: transform 0.08s ease-out;
-}
-.lore-tap-circle:active { transform: scale(0.93); }
-.lore-tap-circle.bump { animation: lore-tap-circle-bump 0.18s ease-out; }
-@keyframes lore-tap-circle-pulse {
-  0%, 100% { transform: scale(1);    box-shadow: 0 0 40px rgba(237,0,140,0.6), 0 0 90px rgba(237,0,140,0.35), inset 0 -10px 18px rgba(0,0,0,0.35), inset 0 8px 14px rgba(255,255,255,0.45); }
-  50%      { transform: scale(1.06); box-shadow: 0 0 60px rgba(237,0,140,0.85), 0 0 120px rgba(237,0,140,0.5), inset 0 -10px 18px rgba(0,0,0,0.35), inset 0 8px 14px rgba(255,255,255,0.6); }
-}
-@keyframes lore-tap-circle-bump {
-  0%   { transform: scale(0.93); }
-  50%  { transform: scale(1.12); }
-  100% { transform: scale(1); }
-}
-.lore-tap-count {
-  font-family: Georgia, serif;
-  font-size: 72px;
-  font-weight: 900;
-  color: #fff;
-  text-shadow:
-    0 2px 6px rgba(0,0,0,0.8),
-    0 0 18px rgba(237,0,140,0.85);
-  line-height: 1;
-}
-.lore-ripples {
+.tg-img {
   position: absolute;
   inset: 0;
-  z-index: 7;
-  pointer-events: none;
-  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+  display: block;
 }
-.lore-ripple {
+.tg-overlay {
   position: absolute;
-  width: 18px;
-  height: 18px;
-  margin-left: -9px;
-  margin-top: -9px;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at center, rgba(0,0,0,0) 35%, rgba(0,0,0,0.55) 100%),
+    linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.2) 35%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0.8) 100%);
+}
+.tg-title {
+  position: absolute;
+  top: 54px;
+  left: 0; right: 0;
+  z-index: 6;
+  color: #fff;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 36px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  text-align: center;
+  text-shadow:
+    0 2px 8px rgba(0,0,0,0.95),
+    0 0 18px var(--color-primary, #e8609a),
+    0 0 36px rgba(232,96,154,0.55);
+  pointer-events: none;
+  animation: tg-title-pulse 0.6s ease-in-out infinite alternate;
+}
+@keyframes tg-title-pulse {
+  from { transform: scale(1);    text-shadow: 0 2px 8px rgba(0,0,0,0.95), 0 0 18px var(--color-primary, #e8609a), 0 0 36px rgba(232,96,154,0.55); }
+  to   { transform: scale(1.04); text-shadow: 0 2px 10px rgba(0,0,0,0.95), 0 0 26px var(--color-primary, #e8609a), 0 0 50px rgba(232,96,154,0.75); }
+}
+.tg-sub {
+  position: absolute;
+  top: 100px;
+  left: 0; right: 0;
+  z-index: 6;
+  color: rgba(255,255,255,0.8);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 16px;
+  letter-spacing: 2px;
+  text-align: center;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.95);
+  pointer-events: none;
+}
+.tg-button {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 200px; height: 200px;
+  margin-left: -100px; margin-top: -100px;
+  z-index: 6;
   border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.95);
-  background: radial-gradient(circle, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0) 70%);
-  animation: lore-ripple 0.65s ease-out forwards;
-  will-change: transform, opacity;
+  background:
+    radial-gradient(circle at 35% 28%, #ffb1d7 0%, #e8609a 40%, #a13369 100%);
+  border: 6px solid #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 0 60px rgba(232,96,154,0.8),
+    0 0 120px rgba(232,96,154,0.45),
+    inset 0 -16px 24px rgba(0,0,0,0.3),
+    inset 0 12px 20px rgba(255,255,255,0.5);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  animation: tg-button-pulse 1.1s ease-in-out infinite;
+  transition: transform 0.08s ease-out;
 }
-@keyframes lore-ripple {
-  0%   { transform: scale(0.5); opacity: 1; }
-  100% { transform: scale(8);   opacity: 0; }
+.tg-button:active { transform: scale(0.92); animation: none; }
+.tg-button.bump { animation: tg-button-bump 0.18s ease-out; }
+@keyframes tg-button-pulse {
+  0%, 100% { transform: scale(1);    box-shadow: 0 0 60px rgba(232,96,154,0.8), 0 0 120px rgba(232,96,154,0.45), inset 0 -16px 24px rgba(0,0,0,0.3), inset 0 12px 20px rgba(255,255,255,0.5); }
+  50%      { transform: scale(1.07); box-shadow: 0 0 90px rgba(232,96,154,0.95), 0 0 160px rgba(232,96,154,0.65), inset 0 -16px 24px rgba(0,0,0,0.3), inset 0 12px 20px rgba(255,255,255,0.65); }
 }
-.lore-tap-bar-wrap {
+@keyframes tg-button-bump {
+  0%   { transform: scale(0.9); }
+  50%  { transform: scale(1.14); }
+  100% { transform: scale(1); }
+}
+.tg-button-num {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 92px;
+  font-weight: 900;
+  color: #fff;
+  line-height: 0.95;
+  text-shadow: 0 3px 8px rgba(0,0,0,0.6), 0 0 14px rgba(232,96,154,0.9);
+}
+.tg-button-tap {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 24px;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-top: -4px;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+}
+.tg-bar-wrap {
   position: absolute;
   left: 0; right: 0;
-  bottom: 56px;
+  bottom: 50px;
   z-index: 6;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
   pointer-events: none;
+  padding: 0 24px;
 }
-.lore-tap-bar {
+.tg-bar {
   position: relative;
-  width: 86%;
+  width: 100%;
   max-width: 380px;
-  height: 42px;
-  background: rgba(0,0,0,0.75);
-  border: 3px solid #378ADD;
-  border-radius: 22px;
+  height: 48px;
+  background: rgba(0,0,0,0.8);
+  border: 4px solid #fff;
+  border-radius: 24px;
   overflow: hidden;
   box-shadow:
-    0 0 22px rgba(55,138,221,0.45),
-    inset 0 2px 6px rgba(0,0,0,0.65),
-    0 6px 18px rgba(0,0,0,0.55);
-  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    0 0 24px rgba(255,255,255,0.4),
+    inset 0 3px 8px rgba(0,0,0,0.8),
+    0 6px 18px rgba(0,0,0,0.65);
 }
-.lore-tap-bar.lvl-low {
-  border-color: #ff3b5c;
-  box-shadow: 0 0 26px rgba(255,59,92,0.55), inset 0 2px 6px rgba(0,0,0,0.65), 0 6px 18px rgba(0,0,0,0.55);
-}
-.lore-tap-bar.lvl-mid {
-  border-color: #ffb02a;
-  box-shadow: 0 0 26px rgba(255,176,42,0.55), inset 0 2px 6px rgba(0,0,0,0.65), 0 6px 18px rgba(0,0,0,0.55);
-}
-.lore-tap-bar.lvl-high {
-  border-color: #1dd16a;
-  box-shadow: 0 0 32px rgba(29,209,106,0.7), inset 0 2px 6px rgba(0,0,0,0.65), 0 6px 18px rgba(0,0,0,0.55);
-}
-.lore-tap-bar-fill {
+.tg-bar-fill {
   position: absolute;
   inset: 0;
   width: 0%;
   background: linear-gradient(90deg, #ff3b5c 0%, #ffb02a 50%, #1dd16a 100%);
-  transition: width 0.1s linear;
-  box-shadow: inset 0 -4px 8px rgba(0,0,0,0.25), inset 0 4px 8px rgba(255,255,255,0.18);
+  transition: width 0.08s linear;
+  box-shadow: inset 0 -6px 10px rgba(0,0,0,0.3), inset 0 6px 10px rgba(255,255,255,0.25);
 }
-.lore-tap-bar-target {
+.tg-bar-target {
   position: absolute;
-  top: 0; bottom: 0;
+  top: -4px; bottom: -4px;
   left: 80%;
-  width: 3px;
+  width: 4px;
   background: #fff;
-  box-shadow: 0 0 8px #fff, 0 0 18px rgba(255,255,255,0.6);
+  box-shadow: 0 0 10px #fff, 0 0 22px rgba(255,255,255,0.7);
   z-index: 2;
 }
-.lore-tap-bar-label {
+.tg-bar-pct {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
-  font-family: Georgia, serif;
+  font-family: 'Barlow Condensed', sans-serif;
   font-weight: 900;
-  font-size: 18px;
-  letter-spacing: 1.5px;
-  text-shadow: 0 2px 4px #000, 0 0 8px rgba(0,0,0,0.8);
+  font-size: 22px;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 4px #000, 0 0 8px rgba(0,0,0,0.95);
   z-index: 3;
+}
+.tg-bar-foot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: rgba(255,255,255,0.85);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.9);
+}
+.tg-bar-target-num {
+  color: #fff;
+  font-weight: 900;
+  font-size: 16px;
+  text-shadow: 0 0 8px rgba(255,255,255,0.7);
 }
 
 /* Scene 6A / 6B — result */
@@ -3448,9 +3476,13 @@ html, body {
   .lore-crt-meta { font-size: 9.5px; letter-spacing: 1.2px; }
   .lore-manga-bubble-inner { font-size: 18px; padding: 14px 18px; }
   .lore-emotion { font-size: 16px; padding: 8px 16px; }
-  .lore-tap-title { font-size: 18px; top: 46px; }
-  .lore-tap-circle { width: 150px; height: 150px; margin-left: -75px; margin-top: -75px; }
-  .lore-tap-count { font-size: 60px; }
+  .tg-title { font-size: 28px; top: 44px; letter-spacing: 3px; }
+  .tg-sub { font-size: 14px; top: 80px; }
+  .tg-button { width: 160px; height: 160px; margin-left: -80px; margin-top: -80px; }
+  .tg-button-num { font-size: 72px; }
+  .tg-button-tap { font-size: 20px; }
+  .tg-bar { height: 42px; }
+  .tg-bar-pct { font-size: 19px; }
   .lore-result-text { font-size: 17px; }
   .lore-bubble { font-size: 14px; }
 }
@@ -3785,18 +3817,23 @@ html, body {
     </div>
 
     <div class="lore-scene" data-lore-scene="5">
-      <img class="lore-fullscreen-img lore-tap-bg" src="assets/story/3.JPG" alt="">
-      <div class="lore-tap-shade"></div>
-      <div class="lore-tap-title" data-lore-i18n="gauge_inst"></div>
-      <div class="lore-tap-circle" id="lore-tap-circle">
-        <span class="lore-tap-count" id="lore-tap-count">10</span>
+      <img class="tg-img" src="assets/story/3.JPG" alt="">
+      <div class="tg-overlay"></div>
+      <div class="tg-title" data-lore-i18n="tg_title"></div>
+      <div class="tg-sub" data-lore-i18n="tg_sub"></div>
+      <div class="tg-button" id="tg-button">
+        <span class="tg-button-num" id="tg-count">10</span>
+        <span class="tg-button-tap" data-lore-i18n="tg_tap_label"></span>
       </div>
-      <div class="lore-ripples" id="lore-ripples"></div>
-      <div class="lore-tap-bar-wrap">
-        <div class="lore-tap-bar" id="lore-tap-bar">
-          <div class="lore-tap-bar-fill" id="lore-tap-bar-fill"></div>
-          <div class="lore-tap-bar-target" aria-hidden="true"></div>
-          <div class="lore-tap-bar-label" id="lore-tap-bar-label">0%</div>
+      <div class="tg-bar-wrap">
+        <div class="tg-bar" id="tg-bar">
+          <div class="tg-bar-fill" id="tg-bar-fill"></div>
+          <div class="tg-bar-target"></div>
+          <div class="tg-bar-pct" id="tg-pct">0%</div>
+        </div>
+        <div class="tg-bar-foot">
+          <span data-lore-i18n="tg_target_label"></span>
+          <span class="tg-bar-target-num">80%</span>
         </div>
       </div>
     </div>
@@ -6163,6 +6200,10 @@ const Lore = (() => {
       staff_caption: 'Our caring medical staff will guide you through the simulation.',
       gauge_inst: 'Tap the screen — fast!',
       tap_btn: 'TAP!',
+      tg_title: 'TAP FAST!',
+      tg_sub: 'Wake up the patient',
+      tg_tap_label: 'TAP',
+      tg_target_label: 'TARGET',
       crt_continue: '[TAP TO CONTINUE]',
       how_feel: 'How do you feel today?',
       fears_q: 'What scares you?',
@@ -6221,6 +6262,10 @@ const Lore = (() => {
       staff_caption: 'Наш заботливый медицинский персонал поможет вам пройти симуляцию.',
       gauge_inst: 'Тапай по экрану — быстро!',
       tap_btn: 'ТАП!',
+      tg_title: 'ТАПАЙ БЫСТРО!',
+      tg_sub: 'Разбуди пациента',
+      tg_tap_label: 'ТАП',
+      tg_target_label: 'ЦЕЛЬ',
       crt_continue: '[ТАПНИ ЧТОБЫ ПРОДОЛЖИТЬ]',
       how_feel: 'Как ты сегодня себя чувствуешь?',
       fears_q: 'Чего ты боишься?',
@@ -6977,7 +7022,7 @@ const Lore = (() => {
       void bubble.offsetWidth;
       bubble.classList.add('pop');
     }
-    const advance = () => { clearListeners(); clearTimers(); runHorrorGlitch(); };
+    const advance = () => { clearListeners(); clearTimers(); runScene5(); };
     timers.push(setTimeout(() => {
       on(scene, 'click', () => { tap('light'); advance(); });
     }, READY_MIN_MS));
@@ -7087,11 +7132,11 @@ const Lore = (() => {
     });
   }
 
-  // ---- Scene 5 (tap-fast 10s, threshold 80%) — minimal, no overlays ----
+  // ---- Scene 8 (tap game) — fresh tg-* namespace, no overlays ----
   function runScene5() {
     clearListeners();
     clearTimers();
-    // Hard-clean any leftover body overlays (paranoid)
+    // Purge any orphan overlays before showing scene
     document.querySelectorAll('.lore-glitch-overlay').forEach(o => {
       try { o.remove(); } catch {}
     });
@@ -7104,58 +7149,33 @@ const Lore = (() => {
     scene.style.display = 'flex';
     scene.style.opacity = '1';
 
-    const fill = document.getElementById('lore-tap-bar-fill');
-    const label = document.getElementById('lore-tap-bar-label');
-    const count = document.getElementById('lore-tap-count');
-    const circle = document.getElementById('lore-tap-circle');
-    const ripples = document.getElementById('lore-ripples');
-    const bar = document.getElementById('lore-tap-bar');
+    const fill   = document.getElementById('tg-bar-fill');
+    const pct    = document.getElementById('tg-pct');
+    const count  = document.getElementById('tg-count');
+    const button = document.getElementById('tg-button');
 
-    if (fill)  fill.style.width = '0%';
-    if (label) label.textContent = '0%';
-    if (count) count.textContent = String(remaining);
+    if (fill)   fill.style.width = '0%';
+    if (pct)    pct.textContent = '0%';
+    if (count)  count.textContent = String(remaining);
 
-    function applyLevel() {
-      if (!bar) return;
-      bar.classList.remove('lvl-low', 'lvl-mid', 'lvl-high');
-      if (gaugeVal >= 80)      bar.classList.add('lvl-high');
-      else if (gaugeVal >= 50) bar.classList.add('lvl-mid');
-      else                     bar.classList.add('lvl-low');
-    }
     function paint() {
-      if (fill)  fill.style.width = gaugeVal + '%';
-      if (label) label.textContent = Math.round(gaugeVal) + '%';
-      applyLevel();
+      if (fill) fill.style.width = gaugeVal + '%';
+      if (pct)  pct.textContent = Math.round(gaugeVal) + '%';
     }
     paint();
 
-    function spawnRipple(x, y) {
-      if (!ripples) return;
-      const r = document.createElement('div');
-      r.className = 'lore-ripple';
-      r.style.left = x + 'px';
-      r.style.top = y + 'px';
-      ripples.appendChild(r);
-      setTimeout(() => { try { r.remove(); } catch {} }, 700);
-    }
-    function bumpCircle() {
-      if (!circle) return;
-      circle.classList.remove('bump');
-      void circle.offsetWidth;
-      circle.classList.add('bump');
+    function bumpButton() {
+      if (!button) return;
+      button.classList.remove('bump');
+      void button.offsetWidth;
+      button.classList.add('bump');
     }
 
     const onTap = (e) => {
       e.preventDefault();
-      let x, y;
-      const touch = (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0]);
-      if (touch) { x = touch.clientX; y = touch.clientY; }
-      else { x = e.clientX; y = e.clientY; }
-      const rect = scene.getBoundingClientRect();
-      spawnRipple(x - rect.left, y - rect.top);
-      gaugeVal = Math.min(100, gaugeVal + 5.2);
+      gaugeVal = Math.min(100, gaugeVal + 5.5);
       paint();
-      bumpCircle();
+      bumpButton();
       tap('light');
     };
     on(scene, 'click', onTap);
