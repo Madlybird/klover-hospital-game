@@ -5753,13 +5753,23 @@ const Game = (() => {
 
     async function doRequest() {
       try {
+        // Client-claimed tg-id from initDataUnsafe — server uses it
+        // only for the Supabase cache lookup (read-only), never to
+        // write the access flag. Safe-ish for game gating.
+        const claimedTgId = (window.Telegram && window.Telegram.WebApp
+          && window.Telegram.WebApp.initDataUnsafe
+          && window.Telegram.WebApp.initDataUnsafe.user
+          && window.Telegram.WebApp.initDataUnsafe.user.id) || null;
         const r = await fetch('/api/verify-access', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Telegram-Init-Data': initData,
           },
-          body: JSON.stringify({ wallet: walletAddress || null }),
+          body: JSON.stringify({
+            wallet: walletAddress || null,
+            claimedTgId,
+          }),
         });
         const json = await r.json().catch(() => ({}));
         return { status: r.status, data: json };
