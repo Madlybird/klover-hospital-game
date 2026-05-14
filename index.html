@@ -3661,8 +3661,6 @@ html, body {
       <span class="lore-dot" data-dot="5"></span>
       <span class="lore-dot" data-dot="6"></span>
       <span class="lore-dot" data-dot="7"></span>
-      <span class="lore-dot" data-dot="8"></span>
-      <span class="lore-dot" data-dot="9"></span>
     </div>
   </div>
 
@@ -6385,7 +6383,7 @@ const Lore = (() => {
     root.querySelectorAll('.lore-scene').forEach(s => s.classList.remove('active'));
     const el = root.querySelector('[data-lore-scene="' + name + '"]');
     if (el) el.classList.add('active');
-    const dotMap = { '1':'1', '2':'2', '4':'3', 'emotion':'4', 'fears':'5', 'forgive':'6', 'ready':'7', '5':'8', '6a':'9', '6b':'9' };
+    const dotMap = { '1':'1', '2':'2', '4':'3', 'emotion':'4', 'fears':'5', 'forgive':'6', 'ready':'7' };
     const want = dotMap[name];
     root.querySelectorAll('.lore-dot').forEach(d => {
       d.classList.toggle('active', d.dataset.dot === want);
@@ -6818,7 +6816,7 @@ const Lore = (() => {
       void bubble.offsetWidth;
       bubble.classList.add('pop');
     }
-    const advance = () => { clearListeners(); clearTimers(); runScene5(); };
+    const advance = () => { clearListeners(); clearTimers(); finish(); };
     timers.push(setTimeout(() => {
       on(scene, 'click', () => { tap('light'); advance(); });
     }, READY_MIN_MS));
