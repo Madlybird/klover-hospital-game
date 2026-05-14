@@ -2851,15 +2851,28 @@ html, body {
 .lore-tarot-card.flipped { transform: rotateY(180deg); }
 .lore-tarot-card.flipped.lifted { transform: rotateY(180deg) translateY(-28px) scale(1.06); }
 .lore-tarot-card.chosen {
-  z-index: 10;
+  z-index: 20;
   filter:
-    drop-shadow(0 0 24px var(--color-primary, #e8609a))
-    drop-shadow(0 0 60px rgba(232,96,154,0.55));
+    drop-shadow(0 0 26px var(--color-primary, #e8609a))
+    drop-shadow(0 0 70px rgba(232,96,154,0.6));
+  transition: transform 0.7s cubic-bezier(.34,1.4,.4,1), filter 0.4s;
+  width: 200px;
+  height: 320px;
+  margin-left: -100px;
+  margin-bottom: 0;
+  bottom: auto;
+  top: 50%;
+  left: 50%;
+  margin-top: -160px;
 }
 .lore-tarot-card.chosen .front {
   border-color: var(--color-primary, #e8609a);
-  box-shadow: inset 0 0 28px rgba(232,96,154,0.55), 0 0 22px rgba(232,96,154,0.4);
-  text-shadow: 0 0 10px var(--color-primary, #e8609a), 0 0 22px rgba(232,96,154,0.7);
+  border-width: 3px;
+  font-size: 22px;
+  line-height: 1.3;
+  padding: 16px;
+  box-shadow: inset 0 0 36px rgba(232,96,154,0.55), 0 0 30px rgba(232,96,154,0.45);
+  text-shadow: 0 0 10px var(--color-primary, #e8609a), 0 0 24px rgba(232,96,154,0.7);
 }
 .lore-tarot-card.dimmed {
   opacity: 0.3;
@@ -3262,6 +3275,31 @@ html, body {
   letter-spacing: 1.5px;
   text-shadow: 0 2px 4px #000, 0 0 8px rgba(0,0,0,0.8);
   z-index: 3;
+}
+/* In-scene horror glitch — child of scene 5, no body overlay */
+.lore-tap-glitch {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  pointer-events: none;
+  opacity: 0;
+  background: #000;
+  overflow: hidden;
+}
+.lore-tap-glitch.active {
+  animation: lore-tap-glitch-bg 5s linear forwards;
+}
+@keyframes lore-tap-glitch-bg {
+  0%   { opacity: 1; background: rgba(255,255,255,0.95); }
+  5%   { opacity: 1; background: rgba(0,0,0,0.92);       }
+  12%  { opacity: 1; background: rgba(232,96,154,0.55);  }
+  20%  { opacity: 1; background: rgba(0,0,0,0.95);       }
+  28%  { opacity: 1; background: rgba(255,255,255,0.4);  }
+  40%  { opacity: 1; background: rgba(91,157,232,0.5);   }
+  55%  { opacity: 1; background: rgba(0,0,0,0.95);       }
+  70%  { opacity: 1; background: rgba(232,96,154,0.55);  }
+  85%  { opacity: 0.55; background: rgba(0,0,0,0.6);     }
+  100% { opacity: 0;   background: rgba(0,0,0,0);        }
 }
 
 /* Scene 6A / 6B — result */
@@ -3795,6 +3833,7 @@ html, body {
           <div class="lore-tap-bar-label" id="lore-tap-bar-label">0%</div>
         </div>
       </div>
+      <div class="lore-tap-glitch" id="lore-tap-glitch"></div>
     </div>
 
     <div class="lore-scene" data-lore-scene="6a">
@@ -6957,10 +6996,11 @@ const Lore = (() => {
       tap('heavy');
       if (hint) hint.classList.add('hide');
       const cards = fan ? fan.querySelectorAll('.lore-tarot-card') : [];
-      card.style.transform = 'rotate(' + (startAngle + step * i) + 'deg) translateY(-36px) rotateY(180deg) scale(1.08)';
+      // Flies to centre, upright (no fan rotation), enlarged via .chosen CSS
+      card.style.transform = 'rotateY(180deg)';
       card.classList.add('flipped', 'chosen');
       cards.forEach(c => { if (c !== card) c.classList.add('dimmed'); });
-      timers.push(setTimeout(() => { clearListeners(); runReadyScene(); }, 1500));
+      timers.push(setTimeout(() => { clearListeners(); runReadyScene(); }, 2200));
     }
     function onCard(card) {
       if (chosenForgive) return;
@@ -7004,35 +7044,21 @@ const Lore = (() => {
       void bubble.offsetWidth;
       bubble.classList.add('pop');
     }
-    const advance = () => { clearListeners(); clearTimers(); runHorrorGlitch(); };
+    const advance = () => { clearListeners(); clearTimers(); runScene5(); };
     timers.push(setTimeout(() => {
       on(scene, 'click', () => { tap('light'); advance(); });
     }, READY_MIN_MS));
     timers.push(setTimeout(advance, READY_AUTO_MS));
   }
 
-  // ---- 5s bad-trip horror glitch into the tap game ----
-  function runHorrorGlitch() {
-    clearListeners();
-    clearTimers();
-    // Activate scene 5 NOW (underneath the glitch overlay) so that even
-    // if the overlay sticks for any reason, the user always sees the tap
-    // game underneath as soon as the overlay fades to transparent.
-    showScene('5');
-    const sceneEarly = document.querySelector('#screen-lore [data-lore-scene="5"]');
-    if (sceneEarly) {
-      sceneEarly.classList.add('active');
-      sceneEarly.style.display = 'flex';
-      sceneEarly.style.opacity = '1';
-    }
+  // Decorate the inline glitch element with the horror sub-layers. Called
+  // when scene 5 boots, before the tap game becomes interactive.
+  function decorateGlitchEl(glitchEl) {
+    if (!glitchEl) return;
     const esc = (s) => String(s || '').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
     const answers = [chosenEmotion, chosenFear, chosenForgive].filter(Boolean);
     if (!answers.length) answers.push('SIMULATION');
 
-    const overlay = document.createElement('div');
-    overlay.className = 'lore-glitch-overlay long horror';
-
-    // Layer 1: base glitch bars + noise (reusing original look)
     let html = '' +
       '<div class="lore-glitch-bar" style="--y:8%"></div>' +
       '<div class="lore-glitch-bar" style="--y:22%"></div>' +
@@ -7042,7 +7068,6 @@ const Lore = (() => {
       '<div class="lore-glitch-bar" style="--y:87%"></div>' +
       '<div class="lore-glitch-noise"></div>';
 
-    // Layer 2: whispers — answers drift across the screen, fading in/out
     let whispers = '<div class="lore-horror-whispers">';
     for (let i = 0; i < 14; i++) {
       const word = answers[i % answers.length];
@@ -7060,7 +7085,6 @@ const Lore = (() => {
     }
     whispers += '</div>';
 
-    // Layer 3: funnel — words spiral around the center
     let funnel = '<div class="lore-horror-funnel">';
     const FN = 16;
     for (let i = 0; i < FN; i++) {
@@ -7074,19 +7098,14 @@ const Lore = (() => {
     }
     funnel += '</div>';
 
-    // Layer 4: strobe container (filled by JS over time so flashes appear at different moments)
     let strobe = '<div class="lore-horror-strobe" id="lore-horror-strobe"></div>';
+    glitchEl.innerHTML = html + whispers + funnel + strobe;
 
-    overlay.innerHTML = html + whispers + funnel + strobe;
-    document.body.appendChild(overlay);
-    Music.glitch(GLITCH2_MS / 1000);
-
-    // Random strobe word flashes over the 5s window
     const fonts = ['Georgia, serif', "'Courier New', monospace", "'Arial Black', sans-serif", 'Impact, sans-serif'];
     const colors = ['#fff', '#ff3b5c', '#ffe040', '#00e1ff', '#b787d8'];
-    const strobeEl = overlay.querySelector('#lore-horror-strobe');
+    const strobeEl = glitchEl.querySelector('#lore-horror-strobe');
     function flashOne() {
-      if (!overlay.isConnected || !strobeEl) return;
+      if (!glitchEl.isConnected || !strobeEl) return;
       const word = answers[Math.floor(Math.random() * answers.length)];
       const el = document.createElement('div');
       el.className = 'lore-strobe-word';
@@ -7100,33 +7119,16 @@ const Lore = (() => {
       strobeEl.appendChild(el);
       setTimeout(() => { try { el.remove(); } catch {} }, 240);
     }
-    // Pulse flashes throughout the window — denser in the middle of the trip
     [0, 180, 360, 540, 700, 880, 1100, 1320, 1600, 1900, 2200, 2500, 2800, 3100, 3400, 3700, 4100, 4400].forEach(t => {
       timers.push(setTimeout(flashOne, t));
     });
-
-    // Bullet-proof handoff to scene 5: primary timer in `timers` (can be
-    // cancelled), plus an UNTRACKED backup timer that always fires so even
-    // if the main schedule is throttled / cleared we still advance.
-    let handed = false;
-    function handoff() {
-      if (handed) return;
-      handed = true;
-      try {
-        document.querySelectorAll('.lore-glitch-overlay').forEach(o => o.remove());
-      } catch {}
-      runScene5();
-    }
-    timers.push(setTimeout(handoff, GLITCH2_MS));
-    setTimeout(handoff, GLITCH2_MS + 1500);
   }
 
-  // ---- Scene 5 (rewritten tap-fast: 10s, threshold 80%) ----
+  // ---- Scene 5 (tap-fast: 10s, threshold 80%, glitch is internal) ----
   function runScene5() {
     clearListeners();
     clearTimers();
-    // Safety net: a previous overlay may still be sitting on top if its
-    // own removal timer was throttled (mobile background tab, etc.).
+    // Make sure no orphan body-overlays are sitting on top
     document.querySelectorAll('.lore-glitch-overlay').forEach(o => {
       try { o.remove(); } catch {}
     });
@@ -7135,7 +7137,6 @@ const Lore = (() => {
     let remaining = 10;
     const scene = document.querySelector('#screen-lore [data-lore-scene="5"]');
     if (!scene) { runScene6B(); return; }
-    // Force the scene to be visible even if any external state interferes
     scene.classList.add('active');
     scene.style.display = 'flex';
     scene.style.opacity = '1';
@@ -7146,6 +7147,7 @@ const Lore = (() => {
     const count = document.getElementById('lore-tap-count');
     const circle = document.getElementById('lore-tap-circle');
     const ripples = document.getElementById('lore-ripples');
+    const glitchEl = document.getElementById('lore-tap-glitch');
 
     if (fill)  fill.style.width = '0%';
     if (label) label.textContent = '0%';
@@ -7183,6 +7185,7 @@ const Lore = (() => {
     }
 
     const onTap = (e) => {
+      if (!gameStarted) return; // ignore taps during the glitch intro
       e.preventDefault();
       let x, y;
       const touch = (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0]);
@@ -7195,27 +7198,46 @@ const Lore = (() => {
       bumpCircle();
       tap('light');
     };
-    // Whole-screen tap target
     on(scene, 'click', onTap);
     on(scene, 'touchstart', onTap, { passive: false });
 
-    const drain = setInterval(() => {
-      gaugeVal = Math.max(0, gaugeVal - 1.7);
-      paint();
-    }, 100);
-    timers.push(drain);
+    let gameStarted = false;
+    // Internal horror glitch first — does NOT block scene 5 visibility
+    if (glitchEl) {
+      glitchEl.classList.remove('active');
+      // ensure decoration is fresh for this run
+      glitchEl.innerHTML = '';
+      decorateGlitchEl(glitchEl);
+      void glitchEl.offsetWidth;
+      glitchEl.classList.add('active');
+      Music.glitch(GLITCH2_MS / 1000);
+    }
 
-    const tick = setInterval(() => {
-      remaining -= 1;
-      if (count) count.textContent = String(Math.max(0, remaining));
-      if (remaining <= 0) {
-        clearInterval(tick);
-        clearInterval(drain);
-        if (gaugeVal >= 80) runScene6A();
-        else runScene6B();
-      }
-    }, 1000);
-    timers.push(tick);
+    function startGame() {
+      if (gameStarted) return;
+      gameStarted = true;
+      if (glitchEl) glitchEl.classList.remove('active');
+      const drain = setInterval(() => {
+        gaugeVal = Math.max(0, gaugeVal - 1.7);
+        paint();
+      }, 100);
+      timers.push(drain);
+      const tick = setInterval(() => {
+        remaining -= 1;
+        if (count) count.textContent = String(Math.max(0, remaining));
+        if (remaining <= 0) {
+          clearInterval(tick);
+          clearInterval(drain);
+          if (gaugeVal >= 80) runScene6A();
+          else runScene6B();
+        }
+      }, 1000);
+      timers.push(tick);
+    }
+
+    // Start game after glitch — primary tracked timer + untracked backup
+    timers.push(setTimeout(startGame, GLITCH2_MS));
+    setTimeout(startGame, GLITCH2_MS + 1200);
   }
 
   // ---- Scene 6A ----
