@@ -2198,6 +2198,39 @@ html, body {
 @keyframes gate-spin {
   to { transform: rotate(360deg); }
 }
+.gate-diag-toggle {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 4px 10px;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: transparent;
+  color: rgba(255,255,255,0.5);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+}
+.gate-diag {
+  display: none;
+  max-height: 220px;
+  margin: 10px 0 0;
+  padding: 8px 10px;
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  line-height: 1.35;
+  color: #6dff9b;
+  background: rgba(0,0,0,0.7);
+  border: 1px solid rgba(109,255,155,0.3);
+  border-radius: 6px;
+  text-align: left;
+  white-space: pre-wrap;
+  word-break: break-all;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.gate-diag.show { display: block; }
 
 /* Falling pills emitted on main-character tap */
 .falling-pill {
@@ -3672,6 +3705,8 @@ html, body {
           <p data-i18n="gate_denied_title">No MAI / VI NFT found</p>
           <p class="gate-strong" data-i18n="gate_denied_sub">in this wallet</p>
           <p class="small-text" data-i18n="gate_denied_note">Try another wallet or get a sticker first</p>
+          <button type="button" class="gate-diag-toggle" onclick="Game.toggleGateDiag()">show details</button>
+          <pre class="gate-diag" id="gate-diag"></pre>
         </div>
       </div>
       <div class="gate-buttons">
@@ -5707,20 +5742,39 @@ const Game = (() => {
       const r = await fetch('/api/verify-access', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ wallet: walletAddress, debug: isAdminBypass() }),
+        // Always request debug data so we can show it on the denied state.
+        body: JSON.stringify({ wallet: walletAddress, debug: true }),
       });
       data = await r.json().catch(() => ({}));
       walletAccess = !!data.hasAccess;
       console.log('[verify-access] result', data);
       window.__lastAccessCheck = data;
+      writeGateDiag(data);
     } catch (e) {
       console.warn('[verify-access] request failed:', e);
       walletAccess = false;
+      writeGateDiag({ error: e.message || 'fetch failed' });
     }
     walletVerifying = false;
     renderWalletGateState();
     updateMenuUI();
     return walletAccess === true;
+  }
+
+  function writeGateDiag(obj) {
+    const pre = document.getElementById('gate-diag');
+    if (!pre) return;
+    try {
+      pre.textContent = JSON.stringify(obj, null, 2);
+    } catch {
+      pre.textContent = String(obj);
+    }
+  }
+
+  function toggleGateDiag() {
+    const pre = document.getElementById('gate-diag');
+    if (!pre) return;
+    pre.classList.toggle('show');
   }
 
   // Admin helper — open the diagnostic URL in console:
@@ -6032,6 +6086,7 @@ const Game = (() => {
     closeWalletGate,
     connectWalletGate,
     debugAccess,
+    toggleGateDiag,
   };
 })();
 
