@@ -3096,6 +3096,62 @@ html, body {
   font-size: 16px;
   text-shadow: 0 0 8px rgba(255,255,255,0.7);
 }
+/* Intro overlay shown for 3s before tap phase begins */
+.tg-intro {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at center, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.95) 100%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.tg-intro.show {
+  animation: tg-intro-anim 3s ease-out forwards;
+}
+@keyframes tg-intro-anim {
+  0%   { opacity: 0; }
+  8%   { opacity: 1; }
+  85%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+.tg-intro-word {
+  color: #fff;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 44px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 0 20px;
+  text-shadow:
+    0 0 12px rgba(255,255,255,0.8),
+    0 0 26px rgba(232,96,154,0.85),
+    3px 0 0 #00e1ff,
+    -3px 0 0 #ff003c;
+  animation: tg-intro-shake 0.12s steps(2) infinite, tg-intro-pulse 1.2s ease-in-out infinite;
+}
+@keyframes tg-intro-shake {
+  0%   { transform: translateX(0)   skewX(0deg); }
+  50%  { transform: translateX(-4px) skewX(-3deg); }
+  100% { transform: translateX(4px)  skewX(3deg); }
+}
+@keyframes tg-intro-pulse {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(232,96,154,0.5)); }
+  50%      { filter: drop-shadow(0 0 18px rgba(232,96,154,0.95)); }
+}
+.tg-intro-divider {
+  width: 64px;
+  height: 2px;
+  background: #ff4fb0;
+  box-shadow: 0 0 12px #ff4fb0, 0 0 24px rgba(255,79,176,0.7);
+}
 
 /* Scene 6A / 6B — result */
 #screen-lore [data-lore-scene="6a"],
@@ -3637,6 +3693,11 @@ html, body {
           <span class="tg-bar-target-num">80%</span>
         </div>
       </div>
+      <div class="tg-intro" id="tg-intro">
+        <div class="tg-intro-word" id="tg-intro-fear"></div>
+        <div class="tg-intro-divider"></div>
+        <div class="tg-intro-word" id="tg-intro-forgive"></div>
+      </div>
     </div>
 
     <div class="lore-scene" data-lore-scene="6a">
@@ -3661,6 +3722,7 @@ html, body {
       <span class="lore-dot" data-dot="5"></span>
       <span class="lore-dot" data-dot="6"></span>
       <span class="lore-dot" data-dot="7"></span>
+      <span class="lore-dot" data-dot="8"></span>
     </div>
   </div>
 
@@ -6012,8 +6074,8 @@ const Lore = (() => {
       success_text: 'Outstanding work! Simulation ready.',
       success_bubble: '"I knew you could do it!"',
       play_btn: 'Play',
-      fail_text: 'Hey... can you hear me?',
-      fail_bubble: '"We need to try again. Focus!"',
+      fail_text: 'Please try again.',
+      fail_bubble: '"Hey... stay with me. One more try."',
       emotions: [
         'Happy','Sad','Angry','Anxious','Calm','Numb','Tired','Hopeful','Lost','Empty',
         'Furious','Ashamed','Guilty','Lonely','Loved','Curious','Confused','Frustrated','Embarrassed','Excited',
@@ -6074,8 +6136,8 @@ const Lore = (() => {
       success_text: 'Отличная работа! Симуляция готова.',
       success_bubble: '«Я знала, что ты справишься!»',
       play_btn: 'Играть',
-      fail_text: 'Эй... ты меня слышишь?',
-      fail_bubble: '«Нам нужно попробовать снова. Сосредоточься!»',
+      fail_text: 'Пожалуйста, попробуй ещё раз.',
+      fail_bubble: '«Эй... останься со мной. Ещё одна попытка.»',
       emotions: [
         'Счастливый','Грустный','Злой','Тревожный','Спокойный','Онемевший','Уставший','Надеющийся','Потерянный','Пустой',
         'Бешеный','Пристыжённый','Виноватый','Одинокий','Любимый','Любопытный','Запутанный','Раздражённый','Смущённый','Возбуждённый',
@@ -6383,7 +6445,7 @@ const Lore = (() => {
     root.querySelectorAll('.lore-scene').forEach(s => s.classList.remove('active'));
     const el = root.querySelector('[data-lore-scene="' + name + '"]');
     if (el) el.classList.add('active');
-    const dotMap = { '1':'1', '2':'2', '4':'3', 'emotion':'4', 'fears':'5', 'forgive':'6', 'ready':'7' };
+    const dotMap = { '1':'1', '2':'2', '4':'3', 'emotion':'4', 'fears':'5', 'forgive':'6', 'ready':'7', '5':'8', '6a':'8', '6b':'8' };
     const want = dotMap[name];
     root.querySelectorAll('.lore-dot').forEach(d => {
       d.classList.toggle('active', d.dataset.dot === want);
@@ -6816,79 +6878,97 @@ const Lore = (() => {
       void bubble.offsetWidth;
       bubble.classList.add('pop');
     }
-    const advance = () => { clearListeners(); clearTimers(); finish(); };
+    const advance = () => { clearListeners(); clearTimers(); runScene5(); };
     timers.push(setTimeout(() => {
       on(scene, 'click', () => { tap('light'); advance(); });
     }, READY_MIN_MS));
     timers.push(setTimeout(advance, READY_AUTO_MS));
   }
 
-  // ---- Scene 8 (tap game) — fresh tg-* namespace, no overlays ----
-  function runScene5() {
+  // ---- Scene 8 (tap game): 3s intro then 10s tap, 80% threshold ----
+  function runScene5(opts) {
+    opts = opts || {};
+    const skipIntro = !!opts.skipIntro;
     clearListeners();
     clearTimers();
-    // Purge any orphan overlays before showing scene
-    document.querySelectorAll('.lore-glitch-overlay').forEach(o => {
-      try { o.remove(); } catch {}
-    });
     showScene('5');
-    gaugeVal = 0;
-    let remaining = 10;
+
     const scene = document.querySelector('#screen-lore [data-lore-scene="5"]');
     if (!scene) { runScene6B(); return; }
     scene.classList.add('active');
     scene.style.display = 'flex';
     scene.style.opacity = '1';
 
+    const intro = document.getElementById('tg-intro');
+    const fearWord = document.getElementById('tg-intro-fear');
+    const forgiveWord = document.getElementById('tg-intro-forgive');
     const fill   = document.getElementById('tg-bar-fill');
     const pct    = document.getElementById('tg-pct');
     const count  = document.getElementById('tg-count');
     const button = document.getElementById('tg-button');
 
-    if (fill)   fill.style.width = '0%';
-    if (pct)    pct.textContent = '0%';
-    if (count)  count.textContent = String(remaining);
+    gaugeVal = 0;
+    let remaining = 10;
+    if (fill)  fill.style.width = '0%';
+    if (pct)   pct.textContent = '0%';
+    if (count) count.textContent = String(remaining);
 
     function paint() {
       if (fill) fill.style.width = gaugeVal + '%';
       if (pct)  pct.textContent = Math.round(gaugeVal) + '%';
     }
-    paint();
-
     function bumpButton() {
       if (!button) return;
       button.classList.remove('bump');
       void button.offsetWidth;
       button.classList.add('bump');
     }
+    paint();
 
-    const onTap = (e) => {
-      e.preventDefault();
-      gaugeVal = Math.min(100, gaugeVal + 9);
-      paint();
-      bumpButton();
-      tap('light');
-    };
-    on(scene, 'click', onTap);
-    on(scene, 'touchstart', onTap, { passive: false });
+    function startTap() {
+      if (intro) intro.classList.remove('show');
+      const onTap = (e) => {
+        e.preventDefault();
+        gaugeVal = Math.min(100, gaugeVal + 9);
+        paint();
+        bumpButton();
+        tap('light');
+      };
+      on(scene, 'click', onTap);
+      on(scene, 'touchstart', onTap, { passive: false });
 
-    const drain = setInterval(() => {
-      gaugeVal = Math.max(0, gaugeVal - 1.0);
-      paint();
-    }, 100);
-    timers.push(drain);
+      const drain = setInterval(() => {
+        gaugeVal = Math.max(0, gaugeVal - 1.3);
+        paint();
+      }, 100);
+      timers.push(drain);
 
-    const tick = setInterval(() => {
-      remaining -= 1;
-      if (count) count.textContent = String(Math.max(0, remaining));
-      if (remaining <= 0) {
-        clearInterval(tick);
-        clearInterval(drain);
-        if (gaugeVal >= 80) runScene6A();
-        else runScene6B();
+      const tick = setInterval(() => {
+        remaining -= 1;
+        if (count) count.textContent = String(Math.max(0, remaining));
+        if (remaining <= 0) {
+          clearInterval(tick);
+          clearInterval(drain);
+          if (gaugeVal >= 80) runScene6A();
+          else runScene6B();
+        }
+      }, 1000);
+      timers.push(tick);
+    }
+
+    if (skipIntro) {
+      if (intro) intro.classList.remove('show');
+      startTap();
+    } else {
+      if (fearWord)    fearWord.textContent    = (chosenFear    || '').toString().toUpperCase();
+      if (forgiveWord) forgiveWord.textContent = (chosenForgive || '').toString().toUpperCase();
+      if (intro) {
+        intro.classList.remove('show');
+        void intro.offsetWidth;
+        intro.classList.add('show');
       }
-    }, 1000);
-    timers.push(tick);
+      timers.push(setTimeout(startTap, 3000));
+    }
   }
 
   // ---- Scene 6A ----
@@ -6925,7 +7005,7 @@ const Lore = (() => {
     showScene('6b');
     tap('medium');
     Music.chord([294, 349, 415], 1.4);
-    timers.push(setTimeout(runScene5, 2000));
+    timers.push(setTimeout(() => runScene5({ skipIntro: true }), 2000));
   }
 
   function isAdmin() {
