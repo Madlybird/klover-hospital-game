@@ -5732,8 +5732,10 @@ const Game = (() => {
   }
 
   // Server-verified holder check via /api/verify-access.
-  // The server reads the validated Telegram user ID from initData and
-  // calls Goodies' partner API. No wallet required.
+  // The server runs TWO paths in parallel:
+  //  - Goodies API by Telegram user ID (validated from initData header)
+  //  - On-chain TonAPI check by wallet address (if wallet is connected)
+  // Either path granting ownership unlocks access.
   async function verifyWalletAccess() {
     walletVerifying = true;
     renderWalletGateState();
@@ -5746,7 +5748,7 @@ const Game = (() => {
           'Content-Type': 'application/json',
           'Telegram-Init-Data': initData,
         },
-        body: JSON.stringify({ debug: true }),
+        body: JSON.stringify({ debug: true, wallet: walletAddress || null }),
       });
       data = await r.json().catch(() => ({}));
       walletAccess = !!data.hasAccess;
@@ -5859,7 +5861,14 @@ const Game = (() => {
       runGateAction(action);
       return;
     }
-    // Re-verify by Telegram user ID. No wallet flow required.
+    // Goodies (telegram-id) ran on gate open and either failed or said
+    // no. If no wallet connected, the on-chain TonAPI path hasn't been
+    // tried yet — open the TonConnect modal so it can run.
+    if (!walletAddress && tonUI) {
+      try { await tonUI.openModal(); } catch (e) { console.warn(e); }
+      return; // onStatusChange will re-verify with the wallet
+    }
+    // Otherwise just retry verification (covers transient errors).
     await verifyWalletAccess();
     if (walletAccess === true && pendingGateAction) {
       const action = pendingGateAction;

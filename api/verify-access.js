@@ -1,25 +1,33 @@
-// Verify whether the current Telegram user owns a pack from our drop
-// (or a unwrapped pack from MAI Nurse / VI Rx collections) via the
-// Goodies partner API.
+// Verify access by checking ownership of MAI Nurse / VI Rx NFTs.
 //
-// Goodies works by Telegram user ID, not by TON wallet — so we
-// authenticate the caller from the Telegram WebApp initData header,
-// then ask Goodies. Wallet connect is irrelevant to access checks.
+// Two parallel paths — either one granting access:
+//   1) Goodies partner API by Telegram user ID
+//      (POST /partner/verify-ownership + /partner/holders).
+//      Only sees UNWRAPPED packs.
+//   2) Direct on-chain check via TonAPI by wallet address.
+//      Canonical: catches wrapped/unwrapped, off-Goodies transfers,
+//      secondary-market purchases, etc.
 //
-// All Goodies credentials and the bot token live ONLY in Vercel env
-// vars; nothing reaches the browser bundle.
+// Goodies credentials and the Telegram bot token live ONLY in Vercel
+// env vars. They never reach the browser bundle.
 
 import crypto from 'node:crypto';
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const GOODIES_USERNAME = process.env.GOODIES_USERNAME;
 const GOODIES_PASSWORD = process.env.GOODIES_PASSWORD;
+const TONAPI_KEY = process.env.TONAPI_KEY || ''; // optional, raises rate limit
 
 const GOODIES_BASE = 'https://api-goodies.cleeviox.com/partner';
 const DROP_ID = '9ee95390-b12a-428a-8ca8-8855059315f5';
 const COLLECTIONS = {
   mai: '5b909f0d-4f30-49bf-ad3a-da131a85fa56',
   vi:  '9c26b8ac-8fd4-4d49-91d7-f9bdcd0e6ec4',
+};
+// TON on-chain collection addresses
+const COLLECTIONS_TON = {
+  mai: 'EQDrSCwNHXWa4v1qaHiKNqRDmUvhqMSw9_NVufKF_ZGRZFvi',
+  vi:  'EQC7KgKo86srEf1XZC1lh_phHeXUlhUClBHJIIlJ3ShW6pY2',
 };
 
 function hmacCheck(initData, botToken) {
@@ -43,61 +51,6 @@ function hmacCheck(initData, botToken) {
   catch { return { ok: false, reason: 'bad_user_json' }; }
 }
 
-function authHeader() {
-  return 'Basic ' + Buffer.from(`${GOODIES_USERNAME}:${GOODIES_PASSWORD}`).toString('base64');
-}
-
-async function verifyDropOwnership(telegramUserId, attempts) {
-  try {
-    const r = await fetch(`${GOODIES_BASE}/verify-ownership`, {
-      method: 'POST',
-      headers: {
-        'Authorization': authHeader(),
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      body: JSON.stringify({ dropId: DROP_ID, telegramUserId: String(telegramUserId) }),
-    });
-    const txt = await r.text();
-    let data = null;
-    try { data = JSON.parse(txt); } catch {}
-    attempts.push({ endpoint: 'POST /partner/verify-ownership', dropId: DROP_ID, status: r.status, response: data || txt.slice(0, 300) });
-    if (r.ok && data && data.isOwner === true) {
-      return { owner: true, packAmount: data.packAmount, source: 'drop' };
-    }
-  } catch (e) {
-    attempts.push({ endpoint: 'POST /partner/verify-ownership', error: e.message });
-  }
-  return { owner: false };
-}
-
-async function holdersIncludes(collectionId, telegramUserId, label, attempts) {
-  try {
-    const url = `${GOODIES_BASE}/holders?collectionId=${encodeURIComponent(collectionId)}`;
-    const r = await fetch(url, {
-      method: 'GET',
-      headers: { 'Authorization': authHeader(), 'Accept': 'application/json' },
-    });
-    const txt = await r.text();
-    let data = null;
-    try { data = JSON.parse(txt); } catch {}
-    const ids = (data && Array.isArray(data.telegramUserIds)) ? data.telegramUserIds : [];
-    const hit = ids.some((x) => String(x) === String(telegramUserId));
-    attempts.push({
-      endpoint: 'GET /partner/holders',
-      collection: label,
-      collectionId,
-      status: r.status,
-      holderCount: data && typeof data.count === 'number' ? data.count : ids.length,
-      matched: hit,
-    });
-    return hit;
-  } catch (e) {
-    attempts.push({ endpoint: 'GET /partner/holders', collection: label, error: e.message });
-    return false;
-  }
-}
-
 function readBody(req) {
   if (req.body && typeof req.body === 'object') return req.body;
   if (typeof req.body === 'string') {
@@ -106,8 +59,80 @@ function readBody(req) {
   return {};
 }
 
+// ---------- Path 1: Goodies (telegram user id) ----------
+function goodiesAuth() {
+  return 'Basic ' + Buffer.from(`${GOODIES_USERNAME}:${GOODIES_PASSWORD}`).toString('base64');
+}
+
+async function goodiesVerifyDrop(telegramUserId, attempts) {
+  try {
+    const r = await fetch(`${GOODIES_BASE}/verify-ownership`, {
+      method: 'POST',
+      headers: {
+        'Authorization': goodiesAuth(),
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({ dropId: DROP_ID, telegramUserId: String(telegramUserId) }),
+    });
+    const txt = await r.text();
+    let data = null; try { data = JSON.parse(txt); } catch {}
+    attempts.push({ path: 'goodies/verify-ownership', status: r.status, response: data || txt.slice(0, 300) });
+    if (r.ok && data && data.isOwner === true) {
+      return { owner: true, packAmount: data.packAmount };
+    }
+  } catch (e) {
+    attempts.push({ path: 'goodies/verify-ownership', error: e.message });
+  }
+  return { owner: false };
+}
+
+async function goodiesHoldersIncludes(collectionId, telegramUserId, label, attempts) {
+  try {
+    const r = await fetch(`${GOODIES_BASE}/holders?collectionId=${encodeURIComponent(collectionId)}`, {
+      method: 'GET',
+      headers: { 'Authorization': goodiesAuth(), 'Accept': 'application/json' },
+    });
+    const txt = await r.text();
+    let data = null; try { data = JSON.parse(txt); } catch {}
+    const ids = (data && Array.isArray(data.telegramUserIds)) ? data.telegramUserIds : [];
+    const hit = ids.some(x => String(x) === String(telegramUserId));
+    attempts.push({
+      path: 'goodies/holders', collection: label,
+      status: r.status, holderCount: data?.count ?? ids.length, matched: hit,
+    });
+    return hit;
+  } catch (e) {
+    attempts.push({ path: 'goodies/holders', collection: label, error: e.message });
+    return false;
+  }
+}
+
+// ---------- Path 2: On-chain via TonAPI (wallet address) ----------
+async function tonapiOwnsCollection(walletAddress, collectionAddress, label, attempts) {
+  try {
+    const url = `https://tonapi.io/v2/accounts/${encodeURIComponent(walletAddress)}/nfts`
+              + `?collection=${encodeURIComponent(collectionAddress)}&limit=1`;
+    const headers = { 'Accept': 'application/json' };
+    if (TONAPI_KEY) headers['Authorization'] = 'Bearer ' + TONAPI_KEY;
+    const r = await fetch(url, { headers });
+    const txt = await r.text();
+    let data = null; try { data = JSON.parse(txt); } catch {}
+    const items = (data && Array.isArray(data.nft_items)) ? data.nft_items : [];
+    const owns = items.length > 0;
+    attempts.push({
+      path: 'tonapi/nfts', collection: label,
+      status: r.status, owns, nftAddress: owns ? items[0].address : null,
+    });
+    return owns;
+  } catch (e) {
+    attempts.push({ path: 'tonapi/nfts', collection: label, error: e.message });
+    return false;
+  }
+}
+
 export default async function handler(req, res) {
-  // GET diagnostic — no secrets, no Goodies traffic
+  // GET diagnostic — no Goodies traffic, no secrets
   if (req.method === 'GET') {
     return res.status(200).json({
       ok: true,
@@ -115,10 +140,12 @@ export default async function handler(req, res) {
         TELEGRAM_BOT_TOKEN: !!BOT_TOKEN,
         GOODIES_USERNAME:   !!GOODIES_USERNAME,
         GOODIES_PASSWORD:   !!GOODIES_PASSWORD,
+        TONAPI_KEY:         !!TONAPI_KEY, // optional
       },
       dropId: DROP_ID,
       collections: COLLECTIONS,
-      build: 'verify-access v3 (telegram-id based)',
+      collectionsTon: COLLECTIONS_TON,
+      build: 'verify-access v4 (goodies + tonapi onchain)',
     });
   }
   if (req.method !== 'POST') {
@@ -126,52 +153,73 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'method_not_allowed' });
   }
 
-  if (!BOT_TOKEN || !GOODIES_USERNAME || !GOODIES_PASSWORD) {
-    return res.status(500).json({
-      error: 'server_not_configured',
-      env: {
-        TELEGRAM_BOT_TOKEN: !!BOT_TOKEN,
-        GOODIES_USERNAME:   !!GOODIES_USERNAME,
-        GOODIES_PASSWORD:   !!GOODIES_PASSWORD,
-      },
-    });
-  }
-
-  const initData = req.headers['telegram-init-data'] || req.headers['x-telegram-init-data'];
-  if (!initData) return res.status(401).json({ error: 'no_init_data' });
-  const v = hmacCheck(initData, BOT_TOKEN);
-  if (!v.ok) return res.status(401).json({ error: 'verify_failed', reason: v.reason });
-
-  const telegramUserId = v.user?.id;
-  if (!telegramUserId) return res.status(401).json({ error: 'no_user_id' });
-
   const body = readBody(req);
   const debug = !!body.debug;
+  const wallet = typeof body.wallet === 'string' ? body.wallet.trim() : '';
+
   const attempts = [];
+  let goodiesAvailable = false;
+  let telegramUserId = null;
 
-  // Primary: drop ownership
-  const drop = await verifyDropOwnership(telegramUserId, attempts);
-
-  // Belt-and-suspenders: also check both collection holder lists,
-  // so users who hold MAI/VI from outside the drop still pass.
-  let mai = false;
-  let vi  = false;
-  if (!drop.owner) {
-    [mai, vi] = await Promise.all([
-      holdersIncludes(COLLECTIONS.mai, telegramUserId, 'mai', attempts),
-      holdersIncludes(COLLECTIONS.vi,  telegramUserId, 'vi',  attempts),
-    ]);
+  // Validate Telegram initData if Goodies creds present
+  const initData = req.headers['telegram-init-data'] || req.headers['x-telegram-init-data'];
+  if (BOT_TOKEN && GOODIES_USERNAME && GOODIES_PASSWORD && initData) {
+    const v = hmacCheck(initData, BOT_TOKEN);
+    if (v.ok && v.user?.id) {
+      telegramUserId = v.user.id;
+      goodiesAvailable = true;
+    } else {
+      attempts.push({ path: 'initData', error: v.reason || 'invalid' });
+    }
+  } else if (initData) {
+    attempts.push({ path: 'initData', skipped: 'goodies_creds_missing' });
   }
 
-  const hasAccess = drop.owner || mai || vi;
+  // Run both paths in parallel
+  const tasks = [];
+
+  // Goodies (telegram user id)
+  let goodiesDrop = { owner: false };
+  let goodiesMai = false, goodiesVi = false;
+  if (goodiesAvailable) {
+    tasks.push((async () => {
+      goodiesDrop = await goodiesVerifyDrop(telegramUserId, attempts);
+      if (!goodiesDrop.owner) {
+        [goodiesMai, goodiesVi] = await Promise.all([
+          goodiesHoldersIncludes(COLLECTIONS.mai, telegramUserId, 'mai', attempts),
+          goodiesHoldersIncludes(COLLECTIONS.vi,  telegramUserId, 'vi',  attempts),
+        ]);
+      }
+    })());
+  }
+
+  // TonAPI (wallet)
+  let chainMai = false, chainVi = false;
+  if (wallet) {
+    tasks.push((async () => {
+      [chainMai, chainVi] = await Promise.all([
+        tonapiOwnsCollection(wallet, COLLECTIONS_TON.mai, 'mai', attempts),
+        tonapiOwnsCollection(wallet, COLLECTIONS_TON.vi,  'vi',  attempts),
+      ]);
+    })());
+  }
+
+  await Promise.all(tasks);
+
+  const goodies = goodiesDrop.owner || goodiesMai || goodiesVi;
+  const chain   = chainMai || chainVi;
+  const hasAccess = goodies || chain;
+
   const payload = {
     ok: true,
     hasAccess,
-    telegramUserId: String(telegramUserId),
-    drop: drop.owner,
-    mai,
-    vi,
-    packAmount: drop.packAmount || 0,
+    telegramUserId: telegramUserId ? String(telegramUserId) : null,
+    wallet: wallet || null,
+    via: {
+      goodies: { drop: goodiesDrop.owner, mai: goodiesMai, vi: goodiesVi, available: goodiesAvailable },
+      chain:   { mai: chainMai, vi: chainVi, available: !!wallet },
+    },
+    packAmount: goodiesDrop.packAmount || 0,
   };
   if (debug) payload.attempts = attempts;
   return res.status(200).json(payload);
