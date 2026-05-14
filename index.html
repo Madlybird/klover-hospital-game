@@ -2368,30 +2368,47 @@ html, body {
   max-width: 620px;
   color: #fff;
   font-family: Georgia, serif;
-  font-size: 30px;
-  font-weight: bold;
-  line-height: 1.45;
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0.3px;
   text-align: center;
   text-shadow:
-    0 0 8px rgba(255,255,255,0.85),
-    0 0 22px rgba(237,0,140,0.6),
-    0 0 44px rgba(237,0,140,0.35);
+    0 0 6px rgba(255,255,255,0.6),
+    0 0 16px rgba(237,0,140,0.45),
+    0 0 32px rgba(237,0,140,0.25);
   opacity: 0;
-  transform: translateZ(-400px) scale(0.4);
-  transition: opacity 0.6s ease, transform 1.1s cubic-bezier(.2,.7,.2,1);
-  will-change: transform, opacity;
+  transform: translateZ(-500px) scale(0.3);
+  filter: blur(8px);
+  transition: opacity 0.55s ease, transform 0.9s cubic-bezier(.2,.7,.2,1), filter 0.4s ease;
+  will-change: transform, opacity, filter;
 }
 .lore-wormhole-text p.show {
   opacity: 1;
   transform: translateZ(0) scale(1);
+  filter: blur(0);
 }
 .lore-wormhole-text p.gone {
   opacity: 0;
-  transform: translateZ(600px) scale(3.2);
-  transition: opacity 0.55s ease, transform 0.85s cubic-bezier(.7,0,.85,.2);
+  transform: translateZ(900px) scale(5);
+  filter: blur(22px);
+  transition: opacity 0.55s ease-out 0.05s, transform 0.7s cubic-bezier(.85,0,.92,.25), filter 0.45s ease-in;
+}
+/* Per-tap suction: pulse the core, briefly accelerate the spin */
+.lore-wormhole-wrap.suck .lore-wormhole-core {
+  animation: lore-wh-suck 0.65s cubic-bezier(.35,0,.65,1);
+}
+.lore-wormhole-wrap.suck .lore-wormhole-stage {
+  animation-duration: 6s;
+}
+@keyframes lore-wh-suck {
+  0%   { transform: scale(1);    filter: brightness(1) hue-rotate(0deg); }
+  35%  { transform: scale(1.45); filter: brightness(1.5) hue-rotate(40deg); }
+  70%  { transform: scale(0.85); filter: brightness(0.85) hue-rotate(-15deg); }
+  100% { transform: scale(1);    filter: brightness(1) hue-rotate(0deg); }
 }
 .lore-wormhole-wrap.diving .lore-wormhole-stage {
-  animation-duration: 4s;
+  animation-duration: 3s;
 }
 .lore-wormhole-wrap.diving .lore-wormhole-core {
   animation: lore-wh-collapse 1.4s ease-in forwards;
@@ -2439,63 +2456,7 @@ html, body {
   box-shadow: 0 0 6px #fff;
 }
 
-/* Scene 3 — pill swipe */
-.lore-pink-bg {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at center, #1a0010 0%, #000 70%);
-}
-.lore-ekg {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 92%;
-  max-width: 520px;
-  height: 28%;
-  transform: translate(-50%, -50%);
-  transform-origin: center;
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0.95;
-  transition: transform 0.16s ease-out;
-}
-.lore-ekg.beat {
-  animation: lore-ekg-beat 0.32s ease-out;
-}
-@keyframes lore-ekg-beat {
-  0%   { transform: translate(-50%, -50%) scale(1); }
-  30%  { transform: translate(-50%, -50%) scale(1.06); }
-  60%  { transform: translate(-50%, -50%) scale(0.98); }
-  100% { transform: translate(-50%, -50%) scale(1); }
-}
-.lore-ekg-path {
-  fill: none;
-  stroke: #ED008C;
-  stroke-width: 3;
-  stroke-linecap: round;
-  filter: drop-shadow(0 0 8px #ED008C) drop-shadow(0 0 18px rgba(237,0,140,0.75));
-  stroke-dasharray: 1200;
-  stroke-dashoffset: 0;
-  animation: lore-ekg-sweep 4s linear infinite;
-}
-@keyframes lore-ekg-sweep {
-  from { stroke-dashoffset: 1200; }
-  to   { stroke-dashoffset: 0; }
-}
-.lore-swipe-instruction {
-  position: absolute;
-  top: 64px; left: 0; right: 0;
-  color: #fff;
-  font-size: 20px;
-  font-weight: bold;
-  text-align: center;
-  z-index: 6;
-  text-shadow: 0 2px 8px rgba(24,95,165,0.55);
-  transition: opacity 0.7s;
-  pointer-events: none;
-}
-.lore-swipe-instruction > div + div { font-size: 16px; margin-top: 4px; opacity: 0.95; }
-.lore-swipe-instruction.fade { opacity: 0; }
+/* Shared — round bottom-right timer pill (used by scene 5 gauge) */
 .lore-timer {
   position: absolute;
   top: 14px;
@@ -2509,67 +2470,6 @@ html, body {
   padding: 2px 12px;
   z-index: 90;
   font-family: Georgia, serif;
-  min-width: 44px;
-  text-align: center;
-}
-.lore-pill-zone {
-  position: absolute;
-  inset: 0;
-  z-index: 4;
-  overflow: hidden;
-}
-.lore-pill {
-  position: absolute;
-  width: 72px;
-  height: 72px;
-  touch-action: manipulation;
-  cursor: pointer;
-  user-select: none;
-  transform-origin: center;
-  animation: lore-pill-pop 0.32s cubic-bezier(.34,1.56,.64,1) forwards;
-  filter: drop-shadow(0 4px 14px rgba(237,0,140,0.6)) drop-shadow(0 0 22px rgba(237,0,140,0.35));
-  -webkit-user-drag: none;
-  object-fit: contain;
-  pointer-events: auto;
-}
-.lore-pill.hit {
-  animation: lore-pill-hit 0.30s ease-out forwards !important;
-  pointer-events: none;
-}
-.lore-pill.miss {
-  animation: lore-pill-miss 0.35s ease-in forwards !important;
-  pointer-events: none;
-}
-@keyframes lore-pill-pop {
-  0%   { transform: scale(0.25); opacity: 0; }
-  60%  { transform: scale(1.18); opacity: 1; }
-  100% { transform: scale(1);    opacity: 1; }
-}
-@keyframes lore-pill-hit {
-  0%   { transform: scale(1);   opacity: 1; }
-  100% { transform: scale(1.7); opacity: 0; }
-}
-@keyframes lore-pill-miss {
-  0%   { transform: scale(1);   opacity: 1; }
-  100% { transform: scale(0.4); opacity: 0; }
-}
-@keyframes lore-pill-ring {
-  0%, 100% { box-shadow: 0 0 0 2px rgba(255,255,255,0.0); }
-  50%      { box-shadow: 0 0 0 4px rgba(255,255,255,0.45); }
-}
-.lore-score {
-  position: absolute;
-  top: 14px;
-  left: 16px;
-  z-index: 90;
-  background: rgba(24,95,165,0.75);
-  border: 2px solid #185FA5;
-  border-radius: 14px;
-  padding: 2px 12px;
-  color: #fff;
-  font-family: Georgia, serif;
-  font-size: 18px;
-  font-weight: bold;
   min-width: 44px;
   text-align: center;
 }
@@ -2591,34 +2491,253 @@ html, body {
   background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(10,26,58,0.85) 100%);
   pointer-events: none;
 }
-.lore-fullscreen-text {
+/* Manga-style speech bubble (used on scene 4 / ready scene) */
+.lore-manga-bubble {
   position: absolute;
-  bottom: 60px;
+  bottom: 80px;
   left: 50%;
-  transform: translateX(-50%);
-  width: 90%;
-  max-width: 420px;
-  z-index: 5;
-  color: #fff;
-  font-size: 18px;
-  font-weight: bold;
-  text-align: center;
-  text-shadow: 0 2px 10px rgba(0,0,0,0.95);
-  background: rgba(24,95,165,0.55);
-  border: 1px solid rgba(255,255,255,0.25);
-  border-radius: 14px;
-  padding: 14px 18px;
-  font-family: Georgia, serif;
-  line-height: 1.45;
+  transform: translateX(-50%) scale(0.4);
   opacity: 0;
-  animation: lore-fade-up 0.9s ease-out 0.2s forwards;
+  width: 88%;
+  max-width: 420px;
+  z-index: 6;
+  pointer-events: none;
+  filter: drop-shadow(0 6px 18px rgba(0,0,0,0.55));
 }
-@keyframes lore-fade-up {
-  from { opacity: 0; transform: translateX(-50%) translateY(12px); }
-  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+.lore-manga-bubble.pop {
+  animation: lore-manga-pop 0.6s cubic-bezier(.2,1.5,.4,1) forwards;
+}
+@keyframes lore-manga-pop {
+  0%   { opacity: 0; transform: translateX(-50%) scale(0.3) rotate(-6deg); }
+  60%  { opacity: 1; transform: translateX(-50%) scale(1.08) rotate(1deg); }
+  100% { opacity: 1; transform: translateX(-50%) scale(1) rotate(0); }
+}
+.lore-manga-bubble-inner {
+  background: #fff;
+  color: #111;
+  font-family: 'Bangers', 'Comic Sans MS', 'Trebuchet MS', sans-serif;
+  font-size: 22px;
+  line-height: 1.25;
+  text-align: center;
+  padding: 18px 22px;
+  border: 3px solid #111;
+  border-radius: 22px;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+  position: relative;
+}
+.lore-manga-tail {
+  position: absolute;
+  bottom: -14px;
+  left: 28%;
+  width: 28px;
+  height: 28px;
+  background: #fff;
+  border-right: 3px solid #111;
+  border-bottom: 3px solid #111;
+  transform: rotate(45deg) skew(-8deg, -8deg);
+  border-bottom-right-radius: 6px;
+}
+.lore-manga-tap-hint {
+  position: absolute;
+  bottom: 28px;
+  left: 0; right: 0;
+  text-align: center;
+  z-index: 7;
+  color: #fff;
+  font-family: Georgia, serif;
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0;
+  animation: lore-tap-hint-in 1.4s ease 1.5s forwards, lore-pulse 1.4s ease-in-out 2.4s infinite;
+  pointer-events: none;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+}
+@keyframes lore-tap-hint-in {
+  to { opacity: 0.85; }
 }
 
-/* Scene 5 — gauge */
+/* Emotion picker scene */
+#screen-lore [data-lore-scene="emotion"] { background: #000; padding: 0; }
+.lore-emotion-bg {
+  position: absolute; inset: 0;
+  background: #000 url("assets/story/new.jpg") center/cover no-repeat;
+  filter: brightness(0.55) saturate(0.85);
+  z-index: 0;
+}
+.lore-emotion-bg::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.85) 100%);
+}
+.lore-emotion-bubble {
+  position: absolute;
+  top: 36px;
+  left: 50%;
+  transform: translateX(-50%) scale(0.4);
+  opacity: 0;
+  width: 90%;
+  max-width: 380px;
+  z-index: 6;
+  filter: drop-shadow(0 6px 18px rgba(0,0,0,0.55));
+}
+.lore-emotion-bubble.pop { animation: lore-manga-pop 0.6s cubic-bezier(.2,1.5,.4,1) forwards; }
+.lore-emotion-bubble .lore-manga-bubble-inner { font-size: 24px; padding: 16px 22px; }
+.lore-emotion-list {
+  position: absolute;
+  top: 38%;
+  bottom: 80px;
+  left: 0; right: 0;
+  z-index: 4;
+  overflow: hidden;
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 86%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 86%, transparent 100%);
+  transition: opacity 0.4s ease;
+}
+.lore-emotion-list.chosen { opacity: 0.5; }
+.lore-emotion-track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 0;
+  animation: lore-emotion-scroll 22s linear infinite;
+  will-change: transform;
+}
+@keyframes lore-emotion-scroll {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-50%); }
+}
+.lore-emotion {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: #fff;
+  font-family: Georgia, serif;
+  font-size: 18px;
+  padding: 9px 22px;
+  border-radius: 22px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+  transition: background 0.18s, transform 0.18s, border-color 0.18s, color 0.18s;
+}
+.lore-emotion:hover, .lore-emotion:focus {
+  background: rgba(237,0,140,0.18);
+  border-color: rgba(237,0,140,0.55);
+  outline: none;
+}
+.lore-emotion.chosen {
+  background: #fff;
+  color: #000;
+  border-color: #fff;
+  transform: scale(1.12);
+  box-shadow: 0 0 32px rgba(255,255,255,0.85);
+}
+
+/* Glitch overlay */
+.lore-glitch-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+  background: #000;
+  animation: lore-glitch-bg 1.3s linear forwards;
+  overflow: hidden;
+  mix-blend-mode: normal;
+}
+@keyframes lore-glitch-bg {
+  0%   { background: rgba(0,0,0,0); }
+  10%  { background: rgba(255,0,80,0.25); }
+  20%  { background: rgba(0,200,255,0.18); }
+  30%  { background: rgba(255,255,255,0.4); }
+  45%  { background: rgba(0,0,0,0.9); }
+  60%  { background: rgba(237,0,140,0.35); }
+  80%  { background: rgba(0,0,0,0.95); }
+  100% { background: rgba(0,0,0,1); }
+}
+.lore-glitch-bar {
+  position: absolute;
+  left: -10%;
+  width: 120%;
+  height: 26px;
+  top: var(--y);
+  background: linear-gradient(90deg, rgba(255,0,120,0) 0%, rgba(255,0,120,0.8) 35%, rgba(0,200,255,0.8) 65%, rgba(255,255,255,0) 100%);
+  mix-blend-mode: screen;
+  filter: blur(2px);
+  animation: lore-glitch-bar 1.3s steps(14) forwards;
+  opacity: 0.85;
+}
+@keyframes lore-glitch-bar {
+  0%   { transform: translateX(0) scaleY(1);    opacity: 0; }
+  10%  { transform: translateX(-60px) scaleY(3); opacity: 1; }
+  25%  { transform: translateX(80px) scaleY(0.4); }
+  40%  { transform: translateX(-30px) scaleY(2.2); }
+  55%  { transform: translateX(50px) scaleY(0.5); }
+  75%  { transform: translateX(0) scaleY(1.6); opacity: 0.9; }
+  100% { transform: translateX(0) scaleY(0.2); opacity: 0; }
+}
+.lore-glitch-noise {
+  position: absolute;
+  inset: -20%;
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.06) 0 2px, transparent 2px 4px),
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.25) 0 1px, transparent 1px 3px);
+  mix-blend-mode: overlay;
+  animation: lore-glitch-shake 0.12s steps(2) infinite;
+}
+@keyframes lore-glitch-shake {
+  0%   { transform: translate(0, 0); }
+  50%  { transform: translate(-6px, 4px); }
+  100% { transform: translate(4px, -3px); }
+}
+.lore-glitch-text {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ED008C;
+  font-family: 'Courier New', monospace;
+  font-size: 42px;
+  font-weight: 900;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  text-shadow:
+    3px 0 0 #00e1ff,
+    -3px 0 0 #ff003c,
+    0 0 14px rgba(255,255,255,0.6);
+  animation: lore-glitch-text 0.18s steps(2) infinite;
+}
+@keyframes lore-glitch-text {
+  0%   { transform: translate(-50%, -50%) skewX(0deg); }
+  50%  { transform: translate(-48%, -52%) skewX(-12deg); }
+  100% { transform: translate(-52%, -48%) skewX(8deg); }
+}
+
+/* Patient ready scene */
+#screen-lore [data-lore-scene="ready"] { background: #000; padding: 0; }
+.lore-ready-bg {
+  position: absolute; inset: 0;
+  background: #000 url("assets/story/Untitled-20260513-213210-7729.png") center/cover no-repeat;
+  z-index: 0;
+}
+.lore-ready-bg::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.85) 100%);
+}
+
+/* Scene 5 — tap anywhere */
+#screen-lore [data-lore-scene="5"] {
+  position: relative;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
 .lore-scene5-bg {
   position: absolute; inset: 0;
   background: #000 url("assets/story/3.JPG") center/cover no-repeat;
@@ -2626,32 +2745,82 @@ html, body {
 .lore-scene5-bg::after {
   content: '';
   position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(10,26,58,0.45) 0%, rgba(10,26,58,0.88) 100%);
+  background: linear-gradient(180deg, rgba(10,26,58,0.35) 0%, rgba(10,26,58,0.85) 100%);
 }
 .lore-gauge-instruction {
-  position: relative;
+  position: absolute;
+  top: 70px;
+  left: 0; right: 0;
   z-index: 5;
   color: #EBF5FF;
-  font-size: 18px;
+  font-size: 19px;
   font-weight: bold;
   text-align: center;
-  text-shadow: 0 2px 6px rgba(0,0,0,0.75);
-  margin-bottom: 22px;
-  padding: 0 20px;
-  margin-top: 60px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.85);
+  padding: 0 24px;
+  pointer-events: none;
 }
-.lore-gauge-instruction > div + div { color: #F4C0D1; font-size: 14px; margin-top: 4px; font-style: italic; }
+.lore-tap-hint-pulse {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 120px; height: 120px;
+  margin-left: -60px; margin-top: -60px;
+  border-radius: 50%;
+  z-index: 4;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 60%);
+  border: 2px solid rgba(255,255,255,0.7);
+  box-shadow: 0 0 28px rgba(255,255,255,0.35), inset 0 0 24px rgba(255,255,255,0.15);
+  animation: lore-tap-hint-pulse 1.4s ease-in-out infinite;
+  transition: opacity 0.5s ease;
+}
+.lore-tap-hint-pulse.hide { opacity: 0; }
+@keyframes lore-tap-hint-pulse {
+  0%, 100% { transform: scale(1);   opacity: 0.85; }
+  50%      { transform: scale(1.35); opacity: 0.3;  }
+}
+.lore-ripples {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  overflow: hidden;
+}
+.lore-ripple {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  margin-left: -8px;
+  margin-top: -8px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.9);
+  background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%);
+  animation: lore-ripple 0.7s ease-out forwards;
+  will-change: transform, opacity;
+}
+@keyframes lore-ripple {
+  0%   { transform: scale(0.5); opacity: 1; }
+  100% { transform: scale(7);   opacity: 0; }
+}
+.lore-gauge-bottom {
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 64px;
+  z-index: 5;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
 .lore-gauge-wrap {
   position: relative;
   z-index: 5;
-  width: 78%;
-  max-width: 320px;
-  height: 28px;
-  background: rgba(0,0,0,0.55);
+  width: 82%;
+  max-width: 360px;
+  height: 30px;
+  background: rgba(0,0,0,0.6);
   border: 2px solid #378ADD;
   border-radius: 16px;
   overflow: hidden;
-  margin-bottom: 22px;
   box-shadow: 0 0 18px rgba(55,138,221,0.4), inset 0 2px 4px rgba(0,0,0,0.5);
 }
 .lore-gauge-fill {
@@ -2665,35 +2834,13 @@ html, body {
   position: absolute;
   inset: 0;
   text-align: center;
-  line-height: 28px;
+  line-height: 30px;
   color: #fff;
   font-weight: bold;
-  font-size: 13px;
+  font-size: 14px;
   text-shadow: 0 1px 3px #000;
   letter-spacing: 1px;
 }
-.lore-tap-btn {
-  position: relative;
-  z-index: 5;
-  background: radial-gradient(circle at 35% 30%, #ff4fb0, #ED008C 65%);
-  color: #fff;
-  border: 3px solid #F4C0D1;
-  width: 170px;
-  height: 170px;
-  border-radius: 50%;
-  font-size: 22px;
-  font-weight: bold;
-  font-family: Georgia, serif;
-  letter-spacing: 1px;
-  cursor: pointer;
-  box-shadow: 0 10px 30px rgba(237,0,140,0.55), inset 0 -8px 12px rgba(0,0,0,0.25), inset 0 6px 10px rgba(255,255,255,0.35);
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  transition: transform 0.07s ease-out;
-}
-.lore-tap-btn:active { transform: scale(0.92); }
-.lore-tap-btn > span { display: block; }
-.lore-tap-btn > span + span { font-size: 14px; opacity: 0.85; }
 
 /* Scene 6A / 6B — result */
 #screen-lore [data-lore-scene="6a"],
@@ -2734,6 +2881,33 @@ html, body {
 }
 #screen-lore [data-lore-scene="6a"] .lore-play-btn:hover {
   box-shadow: 0 12px 32px rgba(0,0,0,0.25), 0 0 0 6px rgba(0,0,0,0.08);
+}
+/* Scene 6B overrides — fail slide is all-black with white text */
+#screen-lore [data-lore-scene="6b"] {
+  background: #000;
+}
+#screen-lore [data-lore-scene="6b"] .lore-result-img {
+  box-shadow: 0 12px 36px rgba(255,255,255,0.12);
+}
+#screen-lore [data-lore-scene="6b"] .lore-result-text {
+  color: #fff;
+}
+#screen-lore [data-lore-scene="6b"] .lore-result-text > div + div {
+  color: #ccc;
+}
+#screen-lore [data-lore-scene="6b"] .lore-bubble {
+  background: #111;
+  border: 2px solid #fff;
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(255,255,255,0.08);
+}
+#screen-lore [data-lore-scene="6b"] .lore-bubble > div + div {
+  color: #ccc;
+}
+#screen-lore [data-lore-scene="6b"] .lore-bubble::before {
+  background: #111;
+  border-left: 2px solid #fff;
+  border-top: 2px solid #fff;
 }
 .lore-result-img {
   max-width: 72%;
@@ -2844,7 +3018,9 @@ html, body {
 @media (max-width: 380px) {
   .lore-scene1-text { font-size: 17px; }
   .lore-wormhole-text p { font-size: 24px; }
-  .lore-tap-btn { width: 140px; height: 140px; font-size: 19px; }
+  .lore-manga-bubble-inner { font-size: 18px; padding: 14px 18px; }
+  .lore-emotion { font-size: 16px; padding: 8px 16px; }
+  .lore-gauge-instruction { font-size: 16px; top: 60px; }
   .lore-result-text { font-size: 17px; }
   .lore-bubble { font-size: 14px; }
 }
@@ -3121,34 +3297,48 @@ html, body {
       <div class="lore-crawl-tap-hint" id="lore-crawl-hint" data-lore-i18n="tap_screen"></div>
     </div>
 
-    <div class="lore-scene" data-lore-scene="3">
-      <div class="lore-pink-bg"></div>
-      <svg class="lore-ekg" viewBox="0 0 400 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path class="lore-ekg-path" d="M 0 100 L 60 100 L 75 100 L 85 70 L 95 130 L 105 60 L 115 140 L 125 100 L 200 100 L 215 100 L 225 70 L 235 130 L 245 60 L 255 140 L 265 100 L 400 100"/>
-      </svg>
-      <div class="lore-swipe-instruction" id="lore-swipe-inst" data-lore-i18n="swipe_inst"></div>
-      <div class="lore-score" id="lore-score">0</div>
-      <div class="lore-timer" id="lore-swipe-timer">10</div>
-      <div class="lore-pill-zone" id="lore-pill-zone"></div>
+    <div class="lore-scene" data-lore-scene="4">
+      <img class="lore-fullscreen-img" src="assets/story/new2.JPG" alt="Mai & Vi">
+      <div class="lore-fullscreen-overlay"></div>
+      <div class="lore-manga-bubble" id="lore-manga-bubble">
+        <div class="lore-manga-bubble-inner" data-lore-i18n="staff_caption"></div>
+        <div class="lore-manga-tail"></div>
+      </div>
+      <div class="lore-manga-tap-hint" data-lore-i18n="tap_screen"></div>
     </div>
 
-    <div class="lore-scene" data-lore-scene="4">
-      <img class="lore-fullscreen-img" src="assets/story/2.jpg" alt="Mai & Vi">
-      <div class="lore-fullscreen-overlay"></div>
-      <div class="lore-fullscreen-text" data-lore-i18n="staff_caption"></div>
+    <div class="lore-scene" data-lore-scene="emotion">
+      <div class="lore-emotion-bg"></div>
+      <div class="lore-emotion-bubble" id="lore-emotion-bubble">
+        <div class="lore-manga-bubble-inner" data-lore-i18n="how_feel"></div>
+        <div class="lore-manga-tail"></div>
+      </div>
+      <div class="lore-emotion-list" id="lore-emotion-list">
+        <div class="lore-emotion-track" id="lore-emotion-track"></div>
+      </div>
+    </div>
+
+    <div class="lore-scene" data-lore-scene="ready">
+      <div class="lore-ready-bg"></div>
+      <div class="lore-manga-bubble" id="lore-ready-bubble">
+        <div class="lore-manga-bubble-inner" data-lore-i18n="ready_caption"></div>
+        <div class="lore-manga-tail"></div>
+      </div>
+      <div class="lore-manga-tap-hint" data-lore-i18n="tap_screen"></div>
     </div>
 
     <div class="lore-scene" data-lore-scene="5">
       <div class="lore-scene5-bg"></div>
       <div class="lore-timer" id="lore-gauge-timer">10</div>
       <div class="lore-gauge-instruction" data-lore-i18n="gauge_inst"></div>
-      <div class="lore-gauge-wrap">
-        <div class="lore-gauge-fill" id="lore-gauge-fill"></div>
-        <div class="lore-gauge-percent" id="lore-gauge-percent">0%</div>
+      <div class="lore-tap-hint-pulse" id="lore-tap-hint-pulse"></div>
+      <div class="lore-ripples" id="lore-ripples"></div>
+      <div class="lore-gauge-bottom">
+        <div class="lore-gauge-wrap">
+          <div class="lore-gauge-fill" id="lore-gauge-fill"></div>
+          <div class="lore-gauge-percent" id="lore-gauge-percent">0%</div>
+        </div>
       </div>
-      <button class="lore-tap-btn" id="lore-tap-btn">
-        <span data-lore-i18n="tap_btn"></span>
-      </button>
     </div>
 
     <div class="lore-scene" data-lore-scene="6a">
@@ -3172,6 +3362,7 @@ html, body {
       <span class="lore-dot" data-dot="4"></span>
       <span class="lore-dot" data-dot="5"></span>
       <span class="lore-dot" data-dot="6"></span>
+      <span class="lore-dot" data-dot="7"></span>
     </div>
   </div>
 
@@ -5486,20 +5677,12 @@ const Game = (() => {
 const Lore = (() => {
   const KEY = 'klover_lore_seen';
   const ADMIN_TG_ID = 264154297;
-  const PILL_PALETTE = [
-    { base: '#e8609a', light: '#f5b4d0', dark: '#8c2d59' },
-    { base: '#4a8fd4', light: '#a5c8ea', dark: '#264a73' },
-    { base: '#2aaa88', light: '#85d4bd', dark: '#155544' },
-    { base: '#f0c030', light: '#fae39a', dark: '#8a6a14' },
-    { base: '#9060cc', light: '#c4a6e3', dark: '#4c3173' }
-  ];
-  const PILL_IMAGES = [
-    'assets/story/%D0%B6%D1%89.png',
-    'assets/story/%D1%8E%D0%BB%D0%B4%D1%8E.png'
-  ];
-  const MAX_LIVE_PILLS = 4;
-  const SCENE4_MIN_MS = 5000;
-  const SCENE4_AUTO_MS = 7000;
+  const SCENE4_MIN_MS = 4500;
+  const SCENE4_AUTO_MS = 8500;
+  const EMOTION_LOOP_MS = 22000;
+  const GLITCH_MS = 1300;
+  const READY_MIN_MS = 2400;
+  const READY_AUTO_MS = 5500;
 
   const L = {
     en: {
@@ -5518,15 +5701,30 @@ const Lore = (() => {
         'Your reflexes, your focus, and your heart will decide their fate.',
         'The journey begins now.'
       ],
-      swipe_inst: 'Tap the pills!',
       staff_caption: 'Our caring medical staff will guide you through the simulation.',
-      gauge_inst: 'Tap rapidly to reach maximum!',
+      gauge_inst: 'Tap the screen — fast!',
       tap_btn: 'TAP!',
+      how_feel: 'How do you feel today?',
+      ready_caption: 'Patient is ready for the simulation.',
       success_text: 'Outstanding work! Simulation ready.',
       success_bubble: '"I knew you could do it!"',
       play_btn: 'Play',
       fail_text: 'Hey... can you hear me?',
-      fail_bubble: '"We need to try again. Focus!"'
+      fail_bubble: '"We need to try again. Focus!"',
+      emotions: [
+        'Happy','Sad','Angry','Anxious','Calm','Numb','Tired','Hopeful','Lost','Empty',
+        'Furious','Ashamed','Guilty','Lonely','Loved','Curious','Confused','Frustrated','Embarrassed','Excited',
+        'Bored','Restless','Peaceful','Trapped','Free','Tense','Relieved','Disgusted','Surprised','Disappointed',
+        'Proud','Insecure','Worthless','Vulnerable','Powerful','Helpless','Brave','Afraid','Paranoid','Suspicious',
+        'Trusting','Betrayed','Forgotten','Seen','Invisible','Overwhelmed','Detached','Dissociated','Derealized','Depersonalized',
+        'Manic','Euphoric','Dysphoric','Anhedonic','Apathetic','Indifferent','Bitter','Jealous','Envious','Grateful',
+        'Resentful','Compassionate','Cold','Warm','Hollow','Heavy','Light','Floaty','Dizzy','Electric',
+        'Static','Glitched','Foggy','Sharp','Soft','Brittle','Resilient','Fragile','Broken','Healing',
+        'Wounded','Scarred','Whole','Fragmented','Splintered','Drowning','Floating','Sinking','Rising','Burning',
+        'Frozen','Melting','Solid','Liquid','Vibrating','Still','Trembling','Frantic','Serene','Wild',
+        'Caged','Soaring','Crashing','Drifting','Anchored','Adrift','Rooted','Uprooted','Reborn','Awake',
+        'Asleep','Dreaming','Waking','Forgetting','Remembering','Unsure','Certain','Wistful','Yearning','Content'
+      ]
     },
     ru: {
       tap_screen: 'Нажимай на экран',
@@ -5544,15 +5742,30 @@ const Lore = (() => {
         'Твои рефлексы, твоё внимание и твоё сердце решат их судьбу.',
         'Погружение начинается.'
       ],
-      swipe_inst: 'Тапай таблетки!',
       staff_caption: 'Наш заботливый медицинский персонал поможет вам пройти симуляцию.',
-      gauge_inst: 'Тапай быстро — достигни максимума!',
+      gauge_inst: 'Тапай по экрану — быстро!',
       tap_btn: 'ТАП!',
+      how_feel: 'Как ты сегодня себя чувствуешь?',
+      ready_caption: 'Пациент готов к симуляции.',
       success_text: 'Отличная работа! Симуляция готова.',
       success_bubble: '«Я знала, что ты справишься!»',
       play_btn: 'Играть',
       fail_text: 'Эй... ты меня слышишь?',
-      fail_bubble: '«Нам нужно попробовать снова. Сосредоточься!»'
+      fail_bubble: '«Нам нужно попробовать снова. Сосредоточься!»',
+      emotions: [
+        'Счастливый','Грустный','Злой','Тревожный','Спокойный','Онемевший','Уставший','Надеющийся','Потерянный','Пустой',
+        'Бешеный','Пристыжённый','Виноватый','Одинокий','Любимый','Любопытный','Запутанный','Раздражённый','Смущённый','Возбуждённый',
+        'Скучающий','Беспокойный','Умиротворённый','В ловушке','Свободный','Напряжённый','Облегчённый','Отвращённый','Удивлённый','Разочарованный',
+        'Гордый','Неуверенный','Бесполезный','Уязвимый','Сильный','Беспомощный','Храбрый','Испуганный','Параноидальный','Подозрительный',
+        'Доверчивый','Преданный','Забытый','Увиденный','Невидимый','Перегруженный','Отстранённый','Диссоциированный','Дереализованный','Деперсонализированный',
+        'Маниакальный','Эйфорический','Дисфорический','Ангедонический','Апатичный','Безразличный','Озлобленный','Ревнивый','Завистливый','Благодарный',
+        'Обиженный','Сострадательный','Холодный','Тёплый','Полый','Тяжёлый','Лёгкий','Парящий','Кружащийся','Электрический',
+        'Статичный','Сбойный','Туманный','Острый','Мягкий','Хрупкий','Стойкий','Ранимый','Сломанный','Исцеляющийся',
+        'Раненый','В шрамах','Целый','Фрагментированный','Расщеплённый','Тонущий','Плывущий','Опускающийся','Восходящий','Горящий',
+        'Замёрзший','Тающий','Твёрдый','Жидкий','Вибрирующий','Неподвижный','Дрожащий','Лихорадочный','Безмятежный','Дикий',
+        'В клетке','Взлетающий','Падающий','Дрейфующий','Заякоренный','Бесцельный','Укоренённый','Вырванный','Возрождённый','Бодрствующий',
+        'Спящий','Видящий сны','Просыпающийся','Забывающий','Помнящий','Сомневающийся','Уверенный','Тоскующий','Жаждущий','Довольный'
+      ]
     }
   };
   function getLang() { return (window.__currentLang === 'ru') ? 'ru' : 'en'; }
@@ -5716,10 +5929,7 @@ const Lore = (() => {
   let timers = [];
   let listeners = [];
   let gaugeVal = 0;
-  let livePills = 0;
-  let heartBPM = 60;
-  let heartTimer = null;
-  let heartDecay = null;
+  let chosenEmotion = null;
 
   function clearTimers() {
     timers.forEach(t => { try { clearTimeout(t); clearInterval(t); } catch {} });
@@ -5741,7 +5951,7 @@ const Lore = (() => {
     root.querySelectorAll('.lore-scene').forEach(s => s.classList.remove('active'));
     const el = root.querySelector('[data-lore-scene="' + name + '"]');
     if (el) el.classList.add('active');
-    const dotMap = { '1':'1', '2':'2', '3':'3', '4':'4', '5':'5', '6a':'6', '6b':'6' };
+    const dotMap = { '1':'1', '2':'2', '4':'3', 'emotion':'4', 'ready':'5', '5':'6', '6a':'7', '6b':'7' };
     const want = dotMap[name];
     root.querySelectorAll('.lore-dot').forEach(d => {
       d.classList.toggle('active', d.dataset.dot === want);
@@ -5764,7 +5974,6 @@ const Lore = (() => {
   function finish() {
     clearTimers();
     clearListeners();
-    stopHeart();
     Music.stop();
     try { localStorage.setItem(KEY, '1'); } catch {}
     const root = document.getElementById('screen-lore');
@@ -5875,12 +6084,20 @@ const Lore = (() => {
     let lock = false;
 
     function diveAndAdvance() {
-      // Final tap on the pill paragraph: collapse wormhole and jump to pill game
+      // Final tap: collapse wormhole and continue to the staff scene
       if (hint) hint.classList.remove('show');
       const cur = textEl && textEl.querySelector('[data-cstep="' + step + '"]');
       if (cur) { cur.classList.remove('show'); cur.classList.add('gone'); }
       if (wrap) wrap.classList.add('diving');
-      timers.push(setTimeout(() => { clearListeners(); runScene3(); }, 1300));
+      timers.push(setTimeout(() => { clearListeners(); runScene4(); }, 1300));
+    }
+
+    function pulseSuck() {
+      if (!wrap) return;
+      wrap.classList.remove('suck');
+      void wrap.offsetWidth;
+      wrap.classList.add('suck');
+      setTimeout(() => { try { wrap.classList.remove('suck'); } catch {} }, 700);
     }
 
     function advance() {
@@ -5891,12 +6108,18 @@ const Lore = (() => {
       }
       step++;
       if (step >= lines.length) {
-        // shouldn't normally hit this — diveAndAdvance handles final
         diveAndAdvance();
         return;
       }
+      // Show next line slightly after the suction starts so it visibly rises
+      // from the depth after the previous line gets swallowed.
       const nxt = textEl && textEl.querySelector('[data-cstep="' + step + '"]');
-      if (nxt) { nxt.classList.remove('gone'); nxt.classList.add('show'); }
+      if (nxt) {
+        timers.push(setTimeout(() => {
+          nxt.classList.remove('gone');
+          nxt.classList.add('show');
+        }, 320));
+      }
       if (progress) {
         progress.querySelectorAll('span').forEach((d, i) => {
           d.classList.toggle('on', i <= step);
@@ -5912,8 +6135,8 @@ const Lore = (() => {
       if (lock) return;
       lock = true;
       setTimeout(() => { lock = false; }, 420);
-      tap('light');
-      // If we're on the final (pill) line, dive into pill game
+      tap('medium');
+      pulseSuck();
       if (step >= lines.length - 1) {
         diveAndAdvance();
       } else {
@@ -5922,177 +6145,167 @@ const Lore = (() => {
     });
   }
 
-  // ---- Scene 3 (tap-the-pills, 10s, up to 4 concurrent, heartbeat tempo) ----
-  function stopHeart() {
-    if (heartTimer) { clearTimeout(heartTimer); heartTimer = null; }
-    if (heartDecay) { clearInterval(heartDecay); heartDecay = null; }
-  }
-  function beatPulse() {
-    const ekg = document.querySelector('#screen-lore [data-lore-scene="3"] .lore-ekg');
-    if (ekg) {
-      ekg.classList.remove('beat');
-      void ekg.offsetWidth;
-      ekg.classList.add('beat');
-    }
-    Music.heartBeat(heartBPM);
-    const interval = Math.max(220, 60000 / heartBPM);
-    heartTimer = setTimeout(beatPulse, interval);
-  }
-  function bumpHeart() {
-    heartBPM = Math.min(220, heartBPM + 14);
-    const ekg = document.querySelector('#screen-lore [data-lore-scene="3"] .lore-ekg-path');
-    if (ekg) {
-      const dur = Math.max(0.6, 240 / heartBPM);
-      ekg.style.animationDuration = dur + 's';
-    }
-  }
-  function runScene3() {
-    clearListeners();
-    clearTimers();
-    stopHeart();
-    showScene('3');
-    const zone = document.getElementById('lore-pill-zone');
-    zone.innerHTML = '';
-    livePills = 0;
-    heartBPM = 60;
-    const ekg = document.querySelector('#screen-lore [data-lore-scene="3"] .lore-ekg-path');
-    if (ekg) ekg.style.animationDuration = '';
-    let remaining = 10;
-    let score = 0;
-    const timerEl = document.getElementById('lore-swipe-timer');
-    const scoreEl = document.getElementById('lore-score');
-    timerEl.textContent = '10';
-    if (scoreEl) scoreEl.textContent = '0';
-    const inst = document.getElementById('lore-swipe-inst');
-    inst.classList.remove('fade');
-    timers.push(setTimeout(() => inst.classList.add('fade'), 3000));
-
-    beatPulse();
-    heartDecay = setInterval(() => {
-      heartBPM = Math.max(60, heartBPM - 1);
-      const e = document.querySelector('#screen-lore [data-lore-scene="3"] .lore-ekg-path');
-      if (e) {
-        const dur = Math.max(0.6, 240 / heartBPM);
-        e.style.animationDuration = dur + 's';
-      }
-    }, 400);
-    timers.push(heartDecay);
-
-    function spawnLoop() {
-      if (remaining <= 0) return;
-      if (livePills < MAX_LIVE_PILLS) {
-        spawnPill(zone, () => {
-          score++;
-          if (scoreEl) scoreEl.textContent = String(score);
-          bumpHeart();
-        });
-      }
-      const next = 300 + Math.random() * 250;
-      timers.push(setTimeout(spawnLoop, next));
-    }
-    timers.push(setTimeout(spawnLoop, 400));
-
-    const tick = setInterval(() => {
-      remaining -= 1;
-      timerEl.textContent = String(remaining);
-      if (remaining <= 0) {
-        clearInterval(tick);
-        stopHeart();
-        runScene4();
-      }
-    }, 1000);
-    timers.push(tick);
-  }
-
-  // ---- Scene 4 (fullscreen Mai & Vi + caption) ----
+  // ---- Scene 4 (staff manga popup, new2.JPG) ----
   function runScene4() {
     clearListeners();
     clearTimers();
     showScene('4');
     Music.chord([392, 523, 659], 1.6);
     const scene = document.querySelector('#screen-lore [data-lore-scene="4"]');
-    const advance = () => { clearListeners(); clearTimers(); runScene5(); };
+    const bubble = document.getElementById('lore-manga-bubble');
+    if (bubble) {
+      bubble.classList.remove('pop');
+      void bubble.offsetWidth;
+      bubble.classList.add('pop');
+    }
+    const advance = () => { clearListeners(); clearTimers(); runEmotionScene(); };
     timers.push(setTimeout(() => {
       on(scene, 'click', () => { tap('light'); advance(); });
     }, SCENE4_MIN_MS));
     timers.push(setTimeout(advance, SCENE4_AUTO_MS));
   }
 
-  function spawnPill(zone, onHit) {
-    if (!zone || !zone.isConnected) return;
-    const rect = zone.getBoundingClientRect();
-    const w = rect.width || window.innerWidth;
-    const h = rect.height || window.innerHeight;
-    const size = 72;
-    const padX = 16, padTop = 120, padBot = 90;
-    const x = padX + Math.random() * Math.max(20, w - 2 * padX - size);
-    const y = padTop + Math.random() * Math.max(20, h - padTop - padBot - size);
-    const src = PILL_IMAGES[Math.floor(Math.random() * PILL_IMAGES.length)];
-    const pill = document.createElement('img');
-    pill.className = 'lore-pill';
-    pill.src = src;
-    pill.alt = '';
-    pill.draggable = false;
-    pill.setAttribute('style',
-      'position:absolute;' +
-      'left:' + x + 'px;' +
-      'top:' + y + 'px;' +
-      'width:' + size + 'px;height:' + size + 'px;' +
-      'animation:lore-pill-pop 0.32s cubic-bezier(.34,1.56,.64,1) forwards;' +
-      'cursor:pointer;user-select:none;'
-    );
-    zone.appendChild(pill);
-    livePills++;
-
-    const lifespan = 2100;
-    let resolved = false;
-    function resolve(kind) {
-      if (resolved) return;
-      resolved = true;
-      livePills = Math.max(0, livePills - 1);
-      pill.classList.add(kind);
-      setTimeout(() => pill.remove(), 360);
+  // ---- Emotion picker scene ----
+  function runEmotionScene() {
+    clearListeners();
+    clearTimers();
+    chosenEmotion = null;
+    showScene('emotion');
+    const list = document.getElementById('lore-emotion-list');
+    const track = document.getElementById('lore-emotion-track');
+    const bubble = document.getElementById('lore-emotion-bubble');
+    if (bubble) {
+      bubble.classList.remove('pop');
+      void bubble.offsetWidth;
+      bubble.classList.add('pop');
     }
-    const hit = (e) => {
-      if (e) { e.preventDefault(); e.stopPropagation(); }
-      if (resolved) return;
-      tap('medium');
-      if (onHit) onHit();
-      resolve('hit');
-    };
-    pill.addEventListener('click', hit);
-    pill.addEventListener('touchstart', hit, { passive: false });
-
-    setTimeout(() => {
-      if (resolved || !pill.isConnected) return;
-      resolve('miss');
-    }, lifespan);
+    const emotions = L[getLang()].emotions;
+    // Duplicate the list to enable seamless infinite scroll
+    if (track) {
+      const html = emotions.map((e, i) => '<button type="button" class="lore-emotion" data-emo="' + i + '">' + e + '</button>').join('');
+      track.innerHTML = html + html;
+      track.style.animation = 'none';
+      void track.offsetWidth;
+      track.style.animation = 'lore-emotion-scroll ' + EMOTION_LOOP_MS + 'ms linear infinite';
+    }
+    function pick(emoText) {
+      if (chosenEmotion) return;
+      chosenEmotion = emoText;
+      tap('heavy');
+      if (list) list.classList.add('chosen');
+      // Highlight chosen button
+      if (track) {
+        track.querySelectorAll('.lore-emotion').forEach(b => {
+          if (b.textContent === emoText) b.classList.add('chosen');
+        });
+        track.style.animationPlayState = 'paused';
+      }
+      timers.push(setTimeout(() => { clearListeners(); runGlitchThenReady(); }, 900));
+    }
+    if (track) {
+      const onClick = (ev) => {
+        const btn = ev.target.closest('.lore-emotion');
+        if (!btn) return;
+        ev.preventDefault();
+        pick(btn.textContent);
+      };
+      on(track, 'click', onClick);
+      on(track, 'touchstart', onClick, { passive: false });
+    }
   }
 
-  // ---- Scene 5 (gauge) ----
+  // ---- Glitch transition into Ready scene ----
+  function runGlitchThenReady() {
+    clearListeners();
+    clearTimers();
+    // Glitch is a transient overlay over the current screen
+    const root = document.getElementById('screen-lore');
+    if (!root) { runReadyScene(); return; }
+    const overlay = document.createElement('div');
+    overlay.className = 'lore-glitch-overlay';
+    overlay.innerHTML =
+      '<div class="lore-glitch-bar" style="--y:18%"></div>' +
+      '<div class="lore-glitch-bar" style="--y:42%"></div>' +
+      '<div class="lore-glitch-bar" style="--y:67%"></div>' +
+      '<div class="lore-glitch-bar" style="--y:81%"></div>' +
+      '<div class="lore-glitch-noise"></div>' +
+      '<div class="lore-glitch-text">' + (chosenEmotion || '') + '</div>';
+    root.appendChild(overlay);
+    Music.chord([220, 277, 311], 0.35);
+    timers.push(setTimeout(() => Music.chord([110, 233, 415], 0.45), 350));
+    timers.push(setTimeout(() => {
+      try { overlay.remove(); } catch {}
+      runReadyScene();
+    }, GLITCH_MS));
+  }
+
+  // ---- Patient ready scene ----
+  function runReadyScene() {
+    clearListeners();
+    clearTimers();
+    showScene('ready');
+    Music.chord([523, 659, 784], 1.6);
+    const scene = document.querySelector('#screen-lore [data-lore-scene="ready"]');
+    const bubble = document.getElementById('lore-ready-bubble');
+    if (bubble) {
+      bubble.classList.remove('pop');
+      void bubble.offsetWidth;
+      bubble.classList.add('pop');
+    }
+    const advance = () => { clearListeners(); clearTimers(); runScene5(); };
+    timers.push(setTimeout(() => {
+      on(scene, 'click', () => { tap('light'); advance(); });
+    }, READY_MIN_MS));
+    timers.push(setTimeout(advance, READY_AUTO_MS));
+  }
+
+  // ---- Scene 5 (tap anywhere, gauge at bottom) ----
   function runScene5() {
     clearListeners();
     clearTimers();
     showScene('5');
     gaugeVal = 0;
     let remaining = 10;
+    let tapCount = 0;
+    const scene = document.querySelector('#screen-lore [data-lore-scene="5"]');
     const fill = document.getElementById('lore-gauge-fill');
     const pct = document.getElementById('lore-gauge-percent');
     const timerEl = document.getElementById('lore-gauge-timer');
+    const ripples = document.getElementById('lore-ripples');
+    const hint = document.getElementById('lore-tap-hint-pulse');
     fill.style.width = '0%';
     pct.textContent = '0%';
     timerEl.textContent = '10';
-    const btn = document.getElementById('lore-tap-btn');
+    if (hint) hint.classList.remove('hide');
+
+    function spawnRipple(x, y) {
+      if (!ripples) return;
+      const r = document.createElement('div');
+      r.className = 'lore-ripple';
+      r.style.left = x + 'px';
+      r.style.top = y + 'px';
+      ripples.appendChild(r);
+      setTimeout(() => { try { r.remove(); } catch {} }, 750);
+    }
 
     const onTap = (e) => {
+      // Ignore taps on UI chrome — though the scene only has non-interactive overlays
       e.preventDefault();
-      gaugeVal = Math.min(100, gaugeVal + 4.5);
+      let x, y;
+      const touch = (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0]);
+      if (touch) { x = touch.clientX; y = touch.clientY; }
+      else { x = e.clientX; y = e.clientY; }
+      const rect = scene.getBoundingClientRect();
+      spawnRipple(x - rect.left, y - rect.top);
+      gaugeVal = Math.min(100, gaugeVal + 4.8);
       fill.style.width = gaugeVal + '%';
       pct.textContent = Math.round(gaugeVal) + '%';
       tap('light');
+      tapCount++;
+      if (hint && tapCount === 1) hint.classList.add('hide');
     };
-    on(btn, 'click', onTap);
-    on(btn, 'touchstart', onTap, { passive: false });
+    on(scene, 'click', onTap);
+    on(scene, 'touchstart', onTap, { passive: false });
 
     const drain = setInterval(() => {
       gaugeVal = Math.max(0, gaugeVal - 1.6);
@@ -6123,12 +6336,13 @@ const Lore = (() => {
     Music.chord([523, 659, 784, 988], 1.8);
     const wrap = document.getElementById('lore-confetti');
     wrap.innerHTML = '';
+    const confColors = ['#ED008C', '#185FA5', '#378ADD', '#F4C0D1', '#ff4fb0', '#2aaa88', '#f0c030'];
     for (let i = 0; i < 50; i++) {
       const p = document.createElement('div');
       p.className = 'lore-conf-piece';
       p.style.left = (Math.random() * 100) + '%';
       p.style.top = (-Math.random() * 80) + 'px';
-      p.style.background = PILL_COLORS[Math.floor(Math.random() * PILL_COLORS.length)];
+      p.style.background = confColors[Math.floor(Math.random() * confColors.length)];
       p.style.animationDelay = (Math.random() * 1.4) + 's';
       p.style.animationDuration = (1.8 + Math.random() * 1.4) + 's';
       wrap.appendChild(p);
