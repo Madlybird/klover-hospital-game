@@ -588,6 +588,24 @@ html, body {
   max-width: 280px;
 }
 
+/* Simulation complete modal (level 1 / 2) */
+.sim-complete-modal { gap: 14px; }
+.sim-complete-photo {
+  width: 100%;
+  max-width: 260px;
+  border-radius: 14px;
+  object-fit: cover;
+  border: 2px solid rgba(237,0,140,0.4);
+  box-shadow: 0 6px 18px rgba(237,0,140,0.25);
+}
+.sim-complete-text {
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.35;
+  text-align: center;
+  color: var(--color-primary, #e8609a);
+}
+
 /* ===== LEVEL LOCKED ===== */
 .level-locked-badge {
   position: absolute;
@@ -3664,6 +3682,18 @@ html, body {
     </div>
   </div>
 
+  <!-- Simulation Complete (level 1 / 2) -->
+  <div class="overlay" id="overlay-sim-complete">
+    <div class="modal sim-complete-modal">
+      <img src="assets/story/Untitled-20260513-213210-7729.png" alt="" class="sim-complete-photo">
+      <div class="sim-complete-text" data-i18n="sim_complete_text">You did it — simulation passed perfectly</div>
+      <div class="modal-score" id="sim-complete-reward">+0 🪙</div>
+      <div class="modal-buttons">
+        <button class="btn-primary" onclick="Game.backToLevels()" data-i18n="sim_back_levels">BACK TO LEVELS</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Wallet Gate (premium sections) -->
   <div class="overlay wallet-gate-overlay" id="overlay-wallet-gate">
     <div class="wallet-gate-modal" id="wallet-gate-modal">
@@ -3850,6 +3880,9 @@ const I18N = {
     next_level: 'NEXT LEVEL',
     share_result: 'SHARE RESULT',
     all_levels_done: 'ALL LEVELS DONE!',
+    sim_complete_text: 'You did it — simulation passed perfectly',
+    sim_earned: 'Earned',
+    sim_back_levels: 'BACK TO LEVELS',
     game_over: 'GAME OVER',
     try_again: 'TRY AGAIN',
     menu: 'MENU',
@@ -3950,6 +3983,9 @@ const I18N = {
     next_level: 'СЛЕДУЮЩИЙ УРОВЕНЬ',
     share_result: 'ПОДЕЛИТЬСЯ',
     all_levels_done: 'ВСЕ УРОВНИ ПРОЙДЕНЫ!',
+    sim_complete_text: 'Ты справился, симуляция пройдена отлично',
+    sim_earned: 'Начислено',
+    sim_back_levels: 'ВЕРНУТЬСЯ НА УРОВНИ',
     game_over: 'КОНЕЦ ИГРЫ',
     try_again: 'ЕЩЁ РАЗ',
     menu: 'МЕНЮ',
@@ -5393,6 +5429,13 @@ const Game = (() => {
     showScreen('menu');
   }
 
+  function backToLevels() {
+    document.querySelectorAll('.overlay').forEach(o => o.classList.remove('active'));
+    stopGame();
+    Save.save(state);
+    showScreen('levels');
+  }
+
   function triggerGameOver() {
     stopGame();
     Audio.over();
@@ -5501,11 +5544,16 @@ const Game = (() => {
       }).then(r => r.json()).then(d => console.log('[referral]', d)).catch(() => {});
     }
 
+    const coinsBefore = state.coins;
     state.coins += Math.floor(score / 100);
     const record = checkHighScore(score);
+    const earned = Math.max(0, state.coins - coinsBefore);
     Save.save(state);
     updateMenuCoins();
     pushProgress();
+
+    const rewardEl = document.getElementById('sim-complete-reward');
+    if (rewardEl) rewardEl.textContent = tr('sim_earned') + ': +' + earned.toLocaleString() + ' 🪙';
 
     document.getElementById('complete-score').textContent =
       tr('score_label') + ': ' + score.toLocaleString() + ' / ' + tr('target_label') + ': ' + LEVELS.find(l=>l.id===currentLevel).target.toLocaleString();
@@ -5523,9 +5571,9 @@ const Game = (() => {
       Telegram.WebApp.HapticFeedback.notificationOccurred('success');
     }
     if (record.isNew && score > 0) {
-      showRecordScreen(record.prev, score, 'overlay-complete');
+      showRecordScreen(record.prev, score, 'overlay-sim-complete');
     } else {
-      document.getElementById('overlay-complete').classList.add('active');
+      document.getElementById('overlay-sim-complete').classList.add('active');
     }
     // Level 2 finishes the current storyline — celebrate with a teaser
     // overlay that auto-dismisses so it doesn't block the existing
@@ -6290,6 +6338,7 @@ const Game = (() => {
     pauseGame,
     resumeGame,
     quitToMenu,
+    backToLevels,
     restartLevel,
     nextLevel,
     copyReferralLink,
