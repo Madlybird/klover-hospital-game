@@ -4,6 +4,7 @@
 // Mini App as ?startapp=<id>, which Game.detectReferral() already reads.
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const BOT_USERNAME = process.env.BOT_USERNAME || 'kloverl_bot';
 const WEBHOOK_SECRET = process.env.TELEGRAM_WEBHOOK_SECRET || '';
 // Set PUBLIC_URL in Vercel env. Example: https://klover-hospital-game.vercel.app
 // If unset, falls back to the host header (fine for most deployments).
@@ -57,6 +58,45 @@ export default async function handler(req, res) {
   }
 
   const update = req.body || {};
+
+  // ---- Inline mode: user picks a chat and the BOT composes the
+  // message (animated GIF + formatted caption with an embedded link
+  // + button). The inviter is the referrer, so the start payload is
+  // their own Telegram id (from.id), independent of what they typed.
+  if (update.inline_query) {
+    const iq = update.inline_query;
+    const refId = String(iq.from?.id || '').replace(/[^\d]/g, '');
+    const host = baseUrl(req);
+    const gifUrl = host + '/assets/pushes/refferal.gif';
+    const startLink = `https://t.me/${BOT_USERNAME}?start=${refId}`;
+    const caption =
+      '🏥 <b>Klover Hospital</b> — pill puzzle with Nurse Mai.\n' +
+      'Play a quick round with me 👇\n' +
+      `<a href="${startLink}">Tap to start your treatment</a>`;
+
+    const results = [{
+      type: 'gif',
+      id: 'invite_' + (refId || 'x'),
+      gif_url: gifUrl,
+      thumbnail_url: gifUrl,
+      caption,
+      parse_mode: 'HTML',
+      reply_markup: {
+        inline_keyboard: [[
+          { text: '🎮 Play Klover Hospital', url: startLink },
+        ]],
+      },
+    }];
+
+    await tg('answerInlineQuery', {
+      inline_query_id: iq.id,
+      results,
+      cache_time: 1,
+      is_personal: true,
+    });
+    return res.status(200).json({ ok: true, inline: true, refId: refId || null });
+  }
+
   const msg = update.message || update.edited_message;
   if (!msg || !msg.chat || !msg.text) {
     return res.status(200).json({ ok: true, ignored: true });

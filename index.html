@@ -5748,14 +5748,23 @@ const Game = (() => {
 
   function inviteFriend() {
     const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || 'demo';
+    const tg = window.Telegram?.WebApp;
+    // Preferred path: inline mode. The user picks a chat and the BOT
+    // composes the message (animated GIF + formatted caption + embedded
+    // link/button). The referrer id is taken server-side from
+    // inline_query.from.id; the query string is just a hint.
+    if (tg && typeof tg.switchInlineQuery === 'function') {
+      try {
+        tg.switchInlineQuery(String(userId), ['users', 'groups', 'channels']);
+        return;
+      } catch (e) { /* fall back to plain share below */ }
+    }
+    // Fallback for older clients / browser: plain share dialog.
     const link = buildReferralLink(userId);
-    // Telegram's share dialog attaches `url=` as a rich preview card,
-    // so `text=` must NOT contain the link too — otherwise the URL
-    // appears twice in the shared message.
     const msg = encodeURIComponent('Play Klover Hospital pill puzzle game with me!');
     const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${msg}`;
-    if (window.Telegram?.WebApp) {
-      Telegram.WebApp.openTelegramLink(shareUrl);
+    if (tg) {
+      tg.openTelegramLink(shareUrl);
     } else {
       window.open(shareUrl, '_blank');
     }
