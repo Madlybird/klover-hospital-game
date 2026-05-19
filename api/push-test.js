@@ -41,6 +41,13 @@ export default async function handler(req, res) {
     return res.status(200).json({ ok: false, reason: 'bot_token_missing' });
   }
 
+  // Dry-run probe: lets us confirm the new deploy is live WITHOUT
+  // sending anything, so polling doesn't trigger the broadcast.
+  const isDry = /(?:[?&])dry=1\b/.test(req.url || '') || req.query?.dry === '1';
+  if (isDry) {
+    return res.status(200).json({ ok: true, dry: true, ready: true, build: 'broadcast-v2' });
+  }
+
   const host = baseUrl(req);
   const keyboard = {
     inline_keyboard: [[
