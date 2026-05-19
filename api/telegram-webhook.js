@@ -75,7 +75,7 @@ export default async function handler(req, res) {
   // Forward the referral id through the Mini App URL so
   // Game.detectReferral() captures it as start_param.
   const webAppUrl = host + (referralId ? `/?startapp=${referralId}` : '/');
-  const photoUrl = host + '/assets/preview.png';
+  const gifUrl = host + '/assets/pushes/refferal.gif';
 
   const keyboard = {
     inline_keyboard: [[
@@ -83,15 +83,16 @@ export default async function handler(req, res) {
     ]],
   };
 
-  // Try sendPhoto first; if the preview image isn't uploaded yet,
-  // fall back to a plain sendMessage so the welcome still works.
-  const photoRes = await tg('sendPhoto', {
+  // Send the animated GIF as an animation; if Telegram can't fetch it
+  // (not deployed yet, too large, etc.) fall back to a plain sendMessage
+  // so the welcome still works.
+  const animRes = await tg('sendAnimation', {
     chat_id: chatId,
-    photo: photoUrl,
+    animation: gifUrl,
     caption: welcomeCaption(referralId),
     reply_markup: keyboard,
   });
-  if (!photoRes.ok) {
+  if (!animRes.ok) {
     await tg('sendMessage', {
       chat_id: chatId,
       text: welcomeCaption(referralId),

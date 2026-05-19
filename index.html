@@ -3333,7 +3333,7 @@ html, body {
 
     <div class="menu-buttons">
       <button class="btn-primary" onclick="Game.requireWalletGate('levels')" data-i18n="menu_play">Ready for your treatment?</button>
-      <button class="btn-secondary" onclick="Game.showScreen('referral')" data-i18n="menu_referral">Patient records</button>
+      <button class="btn-secondary" onclick="Game.requireWalletGate('referral')" data-i18n="menu_referral">Patient records</button>
       <button class="btn-secondary" onclick="Game.requireWalletGate('shop')" data-i18n="menu_shop">Medicine cabinet</button>
       <button class="btn-secondary" onclick="Game.showScreen('settings')" data-i18n="menu_settings">Settings</button>
     </div>
@@ -3452,21 +3452,7 @@ html, body {
       <div class="screen-title" data-i18n="menu_referral">Patient records</div>
       <div style="width:40px;"></div>
     </div>
-    <div class="ref-soon">
-      <div class="ref-soon-cross">
-        <span></span><span></span>
-      </div>
-      <div class="ref-soon-stamp" data-i18n="ref_soon_stamp">UNDER CONSTRUCTION</div>
-      <div class="ref-soon-title" data-i18n="ref_soon_title">Patient records department</div>
-      <div class="ref-soon-status" data-i18n="ref_soon_status">STATUS&nbsp;:&nbsp;COMING SOON</div>
-      <div class="ref-soon-body" data-i18n="ref_soon_body">Access to the referral programme is being prepared by the medical team.</div>
-      <div class="ref-soon-meta">
-        <span>KLAS&nbsp;SYSTEM v2.0</span>
-        <span class="ref-soon-rec"><span class="ref-soon-rec-dot"></span>&nbsp;PROCESSING</span>
-      </div>
-      <button class="btn-secondary ref-soon-back" onclick="Game.showScreen('menu')" data-i18n="back_to_menu">BACK TO MENU</button>
-    </div>
-    <div class="referral-stats" style="display:none">
+    <div class="referral-stats">
       <div class="stat-box">
         <span class="stat-value" id="ref-friends">0</span>
         <span class="stat-label" data-i18n="ref_friends">Friends</span>
@@ -3476,15 +3462,15 @@ html, body {
         <span class="stat-label" data-i18n="ref_coins">Coins Earned</span>
       </div>
     </div>
-    <div class="referral-link-box" style="display:none">
+    <div class="referral-link-box">
       <div class="referral-link-text" id="referral-link-text">Loading...</div>
       <button class="btn-copy" onclick="Game.copyReferralLink()" data-i18n="copy">COPY</button>
     </div>
-    <div class="referral-buttons" style="display:none">
+    <div class="referral-buttons">
       <button class="btn-primary" onclick="Game.inviteFriend()" data-i18n="invite_friend">INVITE FRIEND</button>
       <button class="btn-secondary" onclick="Game.showScreen('menu')" data-i18n="back_to_menu">BACK TO MENU</button>
     </div>
-    <div class="referral-reward-note" data-i18n="ref_reward_note" style="display:none">+500 coins when a friend completes Level 1</div>
+    <div class="referral-reward-note" data-i18n="ref_reward_note">+500 coins when a friend completes Level 1</div>
   </div>
 
   <!-- SETTINGS -->
@@ -6145,6 +6131,7 @@ const Game = (() => {
   function runGateAction(target) {
     if (target === 'levels') goToLevels();
     else if (target === 'shop')  showScreen('shop');
+    else if (target === 'referral') showScreen('referral');
   }
 
   // Stub for future on-chain rewards
