@@ -5746,7 +5746,7 @@ const Game = (() => {
       .catch(() => showToast(tr('link_copied')));
   }
 
-  function inviteFriend() {
+  function plainShareInvite() {
     const userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || 'demo';
     const link = buildReferralLink(userId);
     const msg = encodeURIComponent('Play Klover Hospital pill puzzle game with me!');
@@ -5756,6 +5756,34 @@ const Game = (() => {
     } else {
       window.open(shareUrl, '_blank');
     }
+  }
+
+  async function inviteFriend() {
+    const tg = window.Telegram?.WebApp;
+    // Preferred (Bot API 8.0+): the bot prepares a message with the
+    // referral link EMBEDDED in the text (HTML <a>), and shareMessage
+    // lets the user post it cleanly — no raw URL.
+    const canShare = tg && typeof tg.shareMessage === 'function'
+      && (typeof tg.isVersionAtLeast !== 'function' || tg.isVersionAtLeast('8.0'));
+    if (canShare) {
+      try {
+        const resp = await fetch('/api/prepare-invite', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'telegram-init-data': tg.initData || '',
+          },
+        });
+        const data = await resp.json();
+        if (data && data.ok && data.id) {
+          tg.shareMessage(data.id, (sent) => {
+            if (!sent) plainShareInvite();
+          });
+          return;
+        }
+      } catch (e) { /* fall through to plain share */ }
+    }
+    plainShareInvite();
   }
 
   function shareResult() {
