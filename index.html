@@ -570,6 +570,24 @@ html, body {
   width: 100%;
 }
 
+/* Endless Ward unlock modal */
+.endless-unlock-modal { gap: 12px; }
+.endless-unlock-photo {
+  width: 84px;
+  height: 84px;
+  border-radius: 14px;
+  object-fit: cover;
+  border: 2px solid rgba(237,0,140,0.4);
+  box-shadow: 0 4px 14px rgba(237,0,140,0.25);
+}
+.endless-unlock-note {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #6a8bab;
+  text-align: center;
+  max-width: 280px;
+}
+
 /* ===== LEVEL LOCKED ===== */
 .level-locked-badge {
   position: absolute;
@@ -3698,6 +3716,20 @@ html, body {
     </div>
   </div>
 
+  <!-- Endless Ward unlock confirm -->
+  <div class="overlay" id="overlay-endless-unlock">
+    <div class="modal endless-unlock-modal">
+      <img src="assets/character/photo_2026-05-11_18-03-28.jpg" alt="" class="endless-unlock-photo">
+      <div class="modal-title" data-i18n="endless_unlock_title">ENDLESS WARD</div>
+      <div class="modal-score" data-i18n="endless_unlock_price">1,000 🪙</div>
+      <div class="endless-unlock-note" data-i18n="endless_unlock_confirm">Spend 1,000 coins to unlock the Endless Ward.</div>
+      <div class="modal-buttons">
+        <button class="btn-primary" onclick="Game.confirmEndlessUnlock()" data-i18n="endless_unlock_yes">UNLOCK</button>
+        <button class="btn-secondary" onclick="Game.closeEndlessUnlock()" data-i18n="endless_unlock_no">NOT NOW</button>
+      </div>
+    </div>
+  </div>
+
   <!-- New Record -->
   <!-- Skin / medicine preview -->
   <div class="overlay" id="overlay-skin-preview">
@@ -3796,7 +3828,11 @@ const I18N = {
     lvl3_priority: 'CRITICAL PATIENT · No discharge — endure until collapse',
     endless: 'ENDLESS',
     endless_hud: 'SURVIVE',
-    endless_unlock_confirm: 'Spend 1,000 coins to unlock the Endless Ward? This patient never recovers — you play until you lose.',
+    endless_unlock_title: 'ENDLESS WARD',
+    endless_unlock_price: '1,000 🪙',
+    endless_unlock_confirm: 'This patient never recovers. Admit them and the pills keep falling faster — play until you collapse.',
+    endless_unlock_yes: 'UNLOCK',
+    endless_unlock_no: 'NOT NOW',
     endless_unlocked_toast: 'Endless Ward unlocked — tap to begin',
     locked: '🔒 LOCKED',
     play: 'PLAY',
@@ -3892,7 +3928,11 @@ const I18N = {
     lvl3_priority: 'КРИТИЧЕСКИЙ ПАЦИЕНТ · Без выписки — играйте до проигрыша',
     endless: 'БЕСКОНЕЧНО',
     endless_hud: 'ВЫЖИВАЙТЕ',
-    endless_unlock_confirm: 'Потратить 1 000 монет, чтобы открыть Бесконечную палату? Этот пациент не выздоравливает — играйте до проигрыша.',
+    endless_unlock_title: 'БЕСКОНЕЧНАЯ ПАЛАТА',
+    endless_unlock_price: '1 000 🪙',
+    endless_unlock_confirm: 'Этот пациент не выздоравливает. Откройте палату — таблетки будут падать всё быстрее, играйте до проигрыша.',
+    endless_unlock_yes: 'ОТКРЫТЬ',
+    endless_unlock_no: 'НЕ СЕЙЧАС',
     endless_unlocked_toast: 'Бесконечная палата открыта — нажмите, чтобы начать',
     locked: '🔒 ЗАКРЫТО',
     play: 'ИГРАТЬ',
@@ -4596,23 +4636,27 @@ const Game = (() => {
       showToast(tr('not_enough_coins'));
       return;
     }
-    const doUnlock = () => {
-      state.coins -= 1000;
-      state.level3unlocked = true;
-      Save.save(state);
-      updateMenuCoins();
-      pushProgress();
-      updateLevelsUI();
-      showToast(tr('endless_unlocked_toast'));
-      startLevel(3);
-    };
-    const msg = tr('endless_unlock_confirm');
-    const tg = window.Telegram?.WebApp;
-    if (tg && typeof tg.showConfirm === 'function') {
-      try { tg.showConfirm(msg, (ok) => { if (ok) doUnlock(); }); return; }
-      catch (e) { /* fall through to window.confirm */ }
-    }
-    if (window.confirm(msg)) doUnlock();
+    // Show the in-game styled confirm modal instead of a native dialog so
+    // it matches the rest of the UI.
+    document.getElementById('overlay-endless-unlock').classList.add('active');
+  }
+
+  function closeEndlessUnlock() {
+    document.getElementById('overlay-endless-unlock').classList.remove('active');
+  }
+
+  function confirmEndlessUnlock() {
+    closeEndlessUnlock();
+    if (state.level3unlocked) { startLevel(3); return; }
+    if ((state.coins || 0) < 1000) { showToast(tr('not_enough_coins')); return; }
+    state.coins -= 1000;
+    state.level3unlocked = true;
+    Save.save(state);
+    updateMenuCoins();
+    pushProgress();
+    updateLevelsUI();
+    showToast(tr('endless_unlocked_toast'));
+    startLevel(3);
   }
 
   function startLevel(levelId) {
@@ -6240,6 +6284,8 @@ const Game = (() => {
     nextSlide,
     goToLevels,
     startLevel,
+    confirmEndlessUnlock,
+    closeEndlessUnlock,
     pauseGame,
     resumeGame,
     quitToMenu,
