@@ -3345,6 +3345,21 @@ html, body {
           <div class="level-card-badge badge-locked" id="level-badge-2" data-i18n="locked">&#128274; LOCKED</div>
         </div>
       </div>
+      <div class="level-card locked" id="level-card-3" onclick="Game.startLevel(3)">
+        <div class="patient-photo" id="level3-photo">
+          <img src="assets/character/photo_2026-05-11_18-03-28.jpg" alt="Endless Ward" class="patient-photo-img">
+        </div>
+        <div class="patient-info">
+          <div class="id-card-label">ID CARD</div>
+          <div class="level-card-name" id="level3-name">RIK</div>
+          <div class="patient-locked-note" id="level3-note" data-i18n="lvl3_locked_note">Unlock for 1000 &#129689;</div>
+          <div class="patient-meta-row">DIFFICULTY <b>&infin;</b></div>
+          <div class="patient-meta-row">KLASS_ID <b>0900011</b></div>
+        </div>
+        <div class="patient-actions">
+          <div class="level-card-badge badge-locked" id="level-badge-3" data-i18n="locked">&#128274; LOCKED</div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -3746,8 +3761,9 @@ const COLORS = {
 const COLOR_KEYS = Object.keys(COLORS);
 
 const LEVELS = [
-  { id:1, name:'MAI',     target:5000,  lives:3, speed:800,  unlocked: true  },
-  { id:2, name:'VI',      target:12000, lives:2, speed:560,  unlocked: false },
+  { id:1, name:'MAI',     target:5000,     lives:3, speed:800, unlocked: true  },
+  { id:2, name:'VI',      target:12000,    lives:2, speed:560, unlocked: false },
+  { id:3, name:'RIK',     target:Infinity, lives:1, speed:680, unlocked: false, endless: true },
 ];
 
 // ============================================================
@@ -3773,6 +3789,13 @@ const I18N = {
     review_case: 'Review case',
     lvl2_locked_note: 'Complete level 1 to unlock',
     lvl2_unlocked_note: 'PRIORITY PATIENT · Advanced care unit',
+    lvl3_locked_note: 'Unlock for 1,000 🪙',
+    lvl3_unlocked_note: 'ENDLESS WARD · Survive as long as you can',
+    lvl3_priority: 'CRITICAL PATIENT · No discharge — endure until collapse',
+    endless: 'ENDLESS',
+    endless_hud: 'SURVIVE',
+    endless_unlock_confirm: 'Spend 1,000 coins to unlock the Endless Ward? This patient never recovers — you play until you lose.',
+    endless_unlocked_toast: 'Endless Ward unlocked — tap to begin',
     locked: '🔒 LOCKED',
     play: 'PLAY',
     complete: 'COMPLETE',
@@ -3862,6 +3885,13 @@ const I18N = {
     review_case: 'Обзор дела',
     lvl2_locked_note: 'Пройдите уровень 1, чтобы открыть',
     lvl2_unlocked_note: 'ВАЖНЫЙ ПАЦИЕНТ · Отделение интенсивной терапии',
+    lvl3_locked_note: 'Открыть за 1 000 🪙',
+    lvl3_unlocked_note: 'БЕСКОНЕЧНАЯ ПАЛАТА · Держитесь как можно дольше',
+    lvl3_priority: 'КРИТИЧЕСКИЙ ПАЦИЕНТ · Без выписки — играйте до проигрыша',
+    endless: 'БЕСКОНЕЧНО',
+    endless_hud: 'ВЫЖИВАЙТЕ',
+    endless_unlock_confirm: 'Потратить 1 000 монет, чтобы открыть Бесконечную палату? Этот пациент не выздоравливает — играйте до проигрыша.',
+    endless_unlocked_toast: 'Бесконечная палата открыта — нажмите, чтобы начать',
     locked: '🔒 ЗАКРЫТО',
     play: 'ИГРАТЬ',
     complete: 'ПРОЙДЕНО',
@@ -4050,6 +4080,7 @@ const Save = {
       coins: 0,
       level1complete: false,
       level2complete: false,
+      level3unlocked: false,
       lastLogin: null,
       lang: 'en',
       sound: true,
@@ -4288,6 +4319,7 @@ const Game = (() => {
     // Detect referral immediately so it's captured even if the
     // /api/save-user hydrate path is delayed by a slow Telegram ready.
     Sync.detectReferral();
+    grantEndlessGiftOnce();
     showReferralWelcomeIfPending();
     hydrateFromRemote();
 
@@ -4371,6 +4403,34 @@ const Game = (() => {
     if (l1badge && state.level1complete) {
       l1badge.textContent = tr('complete');
       l1badge.className = 'level-card-badge badge-complete';
+    }
+
+    // Level 3 — Endless Ward. Unlocked by spending 1,000 coins (persisted
+    // in state.level3unlocked). Locked until then; the badge doubles as the
+    // "spend to unlock" affordance handled in startLevel(3).
+    const l3card = document.getElementById('level-card-3');
+    const l3badge = document.getElementById('level-badge-3');
+    const l3note = document.getElementById('level3-note');
+    if (state.level3unlocked) {
+      if (l3card) l3card.classList.remove('locked');
+      if (l3badge) {
+        l3badge.textContent = tr('endless');
+        l3badge.className = 'level-card-badge badge-play';
+      }
+      if (l3note) {
+        l3note.textContent = tr('lvl3_unlocked_note');
+        l3note.className = 'patient-priority';
+      }
+    } else {
+      if (l3card) l3card.classList.add('locked');
+      if (l3badge) {
+        l3badge.textContent = tr('locked');
+        l3badge.className = 'level-card-badge badge-locked';
+      }
+      if (l3note) {
+        l3note.textContent = tr('lvl3_locked_note');
+        l3note.className = 'patient-locked-note';
+      }
     }
   }
 
@@ -4506,6 +4566,53 @@ const Game = (() => {
     showScreen('levels');
   }
 
+  // One-time-only gift: account 881282443 receives 1,000 coins on first
+  // load so it can afford the Endless Ward unlock. Guarded by a localStorage
+  // flag so it never repeats; the credited balance syncs to the server via
+  // pushProgress (server keeps the max value seen).
+  function grantEndlessGiftOnce() {
+    const tgId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+    if (tgId !== 881282443) return;
+    try {
+      if (localStorage.getItem('klover_lvl3_grant') === '1') return;
+      state.coins = (state.coins || 0) + 1000;
+      localStorage.setItem('klover_lvl3_grant', '1');
+      Save.save(state);
+      pushProgress();
+      updateMenuCoins();
+    } catch (e) {
+      console.warn('[endless-gift] failed:', e.message);
+    }
+  }
+
+  // Endless Ward costs 1,000 coins to unlock. Any player with the balance
+  // can buy it; the unlock persists in state and syncs. On success we start
+  // the level immediately so the spend feels rewarding.
+  function tryUnlockEndless() {
+    if (state.level3unlocked) { startLevel(3); return; }
+    if ((state.coins || 0) < 1000) {
+      showToast(tr('not_enough_coins'));
+      return;
+    }
+    const doUnlock = () => {
+      state.coins -= 1000;
+      state.level3unlocked = true;
+      Save.save(state);
+      updateMenuCoins();
+      pushProgress();
+      updateLevelsUI();
+      showToast(tr('endless_unlocked_toast'));
+      startLevel(3);
+    };
+    const msg = tr('endless_unlock_confirm');
+    const tg = window.Telegram?.WebApp;
+    if (tg && typeof tg.showConfirm === 'function') {
+      try { tg.showConfirm(msg, (ok) => { if (ok) doUnlock(); }); return; }
+      catch (e) { /* fall through to window.confirm */ }
+    }
+    if (window.confirm(msg)) doUnlock();
+  }
+
   function startLevel(levelId) {
     if (levelId === 1 && window.Lore && !window.Lore.seen()) {
       window.Lore.start(() => startLevel(levelId));
@@ -4515,6 +4622,12 @@ const Game = (() => {
     if (!lvl) return;
     if (!lvl.unlocked && !state.level1complete && levelId === 2) {
       showToast(tr('complete_lvl1_first'));
+      return;
+    }
+    // Level 3 (Endless Ward) is gated behind a 1,000-coin purchase.
+    // Tapping the locked card runs the unlock flow instead of starting.
+    if (levelId === 3 && !state.level3unlocked) {
+      tryUnlockEndless();
       return;
     }
     currentLevel = levelId;
@@ -4530,7 +4643,9 @@ const Game = (() => {
     updateBombUI();
 
     document.getElementById('hud-level-name').textContent = lvl.name;
-    document.getElementById('hud-target').textContent = tr('recovery_label') + ': ' + lvl.target.toLocaleString();
+    document.getElementById('hud-target').textContent = lvl.endless
+      ? tr('endless_hud')
+      : tr('recovery_label') + ': ' + lvl.target.toLocaleString();
     updateHUD();
 
     showScreen('game');
@@ -4682,6 +4797,11 @@ const Game = (() => {
         if (score >= lvl.target) {
           setTimeout(triggerLevelComplete, 300);
           return;
+        }
+        // Endless Ward: pills fall faster the longer you survive — ramps
+        // down every 600 pts by 35ms, floored at 170ms so it stays playable.
+        if (lvl.endless) {
+          fallSpeed = Math.max(170, lvl.speed - Math.floor(score / 600) * 35);
         }
         // Next pair
         currentPair = nextPair;
@@ -5622,6 +5742,7 @@ const Game = (() => {
       // (e.g., the level 2 name is rewritten by updateLevelsUI based on
       // unlock state — we let that function pick the right translation).
       if (el.id === 'level2-name' || el.id === 'level2-note' || el.id === 'level-badge-2') return;
+      if (el.id === 'level3-name' || el.id === 'level3-note' || el.id === 'level-badge-3') return;
       el.textContent = txt;
     });
     // Re-render dynamic screens that bake translated strings into JS-built UI.
@@ -5635,7 +5756,9 @@ const Game = (() => {
     const hudTarget = document.getElementById('hud-target');
     if (hudTarget && typeof currentLevel === 'number') {
       const lvl = LEVELS.find(l => l.id === currentLevel);
-      if (lvl) hudTarget.textContent = tr('recovery_label') + ': ' + lvl.target.toLocaleString();
+      if (lvl) hudTarget.textContent = lvl.endless
+        ? tr('endless_hud')
+        : tr('recovery_label') + ': ' + lvl.target.toLocaleString();
     }
     // Tutorial slide labels live in the slides array, refresh that too.
     slides[0].text = tr('slide_1', lang);
