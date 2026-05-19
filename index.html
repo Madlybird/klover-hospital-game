@@ -605,6 +605,7 @@ html, body {
   text-align: center;
   color: var(--color-primary, #e8609a);
 }
+.sim-fail-text { color: #e23b5c; }
 
 /* ===== LEVEL LOCKED ===== */
 .level-locked-badge {
@@ -3736,13 +3737,14 @@ html, body {
 
   <!-- Game Over -->
   <div class="overlay" id="overlay-gameover">
-    <div class="modal">
-      <div class="modal-title" data-i18n="game_over">GAME OVER</div>
+    <div class="modal sim-complete-modal">
+      <img src="assets/story/4.JPG" alt="" class="sim-complete-photo">
+      <div class="sim-complete-text sim-fail-text" data-i18n="sim_fail_text">Oh no… the simulation swallowed you. Steady your hands and dive back in.</div>
       <div class="modal-score" id="gameover-score">Score: 0</div>
       <div class="modal-best" id="gameover-best">Best: 0</div>
       <div class="modal-buttons">
         <button class="btn-primary" onclick="Game.restartLevel()" data-i18n="try_again">TRY AGAIN</button>
-        <button class="btn-secondary" onclick="Game.quitToMenu()" data-i18n="menu">MENU</button>
+        <button class="btn-secondary" onclick="Game.backToLevels()" data-i18n="sim_back_levels">BACK TO LEVELS</button>
       </div>
     </div>
   </div>
@@ -3883,6 +3885,7 @@ const I18N = {
     sim_complete_text: 'You did it — simulation passed perfectly',
     sim_earned: 'Earned',
     sim_back_levels: 'BACK TO LEVELS',
+    sim_fail_text: 'Oh no… the simulation swallowed you whole. Steady your hands — and dive back in.',
     game_over: 'GAME OVER',
     try_again: 'TRY AGAIN',
     menu: 'MENU',
@@ -3986,6 +3989,7 @@ const I18N = {
     sim_complete_text: 'Ты справился, симуляция пройдена отлично',
     sim_earned: 'Начислено',
     sim_back_levels: 'ВЕРНУТЬСЯ НА УРОВНИ',
+    sim_fail_text: 'О нет… симуляция поглотила тебя. Соберись с силами — и вернись в бой.',
     game_over: 'КОНЕЦ ИГРЫ',
     try_again: 'ЕЩЁ РАЗ',
     menu: 'МЕНЮ',
