@@ -3293,7 +3293,6 @@ html, body {
 
     <div class="menu-buttons">
       <button class="btn-primary" onclick="Game.requireWalletGate('levels')" data-i18n="menu_play">Ready for your treatment?</button>
-      <button class="btn-secondary" onclick="Game.requireWalletGate('howto')" data-i18n="menu_howto">How to take your medicine</button>
       <button class="btn-secondary" onclick="Game.showScreen('referral')" data-i18n="menu_referral">Patient records</button>
       <button class="btn-secondary" onclick="Game.requireWalletGate('shop')" data-i18n="menu_shop">Medicine cabinet</button>
       <button class="btn-secondary" onclick="Game.showScreen('settings')" data-i18n="menu_settings">Settings</button>
@@ -3304,27 +3303,6 @@ html, body {
       <span class="klas-right" onclick="Game.toggleTonConnect()" data-i18n="connect">&#9673; CONNECT</span>
     </div>
 
-  </div>
-
-  <!-- HOW TO PLAY -->
-  <div id="screen-howto" class="screen">
-    <div class="howto-header">
-      <button class="btn-back" onclick="Game.showScreen('menu')">&#8592;</button>
-      <div class="screen-title howto-title" data-i18n="howto_title">Nurse Mai's treatment guide</div>
-    </div>
-    <div class="slide-area">
-      <div class="slide-text" id="slide-text">Nurse Mai's treatment guide.</div>
-      <div class="slide-canvas-wrap">
-        <canvas id="slide-canvas" width="200" height="130"></canvas>
-      </div>
-      <div class="dots-row" id="slide-dots">
-        <div class="dot active"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-      </div>
-      <button class="btn-slide-next" id="slide-btn" onclick="Game.nextSlide()">Continue</button>
-    </div>
   </div>
 
   <!-- LEVEL SELECT -->
@@ -3779,7 +3757,6 @@ const I18N = {
   en: {
     tagline: 'PILL PUZZLE GAME',
     menu_play: 'Ready for your treatment?',
-    menu_howto: 'How to take your medicine',
     menu_referral: 'Patient records',
     menu_shop: 'Medicine cabinet',
     menu_settings: 'Settings',
@@ -3788,7 +3765,6 @@ const I18N = {
     connect_short: 'CONNECT',
     disconnect: 'DISCONNECT',
     not_connected: 'Not connected',
-    howto_title: "Nurse Mai's treatment guide",
     levels_title: 'Patient assignment',
     levels_subtitle: "Select your patient for today's treatment:",
     story_btn: 'Story',
@@ -3870,7 +3846,6 @@ const I18N = {
   ru: {
     tagline: 'ИГРА-ГОЛОВОЛОМКА С ТАБЛЕТКАМИ',
     menu_play: 'Готовы к лечению?',
-    menu_howto: 'Как принимать лекарство',
     menu_referral: 'Карта пациента',
     menu_shop: 'Аптечка',
     menu_settings: 'Настройки',
@@ -3879,7 +3854,6 @@ const I18N = {
     connect_short: 'ПОДКЛЮЧИТЬ',
     disconnect: 'ОТКЛЮЧИТЬ',
     not_connected: 'Не подключен',
-    howto_title: 'Гид от медсестры Май',
     levels_title: 'Назначение пациента',
     levels_subtitle: 'Выберите пациента на сегодня:',
     story_btn: 'История',
@@ -4357,7 +4331,6 @@ const Game = (() => {
     else Particles.start();
 
     if (name === 'menu') updateMenuUI();
-    if (name === 'howto') { slideIndex = 0; renderSlide(); }
     if (name === 'referral') updateReferralUI();
     if (name === 'settings') updateSettingsUI();
     if (name === 'shop') renderShop();
@@ -4512,9 +4485,7 @@ const Game = (() => {
       }
       ctx.globalAlpha = 1;
     }
-    requestAnimationFrame(() => {
-      if (currentScreen === 'howto') drawSlideDemo(slideIndex);
-    });
+    requestAnimationFrame(() => {});
   }
 
   function drawDemoBlob(ctx, x, y, w, h, color) {
@@ -5657,7 +5628,6 @@ const Game = (() => {
     if (currentScreen === 'levels') updateLevelsUI();
     if (currentScreen === 'menu') updateMenuUI();
     if (currentScreen === 'settings') updateSettingsUI();
-    if (currentScreen === 'howto') renderSlide();
     if (currentScreen === 'shop') renderShop();
     // In-game HUD strings are written by JS each frame/event — refresh the
     // ones that aren't (level name + recovery target) so a mid-session
@@ -5952,7 +5922,6 @@ const Game = (() => {
 
   function runGateAction(target) {
     if (target === 'levels') goToLevels();
-    else if (target === 'howto') showScreen('howto');
     else if (target === 'shop')  showScreen('shop');
   }
 
