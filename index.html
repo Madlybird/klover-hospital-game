@@ -3411,6 +3411,372 @@ html, body {
   font-family: inherit;
 }
 .c2-placeholder-btn:hover { background: linear-gradient(135deg, #561240, #851852); }
+
+/* ---- C2 storyline panels (#screen-c2-intro) ---- */
+.c2p-stage {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  background: #04020a;
+}
+.c2p-scene {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+#c2p-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+}
+.c2p-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  padding: 14px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+  font-family: 'Courier New', monospace;
+  z-index: 3;
+}
+.c2p-clock {
+  font-size: 14px;
+  letter-spacing: 3px;
+  color: rgba(255,180,200,0.85);
+  text-shadow: 0 0 8px rgba(232,60,90,0.5);
+  font-weight: 700;
+}
+.c2p-skip {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.5);
+  background: rgba(20,5,20,0.6);
+  padding: 4px 10px;
+  border: 1px solid rgba(180,40,80,0.35);
+  border-radius: 4px;
+  pointer-events: auto;
+  cursor: pointer;
+}
+.c2p-skip:hover { color: #fff; border-color: rgba(232,96,154,0.7); }
+.c2p-textbox {
+  flex: 0 0 auto;
+  min-height: 130px;
+  background: linear-gradient(180deg, rgba(8,3,12,0.95) 0%, #08030d 100%);
+  border-top: 1px solid rgba(180,40,80,0.35);
+  padding: 16px 22px 20px;
+  font-family: Georgia, serif;
+  color: #f0e0e8;
+  position: relative;
+}
+.c2p-text {
+  font-size: 18px;
+  line-height: 1.5;
+  font-style: italic;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.7);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.c2p-text.show { opacity: 1; transform: translateY(0); }
+.c2p-tap-hint {
+  position: absolute;
+  bottom: 6px;
+  left: 0; right: 0;
+  text-align: center;
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: rgba(232,96,154,0.6);
+  animation: c2p-pulse 1.4s ease-in-out infinite;
+}
+@keyframes c2p-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.95; }
+}
+
+/* ---- C2 typing minigame (#screen-c2-action) ---- */
+.c2a-stage {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  background: #04020a;
+  position: relative;
+}
+.c2a-hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px 10px;
+  border-bottom: 1px solid rgba(180,40,80,0.30);
+  background: linear-gradient(180deg, rgba(20,5,25,0.92), rgba(8,3,12,0.92));
+  font-family: 'Courier New', monospace;
+}
+.c2a-timer-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.c2a-timer-label {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: rgba(255,180,200,0.55);
+}
+.c2a-timer {
+  font-size: 28px;
+  font-weight: 800;
+  color: #e8609a;
+  text-shadow: 0 0 12px rgba(232,96,154,0.6);
+  line-height: 1;
+}
+.c2a-hint {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: rgba(240,224,232,0.65);
+  font-weight: 700;
+  text-align: center;
+  flex: 1;
+  padding: 0 12px;
+}
+.c2a-lives { display: flex; gap: 4px; }
+.c2a-life {
+  font-size: 18px;
+  color: rgba(255,255,255,0.15);
+  text-shadow: none;
+}
+.c2a-life.on {
+  color: #e8609a;
+  text-shadow: 0 0 8px rgba(232,96,154,0.7);
+}
+#c2a-canvas {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  display: block;
+  image-rendering: pixelated;
+  cursor: crosshair;
+}
+.c2a-end-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(4,2,10,0.92);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  z-index: 5;
+}
+.c2a-end-overlay.show { display: flex; }
+.c2a-end-title {
+  font-family: 'Courier New', monospace;
+  font-size: 28px;
+  letter-spacing: 4px;
+  font-weight: 800;
+  color: #e8609a;
+  text-shadow: 0 0 16px rgba(232,96,154,0.7);
+}
+.c2a-end-buttons { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
+/* ---- C2 level select (#screen-c2-levels) ---- */
+.c2-levels-grid { gap: 14px; }
+.c2-card {
+  background: linear-gradient(135deg, rgba(20,5,30,0.95), rgba(40,10,30,0.92)) !important;
+  border: 1px solid rgba(180,40,80,0.30) !important;
+  color: #fff !important;
+}
+.c2-card .level-card-name { color: #e8609a; text-shadow: 0 0 10px rgba(232,96,154,0.45); }
+.c2-card .id-card-label { color: rgba(232,96,154,0.65); }
+.c2-card .patient-meta-row { color: rgba(255,255,255,0.55); }
+.c2-card .patient-meta-row b { color: #ffb8d0; }
+.c2-card.locked { filter: grayscale(0.5) brightness(0.7); }
+.c2-priority { color: #ffaac0 !important; }
+.c2-locked { color: rgba(255,180,200,0.55) !important; }
+.c2-photo {
+  background: radial-gradient(circle at 50% 40%, #2a0a1c 0%, #060108 80%);
+}
+.c2-photo-portrait {
+  width: 100%; height: 100%;
+  background-size: 22px 22px;
+  background-position: center;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+}
+.c2-photo-portrait[data-art="m1"] {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 13' shape-rendering='crispEdges'><rect width='11' height='13' fill='%23120612'/><rect x='3' y='1' width='5' height='2' fill='%233a1828'/><rect x='2' y='3' width='7' height='5' fill='%235a3848'/><rect x='3' y='5' width='1' height='1' fill='%23ff5070'/><rect x='7' y='5' width='1' height='1' fill='%23ff5070'/><rect x='4' y='7' width='3' height='1' fill='%23000'/><rect x='3' y='8' width='5' height='3' fill='%231a0e10'/></svg>");
+  background-size: 80% 80%;
+}
+.c2-photo-portrait[data-art="m2"] {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 13' shape-rendering='crispEdges'><rect width='11' height='13' fill='%23080608'/><rect x='2' y='2' width='7' height='2' fill='%231a0e10'/><rect x='1' y='4' width='9' height='5' fill='%233a4a2a'/><rect x='3' y='5' width='2' height='1' fill='%23ff7090'/><rect x='6' y='5' width='2' height='1' fill='%23ff7090'/><rect x='3' y='7' width='5' height='1' fill='%23000'/><rect x='2' y='9' width='7' height='3' fill='%232a3820'/></svg>");
+  background-size: 80% 80%;
+}
+.c2-photo-portrait[data-art="m3"] {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 13' shape-rendering='crispEdges'><rect width='11' height='13' fill='%23000'/><rect x='4' y='1' width='3' height='1' fill='%23e8609a'/><rect x='3' y='2' width='5' height='4' fill='%23180812'/><rect x='4' y='3' width='1' height='1' fill='%23ff90b0'/><rect x='6' y='3' width='1' height='1' fill='%23ff90b0'/><rect x='4' y='5' width='3' height='1' fill='%23ff5070'/><rect x='2' y='7' width='7' height='4' fill='%23080608'/><rect x='3' y='8' width='5' height='1' fill='%236e0a1e'/></svg>");
+  background-size: 80% 80%;
+}
+.c2-btn-proceed {
+  background: linear-gradient(135deg, #420a30, #6e1142) !important;
+  color: #fff !important;
+  border: 1px solid rgba(232,96,154,0.5) !important;
+}
+.c2-btn-proceed:hover { background: linear-gradient(135deg, #561240, #851852) !important; }
+.c2-badge.badge-play { background: linear-gradient(135deg, #6e1142, #a01856); color: #fff; }
+.c2-badge.badge-complete { background: linear-gradient(135deg, #1a5a30, #2c8050); color: #fff; }
+.c2-badge-locked { background: rgba(40,10,20,0.6); color: rgba(255,180,200,0.5); }
+.c2-mystery-card {
+  margin: 18px auto 24px;
+  max-width: 360px;
+  padding: 14px 16px;
+  background: rgba(8,4,12,0.85);
+  border: 1px dashed rgba(180,40,80,0.35);
+  border-radius: 10px;
+  text-align: center;
+  font-family: 'Courier New', monospace;
+}
+.c2-mystery-label {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: rgba(232,96,154,0.8);
+  font-weight: 800;
+}
+.c2-mystery-body {
+  font-size: 12px;
+  margin-top: 6px;
+  color: rgba(240,224,232,0.6);
+  line-height: 1.5;
+  font-style: italic;
+}
+
+/* ---- C2 infection puzzle (#screen-c2-game) ---- */
+.c2g-hud {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px 10px;
+  background: linear-gradient(180deg, rgba(20,5,25,0.95), rgba(8,3,12,0.92));
+  border-bottom: 1px solid rgba(180,40,80,0.30);
+  font-family: 'Courier New', monospace;
+  box-sizing: border-box;
+}
+.c2g-hud-score, .c2g-hud-right {
+  display: flex;
+  flex-direction: column;
+}
+.c2g-hud-right { align-items: flex-end; gap: 4px; }
+.c2g-hud-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.c2g-level-name {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  color: #fff;
+}
+.c2g-hud-target {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #ffaac0;
+}
+.c2g-inf-bar {
+  width: 140px;
+  height: 6px;
+  background: rgba(232,96,154,0.12);
+  border-radius: 3px;
+  margin-top: 3px;
+  overflow: hidden;
+}
+.c2g-inf-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #e8609a, #ff3060);
+  width: 0%;
+  transition: width 0.3s ease;
+}
+.c2g-inf-label {
+  font-size: 9px;
+  letter-spacing: 1.6px;
+  color: rgba(255,180,200,0.55);
+  margin-top: 2px;
+}
+.c2g-lives {
+  display: flex;
+  gap: 3px;
+}
+.c2g-life {
+  font-size: 14px;
+  color: rgba(255,255,255,0.18);
+}
+.c2g-life.on { color: #e8609a; text-shadow: 0 0 6px rgba(232,96,154,0.7); }
+.c2g-pause {
+  margin-top: 4px;
+}
+.c2g-area {
+  width: 100%;
+  display: flex;
+  gap: 14px;
+  padding: 10px 12px;
+  height: calc(100vh - 130px);
+  align-items: flex-start;
+  justify-content: center;
+  box-sizing: border-box;
+}
+#c2g-canvas {
+  background: #0a050d;
+  border: 1px solid rgba(180,40,80,0.20);
+  display: block;
+  image-rendering: pixelated;
+}
+.c2-fact-card {
+  background: rgba(20,5,20,0.65) !important;
+  border-color: rgba(180,40,80,0.35) !important;
+  color: rgba(240,224,232,0.8) !important;
+}
+.c2-fact-card b { color: #e8609a !important; }
+.c2g-end-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(4,2,10,0.92);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}
+.c2g-end-overlay.show { display: flex; }
+.c2g-end-card {
+  padding: 28px 32px;
+  background: linear-gradient(135deg, #1a0612, #2c0a20);
+  border: 1px solid rgba(232,96,154,0.4);
+  border-radius: 14px;
+  text-align: center;
+  min-width: 260px;
+}
+.c2g-end-title {
+  font-family: 'Courier New', monospace;
+  font-size: 22px;
+  letter-spacing: 4px;
+  font-weight: 800;
+  color: #e8609a;
+  text-shadow: 0 0 12px rgba(232,96,154,0.6);
+  margin-bottom: 8px;
+}
+.c2g-end-sub {
+  font-size: 13px;
+  color: rgba(240,224,232,0.65);
+  margin-bottom: 18px;
+}
+.c2g-end-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+#screen-c2-game { position: relative; }
 </style>
 </head>
 <body>
@@ -3527,21 +3893,42 @@ html, body {
 
   <!-- ===== CHAPTER 2 SCREENS (dev-gated stubs, filled in later sprints) ===== -->
 
-  <!-- C2: storyline intro (Sprint 2 will replace placeholder) -->
+  <!-- C2: storyline intro panels (8 panels: 6 pre-action, 2 post-action) -->
   <div id="screen-c2-intro" class="screen">
-    <div class="c2-placeholder">
-      <div class="c2-placeholder-title" data-i18n="c2_intro_stub_title">NIGHT SHIFT</div>
-      <div class="c2-placeholder-sub" data-i18n="c2_intro_stub_sub">Storyline panels arrive in the next build. For now, skip ahead to the level select.</div>
-      <button class="c2-placeholder-btn" onclick="Game.finishC2Intro()" data-i18n="c2_skip_btn">SKIP &rsaquo;</button>
+    <div class="c2p-stage">
+      <div class="c2p-scene" id="c2p-scene">
+        <canvas id="c2p-canvas"></canvas>
+        <div class="c2p-overlay">
+          <div class="c2p-clock" id="c2p-clock">03:47</div>
+          <div class="c2p-skip" onclick="Game.skipC2IntroToAction()" data-i18n="c2_skip_btn">SKIP &rsaquo;</div>
+        </div>
+      </div>
+      <div class="c2p-textbox">
+        <div class="c2p-text" id="c2p-text"></div>
+        <div class="c2p-tap-hint" id="c2p-tap-hint" data-i18n="c2_tap_continue">&#9678; tap to continue</div>
+      </div>
     </div>
   </div>
 
-  <!-- C2: typing zombies action (Sprint 3) -->
+  <!-- C2: typing zombies action (30s, 3 waves) -->
   <div id="screen-c2-action" class="screen">
-    <div class="c2-placeholder">
-      <div class="c2-placeholder-title" data-i18n="c2_action_stub_title">TYPE TO SURVIVE</div>
-      <div class="c2-placeholder-sub" data-i18n="c2_action_stub_sub">The typing minigame arrives in Sprint 3. Continue for now.</div>
-      <button class="c2-placeholder-btn" onclick="Game.finishC2Action()" data-i18n="c2_continue_btn">CONTINUE &rsaquo;</button>
+    <div class="c2a-stage">
+      <div class="c2a-hud">
+        <div class="c2a-timer-wrap">
+          <div class="c2a-timer-label" data-i18n="c2_time_label">TIME</div>
+          <div class="c2a-timer" id="c2a-timer">30</div>
+        </div>
+        <div class="c2a-hint" data-i18n="c2_action_hint">TYPE TO HEAL. TYPE TO SURVIVE.</div>
+        <div class="c2a-lives" id="c2a-lives"></div>
+      </div>
+      <canvas id="c2a-canvas"></canvas>
+      <div class="c2a-end-overlay" id="c2a-end-overlay">
+        <div class="c2a-end-title" id="c2a-end-title">SHE DIDN'T WAKE</div>
+        <div class="c2a-end-buttons">
+          <button class="c2-placeholder-btn" onclick="Game.restartC2Action()" data-i18n="try_again">TRY AGAIN</button>
+          <button class="c2-placeholder-btn" onclick="Game.showScreen('levels')" data-i18n="quit_to_menu">QUIT</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -3553,19 +3940,98 @@ html, body {
       <button class="btn-story" onclick="Game.replayC2Intro()" data-i18n="story_btn" title="Replay nightmare">Story</button>
     </div>
     <div class="patient-subtitle" data-i18n="c2_levels_subtitle">The patients she couldn't save:</div>
-    <div class="c2-placeholder" style="min-height:60vh">
-      <div class="c2-placeholder-title" data-i18n="c2_levels_stub_title">M-1 &middot; M-2 &middot; M-3</div>
-      <div class="c2-placeholder-sub" data-i18n="c2_levels_stub_sub">Level cards arrive after the infection mechanic ships.</div>
-      <button class="c2-placeholder-btn" onclick="Game.startC2Level(1)" data-i18n="c2_preview_l1">PREVIEW LEVEL 1</button>
+    <div class="levels-grid c2-levels-grid">
+      <div class="level-card c2-card" id="c2-level-card-1" onclick="Game.startC2Level(1)">
+        <div class="patient-photo c2-photo">
+          <div class="c2-photo-portrait" data-art="m1"></div>
+        </div>
+        <div class="patient-info">
+          <div class="id-card-label">ID CARD</div>
+          <div class="level-card-name">M-1</div>
+          <div class="patient-priority c2-priority" data-i18n="c2_lvl1_priority">PATIENT ZERO &middot; First to fall</div>
+          <div class="patient-meta-row">DIFFICULTY <b>&bull;</b></div>
+          <div class="patient-meta-row">CLASS_ID <b>NIGHTMARE_01</b></div>
+        </div>
+        <div class="patient-actions">
+          <button class="btn-proceed c2-btn-proceed" onclick="event.stopPropagation();Game.startC2Level(1)" data-i18n="c2_contain">CONTAIN</button>
+          <div class="level-card-badge c2-badge" id="c2-level-badge-1" data-i18n="play">PLAY</div>
+        </div>
+      </div>
+      <div class="level-card c2-card locked" id="c2-level-card-2" onclick="Game.startC2Level(2)">
+        <div class="patient-photo c2-photo">
+          <div class="c2-photo-portrait" data-art="m2"></div>
+        </div>
+        <div class="patient-info">
+          <div class="id-card-label">ID CARD</div>
+          <div class="level-card-name">M-2</div>
+          <div class="patient-locked-note c2-locked" id="c2-level2-note" data-i18n="c2_lvl2_locked_note">Contain M-1 first</div>
+          <div class="patient-meta-row">DIFFICULTY <b>&bull;&bull;&bull;</b></div>
+          <div class="patient-meta-row">CLASS_ID <b>NIGHTMARE_02</b></div>
+        </div>
+        <div class="patient-actions">
+          <div class="level-card-badge badge-locked c2-badge-locked" id="c2-level-badge-2" data-i18n="locked">&#128274; LOCKED</div>
+        </div>
+      </div>
+      <div class="level-card c2-card locked" id="c2-level-card-3" onclick="Game.startC2Level(3)">
+        <div class="patient-photo c2-photo">
+          <div class="c2-photo-portrait" data-art="m3"></div>
+        </div>
+        <div class="patient-info">
+          <div class="id-card-label">ID CARD</div>
+          <div class="level-card-name">M-3</div>
+          <div class="patient-locked-note c2-locked" id="c2-level3-note" data-i18n="c2_lvl3_locked_note">Contain M-1 and M-2 first</div>
+          <div class="patient-meta-row">DIFFICULTY <b>&infin;</b></div>
+          <div class="patient-meta-row">CLASS_ID <b>NIGHTMARE_INF</b></div>
+        </div>
+        <div class="patient-actions">
+          <div class="level-card-badge badge-locked c2-badge-locked" id="c2-level-badge-3" data-i18n="locked">&#128274; LOCKED</div>
+        </div>
+      </div>
+    </div>
+    <div class="c2-mystery-card" id="c2-mystery-card">
+      <div class="c2-mystery-label" data-i18n="c2_mystery_label">PATIENT FILE &mdash; ???</div>
+      <div class="c2-mystery-body" data-i18n="c2_mystery_body">Found on the registry desk after the nightmare. Name field empty. Coming soon.</div>
     </div>
   </div>
 
-  <!-- C2: infection puzzle gameplay (Sprint 4) -->
+  <!-- C2: infection puzzle gameplay -->
   <div id="screen-c2-game" class="screen">
-    <div class="c2-placeholder">
-      <div class="c2-placeholder-title" data-i18n="c2_game_stub_title">INFECTION</div>
-      <div class="c2-placeholder-sub" data-i18n="c2_game_stub_sub">The containment puzzle arrives in Sprint 4.</div>
-      <button class="c2-placeholder-btn" onclick="Game.showScreen('c2-levels')" data-i18n="c2_back_btn">&lsaquo; BACK</button>
+    <div class="c2g-hud">
+      <div class="c2g-hud-score">
+        <div class="hud-label" data-i18n="c2_score_label">VITALS</div>
+        <div class="hud-value" id="c2g-score">0</div>
+      </div>
+      <div class="c2g-hud-center">
+        <div class="c2g-level-name" id="c2g-level-name">M-1</div>
+        <div class="c2g-hud-target" id="c2g-target">TARGET: 5,000</div>
+        <div class="c2g-inf-bar"><div class="c2g-inf-fill" id="c2g-inf"></div></div>
+        <div class="c2g-inf-label" data-i18n="c2_infection_label">INFECTION</div>
+      </div>
+      <div class="c2g-hud-right">
+        <div class="c2g-lives" id="c2g-lives"></div>
+        <button class="btn-pause c2g-pause" onclick="Game.pauseC2Game()">&#9646;&#9646;</button>
+      </div>
+    </div>
+    <div class="c2g-area">
+      <canvas id="c2g-canvas"></canvas>
+      <div class="c2g-sidebar">
+        <div class="next-label" data-i18n="next_dose">NEXT DOSE</div>
+        <div class="rot-buttons" style="margin-top:auto">
+          <button class="rot-btn" onclick="Game.c2RotateCCW()" aria-label="Rotate left">&#8634;</button>
+          <button class="rot-btn" onclick="Game.c2RotateCW()" aria-label="Rotate right">&#8635;</button>
+        </div>
+        <div class="fact-card c2-fact-card"><b data-i18n="c2_fact_label">!! FACT</b><span data-i18n="c2_fact_text">Match 4+ antidotes touching infection to neutralize it.</span></div>
+      </div>
+    </div>
+    <div class="c2g-end-overlay" id="c2g-end-overlay">
+      <div class="c2g-end-card">
+        <div class="c2g-end-title" id="c2g-end-title">CONTAINED</div>
+        <div class="c2g-end-sub" id="c2g-end-sub">Score: 0</div>
+        <div class="c2g-end-buttons">
+          <button class="c2-placeholder-btn" onclick="Game.c2RestartLevel()" data-i18n="try_again">TRY AGAIN</button>
+          <button class="c2-placeholder-btn" onclick="Game.showScreen('c2-levels')" data-i18n="c2_back_btn">&lsaquo; BACK</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -4097,18 +4563,44 @@ const I18N = {
     c2_sub: "A nightmare you can't wake from",
     c2_levels_title: 'Night Shift',
     c2_levels_subtitle: "The patients she couldn't save:",
-    c2_intro_stub_title: 'NIGHT SHIFT',
-    c2_intro_stub_sub: 'Storyline panels arrive in the next build. For now, skip ahead to the level select.',
-    c2_action_stub_title: 'TYPE TO SURVIVE',
-    c2_action_stub_sub: 'The typing minigame arrives in Sprint 3. Continue for now.',
-    c2_levels_stub_title: 'M-1 · M-2 · M-3',
-    c2_levels_stub_sub: 'Level cards arrive after the infection mechanic ships.',
-    c2_game_stub_title: 'INFECTION',
-    c2_game_stub_sub: 'The containment puzzle arrives in Sprint 4.',
     c2_skip_btn: 'SKIP ›',
     c2_continue_btn: 'CONTINUE ›',
-    c2_preview_l1: 'PREVIEW LEVEL 1',
     c2_back_btn: '‹ BACK',
+    c2_tap_continue: '◎ tap to continue',
+    // Storyline panels — Mai's nightmare.
+    c2_p1: "Just five minutes... I'll close my eyes for five minutes.",
+    c2_p2: '...Mai?',
+    c2_p3: "Vi! Wait — what are you doing here?",
+    c2_p4: 'You forgot them, Mai. All of them.',
+    c2_p5: 'Remember the treatment. Remember it now.',
+    c2_p6: 'TYPE TO HEAL. TYPE TO SURVIVE.',
+    c2_p7: '...oh.',
+    c2_p8: '...one minute. Just one minute.',
+    // Typing minigame
+    c2_time_label: 'TIME',
+    c2_action_hint: 'TYPE TO HEAL. TYPE TO SURVIVE.',
+    c2_action_fail: "SHE DIDN'T WAKE",
+    // Level select
+    c2_lvl1_priority: 'PATIENT ZERO · First to fall',
+    c2_lvl2_locked_note: 'Contain M-1 first',
+    c2_lvl2_unlocked_note: 'WARD INFECTION · Multiple seeds',
+    c2_lvl3_locked_note: 'Contain M-1 and M-2 first',
+    c2_lvl3_unlocked_note: 'ENDLESS NIGHTMARE · No discharge',
+    c2_contain: 'CONTAIN',
+    c2_endless: 'ENDLESS',
+    c2_complete_lvl1_first: 'Contain M-1 first!',
+    c2_complete_lvl2_first: 'Contain M-2 first!',
+    c2_mystery_label: 'PATIENT FILE — ???',
+    c2_mystery_body: 'Found on the registry desk after the nightmare. Name field empty. Coming soon.',
+    // Infection puzzle HUD
+    c2_score_label: 'VITALS',
+    c2_target_label: 'TARGET',
+    c2_endless_hud: 'SURVIVE',
+    c2_infection_label: 'INFECTION',
+    c2_fact_label: '!! FACT',
+    c2_fact_text: 'Match 4+ antidotes touching infection to neutralize it.',
+    c2_level_clear: 'CONTAINED',
+    c2_level_fail: 'OVERRUN',
   },
   ru: {
     tagline: 'ИГРА-ГОЛОВОЛОМКА С ТАБЛЕТКАМИ',
@@ -4219,18 +4711,44 @@ const I18N = {
     c2_sub: 'Кошмар, от которого не проснуться',
     c2_levels_title: 'Ночная смена',
     c2_levels_subtitle: 'Пациенты, которых она не спасла:',
-    c2_intro_stub_title: 'НОЧНАЯ СМЕНА',
-    c2_intro_stub_sub: 'Сюжетные панели появятся в следующей сборке. Пока — переход к выбору уровней.',
-    c2_action_stub_title: 'НАБЕРИ — ВЫЖИВИ',
-    c2_action_stub_sub: 'Мини-игра с печатанием появится в Спринте 3. Пока — продолжаем.',
-    c2_levels_stub_title: 'М-1 · М-2 · М-3',
-    c2_levels_stub_sub: 'Карточки уровней появятся после механики заражения.',
-    c2_game_stub_title: 'ЗАРАЖЕНИЕ',
-    c2_game_stub_sub: 'Головоломка-сдерживание появится в Спринте 4.',
     c2_skip_btn: 'ПРОПУСТИТЬ ›',
     c2_continue_btn: 'ДАЛЬШЕ ›',
-    c2_preview_l1: 'ПРЕВЬЮ УРОВНЯ 1',
     c2_back_btn: '‹ НАЗАД',
+    c2_tap_continue: '◎ нажми чтобы продолжить',
+    // Сюжетные панели — кошмар Май.
+    c2_p1: 'Только пять минут… я закрою глаза на пять минут.',
+    c2_p2: '…Май?',
+    c2_p3: 'Vi! Подожди — что ты здесь делаешь?',
+    c2_p4: 'Ты их забыла, Май. Всех.',
+    c2_p5: 'Вспомни лечение. Вспомни сейчас.',
+    c2_p6: 'НАБЕРИ — ЧТОБЫ ИСЦЕЛИТЬ. НАБЕРИ — ЧТОБЫ ВЫЖИТЬ.',
+    c2_p7: '…ох.',
+    c2_p8: '…одна минута. Всего одна минута.',
+    // Мини-игра набора
+    c2_time_label: 'ВРЕМЯ',
+    c2_action_hint: 'НАБЕРИ — ЧТОБЫ ВЫЖИТЬ',
+    c2_action_fail: 'ОНА НЕ ПРОСНУЛАСЬ',
+    // Выбор уровней
+    c2_lvl1_priority: 'ПАЦИЕНТ НОЛЬ · Первая пала',
+    c2_lvl2_locked_note: 'Сначала сдержите М-1',
+    c2_lvl2_unlocked_note: 'ЗАРАЖЕНИЕ ПАЛАТЫ · Несколько очагов',
+    c2_lvl3_locked_note: 'Сначала сдержите М-1 и М-2',
+    c2_lvl3_unlocked_note: 'БЕСКОНЕЧНЫЙ КОШМАР · Без выписки',
+    c2_contain: 'СДЕРЖАТЬ',
+    c2_endless: 'БЕСКОНЕЧНО',
+    c2_complete_lvl1_first: 'Сначала сдержите М-1!',
+    c2_complete_lvl2_first: 'Сначала сдержите М-2!',
+    c2_mystery_label: 'КАРТА ПАЦИЕНТА — ???',
+    c2_mystery_body: 'Найдена на стойке регистратуры после кошмара. Поле имени пустое. Скоро.',
+    // HUD заражения
+    c2_score_label: 'ПОКАЗАТЕЛИ',
+    c2_target_label: 'ЦЕЛЬ',
+    c2_endless_hud: 'ВЫЖИВАЙТЕ',
+    c2_infection_label: 'ЗАРАЖЕНИЕ',
+    c2_fact_label: '!! ФАКТ',
+    c2_fact_text: 'Соберите 4+ антидота рядом с заражением, чтобы нейтрализовать.',
+    c2_level_clear: 'СДЕРЖАНО',
+    c2_level_fail: 'ЗАХВАЧЕНО',
   },
 };
 
@@ -4864,38 +5382,166 @@ const Game = (() => {
   function openC2() {
     if (!isDevAccount()) return;
     if (!state.c2_introSeen) {
-      showScreen('c2-intro');
+      playC2IntroPart1();
     } else {
+      updateC2LevelsUI();
       showScreen('c2-levels');
     }
   }
 
-  // Finish (or skip) the storyline intro. Marks it as seen so the next
-  // openC2() bypasses it, then routes into the typing minigame.
-  function finishC2Intro() {
-    state.c2_introSeen = true;
-    Save.save(state);
-    showScreen('c2-action');
+  // Plays panels 0..5 (pre-action), then routes to the typing minigame.
+  function playC2IntroPart1() {
+    showScreen('c2-intro');
+    // Defer one frame so the screen is visible before the canvas sizes.
+    requestAnimationFrame(() => {
+      C2.Intro.play(0, 5, () => {
+        showScreen('c2-action');
+        requestAnimationFrame(() => {
+          C2.Typing.start(
+            () => { // win
+              // Play epilogue panels 6..7
+              showScreen('c2-intro');
+              requestAnimationFrame(() => {
+                C2.Intro.play(6, 7, () => {
+                  state.c2_introSeen = true;
+                  Save.save(state);
+                  updateC2LevelsUI();
+                  showScreen('c2-levels');
+                });
+              });
+            },
+            () => { // lose — show retry overlay
+              const o = document.getElementById('c2a-end-overlay');
+              if (o) o.classList.add('show');
+            }
+          );
+        });
+      });
+      C2.Intro.bindTap();
+    });
   }
 
-  // Finish the typing minigame. Routes to the c2 level select.
-  function finishC2Action() {
-    showScreen('c2-levels');
+  // Skip whatever Intro range is currently playing. Uses Intro.skipToEnd
+  // so the registered onDone callback fires — that means skipping during
+  // pre-action panels (0-5) lands on the typing minigame, and skipping
+  // during the epilogue (6-7) lands on the c2-levels screen.
+  function skipC2IntroToAction() {
+    try { C2.Intro.skipToEnd(); } catch (e) {}
   }
 
-  // Replay nightmare intro from the c2 level select. Does NOT clear
-  // c2_introSeen — the intro→action chain just plays again.
+  // Restart the typing minigame from its overlay.
+  function restartC2Action() {
+    const o = document.getElementById('c2a-end-overlay');
+    if (o) o.classList.remove('show');
+    requestAnimationFrame(() => {
+      C2.Typing.start(
+        () => {
+          showScreen('c2-intro');
+          requestAnimationFrame(() => {
+            C2.Intro.play(6, 7, () => {
+              state.c2_introSeen = true;
+              Save.save(state);
+              updateC2LevelsUI();
+              showScreen('c2-levels');
+            });
+          });
+        },
+        () => {
+          const o2 = document.getElementById('c2a-end-overlay');
+          if (o2) o2.classList.add('show');
+        }
+      );
+    });
+  }
+
+  // Replay nightmare intro from the c2 level select. Plays full sequence
+  // again (panels 1-6 → action → 7-8).
   function replayC2Intro() {
     if (!isDevAccount()) return;
-    showScreen('c2-intro');
+    playC2IntroPart1();
   }
 
-  // Start a Chapter 2 level. Stub until Sprint 4 wires the infection
-  // mechanic; for now it just shows the c2-game placeholder.
+  // Bridge so the C2 module can set Save state without coupling.
+  window.__c2_state_set = function(key, val) {
+    state[key] = val;
+    Save.save(state);
+    updateC2LevelsUI();
+  };
+
+  // Update Chapter 2 level cards (unlocks + badges).
+  function updateC2LevelsUI() {
+    const c1 = document.getElementById('c2-level-card-1');
+    const c2 = document.getElementById('c2-level-card-2');
+    const c3 = document.getElementById('c2-level-card-3');
+    const b1 = document.getElementById('c2-level-badge-1');
+    const b2 = document.getElementById('c2-level-badge-2');
+    const b3 = document.getElementById('c2-level-badge-3');
+    const n2 = document.getElementById('c2-level2-note');
+    const n3 = document.getElementById('c2-level3-note');
+    if (b1) {
+      b1.textContent = state.c2_level1complete ? tr('complete') : tr('play');
+      b1.className = 'level-card-badge c2-badge ' + (state.c2_level1complete ? 'badge-complete' : 'badge-play');
+    }
+    if (c2) {
+      if (state.c2_level1complete) {
+        c2.classList.remove('locked');
+        if (b2) {
+          b2.textContent = state.c2_level2complete ? tr('complete') : tr('play');
+          b2.className = 'level-card-badge c2-badge ' + (state.c2_level2complete ? 'badge-complete' : 'badge-play');
+        }
+        if (n2) { n2.textContent = tr('c2_lvl2_unlocked_note'); n2.className = 'patient-priority c2-priority'; }
+      } else {
+        c2.classList.add('locked');
+        if (b2) { b2.textContent = tr('locked'); b2.className = 'level-card-badge badge-locked c2-badge-locked'; }
+        if (n2) { n2.textContent = tr('c2_lvl2_locked_note'); n2.className = 'patient-locked-note c2-locked'; }
+      }
+    }
+    if (c3) {
+      const unlock3 = state.c2_level1complete && state.c2_level2complete;
+      if (unlock3) {
+        c3.classList.remove('locked');
+        if (b3) { b3.textContent = tr('c2_endless'); b3.className = 'level-card-badge c2-badge badge-play'; }
+        if (n3) { n3.textContent = tr('c2_lvl3_unlocked_note'); n3.className = 'patient-priority c2-priority'; }
+      } else {
+        c3.classList.add('locked');
+        if (b3) { b3.textContent = tr('locked'); b3.className = 'level-card-badge badge-locked c2-badge-locked'; }
+        if (n3) { n3.textContent = tr('c2_lvl3_locked_note'); n3.className = 'patient-locked-note c2-locked'; }
+      }
+    }
+  }
+
+  // Start a Chapter 2 level. Enforces unlock chain.
   function startC2Level(levelId) {
     if (!isDevAccount()) return;
+    if (levelId === 2 && !state.c2_level1complete) { showToast(tr('c2_complete_lvl1_first')); return; }
+    if (levelId === 3 && !(state.c2_level1complete && state.c2_level2complete)) { showToast(tr('c2_complete_lvl2_first')); return; }
     showScreen('c2-game');
+    requestAnimationFrame(() => C2.Infection.startLevel(levelId));
   }
+
+  function c2RotateCW() { try { C2.Infection.rotate(1); } catch (e) {} }
+  function c2RotateCCW() { try { C2.Infection.rotate(-1); } catch (e) {} }
+  function c2RestartLevel() {
+    const o = document.getElementById('c2g-end-overlay');
+    if (o) o.classList.remove('show');
+    requestAnimationFrame(() => {
+      const lvl = C2.Infection.LEVELS.find(() => true); // sentinel; level id is held in module
+      // Re-trigger startLevel via last-known via the visible HUD label
+      const nm = document.getElementById('c2g-level-name');
+      const idMap = { 'M-1': 1, 'M-2': 2, 'M-3': 3 };
+      const id = idMap[nm ? nm.textContent : 'M-1'] || 1;
+      C2.Infection.startLevel(id);
+    });
+  }
+  function pauseC2Game() {
+    showScreen('c2-levels');
+    try { C2.Infection.stop(); } catch (e) {}
+  }
+
+  // Legacy stub names kept as aliases so the old c2 onclick handlers
+  // still work if cached in any browser.
+  function finishC2Intro() { skipC2IntroToAction(); }
+  function finishC2Action() { showScreen('c2-levels'); }
 
   // One-time-only gift: account 881282443 receives 1,000 coins on first
   // load so it can afford the Endless Ward unlock. Guarded by a localStorage
@@ -6641,8 +7287,14 @@ const Game = (() => {
     openC2,
     finishC2Intro,
     finishC2Action,
+    skipC2IntroToAction,
+    restartC2Action,
     replayC2Intro,
     startC2Level,
+    c2RotateCW,
+    c2RotateCCW,
+    c2RestartLevel,
+    pauseC2Game,
     isDevAccount,
   };
 })();
@@ -7493,6 +8145,1367 @@ const Lore = (() => {
   return { start, replay, reset, isAdmin, seen, finishNow };
 })();
 window.Lore = Lore;
+
+// ============================================================
+// CHAPTER 2 — "Night Shift"
+// Dev-gated nightmare arc. All Chapter 2 gameplay lives here:
+// horror SFX, storyline panels, typing zombies minigame, and
+// the infection containment puzzle. Routed in by Game.openC2()
+// when isDevAccount() returns true.
+// ============================================================
+const C2 = (() => {
+
+  // ---- AUDIO ----
+  // Procedural horror SFX via Web Audio API. Shares no state with
+  // the main game's Audio module so chapter 2 can be muted without
+  // touching chapter 1 sounds.
+  const Audio = (() => {
+    let ctx = null, enabled = true;
+    function getCtx() {
+      if (!ctx) {
+        try { ctx = new (window.AudioContext || window.webkitAudioContext)(); }
+        catch (e) { return null; }
+      }
+      if (ctx.state === 'suspended') ctx.resume();
+      return ctx;
+    }
+    function tone(freq, dur, vol, type, attack) {
+      if (!enabled) return;
+      const c = getCtx(); if (!c) return;
+      const t = c.currentTime;
+      const osc = c.createOscillator();
+      const g = c.createGain();
+      osc.type = type || 'sine';
+      osc.frequency.setValueAtTime(freq, t);
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(vol, t + (attack || 0.01));
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      osc.connect(g); g.connect(c.destination);
+      osc.start(t); osc.stop(t + dur + 0.05);
+    }
+    function noise(dur, vol, freq) {
+      if (!enabled) return;
+      const c = getCtx(); if (!c) return;
+      const t = c.currentTime;
+      const buf = c.createBuffer(1, Math.ceil(c.sampleRate * dur), c.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1);
+      const src = c.createBufferSource(); src.buffer = buf;
+      const bp = c.createBiquadFilter();
+      bp.type = 'bandpass';
+      bp.frequency.value = freq || 1200;
+      bp.Q.value = 1.8;
+      const g = c.createGain();
+      g.gain.setValueAtTime(vol, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      src.connect(bp); bp.connect(g); g.connect(c.destination);
+      src.start(t); src.stop(t + dur + 0.05);
+    }
+    return {
+      enable: (v) => { enabled = v; },
+      // Single low heart thump.
+      heart: () => {
+        const c = getCtx(); if (!c) return;
+        const t = c.currentTime;
+        [0, 0.12].forEach((dt, i) => {
+          const osc = c.createOscillator();
+          const g = c.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(80, t + dt);
+          osc.frequency.exponentialRampToValueAtTime(38, t + dt + 0.13);
+          g.gain.setValueAtTime(0, t + dt);
+          g.gain.linearRampToValueAtTime(i ? 0.18 : 0.28, t + dt + 0.01);
+          g.gain.exponentialRampToValueAtTime(0.001, t + dt + 0.18);
+          osc.connect(g); g.connect(c.destination);
+          osc.start(t + dt); osc.stop(t + dt + 0.2);
+        });
+      },
+      // Whispered breath — filtered noise.
+      breath: () => noise(0.5, 0.06, 700),
+      // Distant slow clock tick.
+      tickSlow: () => tone(2400, 0.05, 0.06, 'square'),
+      // Glitchy short stutter — dissonant + noise.
+      glitch: (dur) => {
+        tone(180, dur || 0.4, 0.15, 'sawtooth');
+        tone(186, dur || 0.4, 0.12, 'sawtooth');
+        noise(dur || 0.4, 0.08, 2400);
+      },
+      // Footstep/shamble.
+      shamble: () => noise(0.18, 0.10, 280),
+      // Glass shatter sting.
+      glass: () => {
+        tone(2400, 0.18, 0.10, 'triangle', 0.005);
+        tone(3200, 0.20, 0.06, 'triangle', 0.005);
+        noise(0.22, 0.06, 4200);
+      },
+      // Correct letter tap — rising chime.
+      tapHit: () => {
+        tone(660, 0.06, 0.14, 'square');
+        setTimeout(() => tone(990, 0.08, 0.12, 'square'), 35);
+      },
+      // Wrong letter tap — short dissonant descend.
+      tapMiss: () => {
+        tone(220, 0.10, 0.14, 'sawtooth');
+        tone(212, 0.10, 0.10, 'sawtooth');
+      },
+      // Zombie hit (letter consumed).
+      zombieHit: () => {
+        noise(0.10, 0.18, 800);
+        tone(110, 0.12, 0.10, 'sawtooth');
+      },
+      // Wave start sting.
+      waveStart: () => {
+        tone(440, 0.06, 0.10, 'square');
+        setTimeout(() => tone(220, 0.20, 0.14, 'sawtooth'), 60);
+      },
+      // Lose-life sting.
+      hurt: () => {
+        tone(300, 0.12, 0.18, 'sawtooth');
+        setTimeout(() => tone(180, 0.20, 0.16, 'sawtooth'), 80);
+      },
+      // Success sting (typing minigame completed).
+      success: () => {
+        [523, 659, 784].forEach((f, i) => setTimeout(() => tone(f, 0.18, 0.16, 'triangle'), i * 90));
+      },
+      // Failure sting.
+      fail: () => {
+        [300, 240, 180, 120].forEach((f, i) => setTimeout(() => tone(f, 0.22, 0.16, 'sawtooth'), i * 110));
+      },
+      // Infection spread blip.
+      spread: () => tone(140, 0.08, 0.08, 'sawtooth'),
+      // Antidote match clear.
+      cure: () => {
+        tone(440, 0.08, 0.14, 'square');
+        setTimeout(() => tone(880, 0.12, 0.16, 'sine'), 50);
+      },
+    };
+  })();
+
+  // ---- INTRO STORYLINE ----
+  // 8 narrative panels (6 pre-action, 2 post-action). Each panel
+  // draws a pixel-art scene on a canvas plus a text overlay.
+  // play(startIdx, endIdx, onDone) plays a range and calls onDone.
+  const Intro = (() => {
+    let canvas = null, ctx = null;
+    let panelIdx = 0;
+    let endIdx = 0;
+    let onDone = null;
+    let animRaf = null;
+    let panelStartT = 0;
+    let textEl = null, hintEl = null, clockEl = null;
+
+    // Scene drawers — each takes ctx, w, h, t (ms since panel start).
+    // Pixel-style: limited palette, no anti-aliasing, blocky shapes.
+    function pxRect(x, y, w, h, color) {
+      ctx.fillStyle = color;
+      ctx.fillRect(Math.floor(x), Math.floor(y), Math.ceil(w), Math.ceil(h));
+    }
+    function pxCircle(cx, cy, r, color) {
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(Math.floor(cx), Math.floor(cy), Math.floor(r), 0, Math.PI * 2);
+      ctx.fill();
+    }
+    function vignette(w, h, strength) {
+      const grad = ctx.createRadialGradient(w/2, h/2, w*0.3, w/2, h/2, w*0.75);
+      grad.addColorStop(0, 'rgba(0,0,0,0)');
+      grad.addColorStop(1, `rgba(0,0,0,${strength || 0.65})`);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+    }
+    function scanlines(w, h) {
+      ctx.fillStyle = 'rgba(0,0,0,0.18)';
+      for (let y = 0; y < h; y += 3) ctx.fillRect(0, y, w, 1);
+    }
+
+    // Panel 1 — desk. Mai head down, flickering lamp, clock 03:47.
+    function scDesk(w, h, t) {
+      // bg: deep night
+      pxRect(0, 0, w, h, '#06030c');
+      // floor
+      pxRect(0, h*0.72, w, h*0.28, '#0c0813');
+      // desk
+      pxRect(w*0.10, h*0.55, w*0.80, h*0.20, '#1a1018');
+      pxRect(w*0.10, h*0.55, w*0.80, 4, '#2a1828');
+      // chair back
+      pxRect(w*0.42, h*0.30, w*0.16, h*0.30, '#0a050d');
+      // Mai silhouette (head down)
+      pxRect(w*0.40, h*0.46, w*0.20, h*0.10, '#1f1218'); // body
+      pxCircle(w*0.50, h*0.50, w*0.05, '#2a1820'); // head
+      pxRect(w*0.42, h*0.52, w*0.16, 3, '#4a3a40'); // hair line
+      // lamp glow with flicker
+      const lampOn = (Math.floor(t / 110) % 17 !== 13);
+      if (lampOn) {
+        const grad = ctx.createRadialGradient(w*0.50, h*0.20, 0, w*0.50, h*0.20, w*0.55);
+        grad.addColorStop(0, 'rgba(255,210,170,0.20)');
+        grad.addColorStop(0.4, 'rgba(255,150,180,0.10)');
+        grad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+        pxRect(w*0.485, 0, w*0.03, h*0.16, '#2a2028'); // wire
+        pxRect(w*0.46, h*0.16, w*0.08, 4, '#3a3030'); // lamp
+      }
+      vignette(w, h, 0.75);
+      scanlines(w, h);
+    }
+
+    // Panel 2 — wrong corridor. Stretched perspective, red light.
+    function scCorridor(w, h, t) {
+      pxRect(0, 0, w, h, '#0a0414');
+      // perspective lines
+      ctx.strokeStyle = 'rgba(180,30,60,0.35)';
+      ctx.lineWidth = 1;
+      const cx = w/2, cy = h*0.55;
+      for (let i = 0; i < 7; i++) {
+        const z = 0.15 + i*0.13;
+        const f = 1 - z;
+        // floor lines
+        ctx.beginPath();
+        ctx.moveTo(0, h - h*z*0.5);
+        ctx.lineTo(cx, cy + 20);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(w, h - h*z*0.5);
+        ctx.lineTo(cx, cy + 20);
+        ctx.stroke();
+      }
+      // door panels left and right
+      for (let i = 0; i < 4; i++) {
+        const k = i / 4;
+        const left = cx * (1 - k * 0.9);
+        const top  = cy - (h*0.18) * (1 - k);
+        const dh = h * 0.22 * (1 - k);
+        const dw = w * 0.10 * (1 - k);
+        pxRect(left - dw, top, dw, dh, '#1a0a14');
+        pxRect(w - left, top, dw, dh, '#1a0a14');
+      }
+      // far red haze
+      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, w*0.40);
+      grad.addColorStop(0, 'rgba(180,30,60,0.45)');
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+      // flicker
+      if (Math.floor(t/180) % 11 === 5) {
+        ctx.fillStyle = 'rgba(255,180,200,0.05)';
+        ctx.fillRect(0, 0, w, h);
+      }
+      vignette(w, h, 0.65);
+      scanlines(w, h);
+    }
+
+    // Panel 3 — Vi at end of corridor, back to camera.
+    function scViFar(w, h, t) {
+      scCorridor(w, h, t);
+      // Vi silhouette small at far point
+      const cx = w/2, cy = h*0.55;
+      pxRect(cx - 8, cy - 18, 16, 22, '#100208'); // body
+      pxCircle(cx, cy - 22, 6, '#1a0810'); // head
+      pxRect(cx - 8, cy - 14, 16, 2, '#3a1828'); // hair line
+      vignette(w, h, 0.70);
+      scanlines(w, h);
+    }
+
+    // Panel 4 — Vi turns, glowing eyes, charts pinned to coat.
+    function scViTurn(w, h, t) {
+      pxRect(0, 0, w, h, '#0a0410');
+      // body
+      pxRect(w*0.32, h*0.40, w*0.36, h*0.50, '#180614');
+      // coat fold
+      pxRect(w*0.32, h*0.40, w*0.36, 3, '#28102a');
+      // charts on coat (scale effect)
+      for (let i = 0; i < 8; i++) {
+        const cy = h*0.45 + (i%4) * h*0.10;
+        const cx = w*0.35 + (i>=4 ? w*0.18 : 0);
+        pxRect(cx, cy, w*0.06, h*0.04, '#2a1218');
+        pxRect(cx + 2, cy + 2, w*0.04, 2, '#5a2030');
+      }
+      // head
+      pxCircle(w*0.50, h*0.30, w*0.13, '#1a0810');
+      // glowing eyes
+      const pulse = 0.6 + 0.4 * Math.sin(t * 0.008);
+      pxRect(w*0.43, h*0.28, w*0.05, 3, `rgba(255,${60+50*pulse},${100+50*pulse},${0.9})`);
+      pxRect(w*0.52, h*0.28, w*0.05, 3, `rgba(255,${60+50*pulse},${100+50*pulse},${0.9})`);
+      // mouth shadow
+      pxRect(w*0.47, h*0.34, w*0.06, 1.5, '#000');
+      // hair
+      pxRect(w*0.36, h*0.18, w*0.28, h*0.06, '#3a1828');
+      // red atmosphere
+      const grad = ctx.createRadialGradient(w*0.5, h*0.30, w*0.1, w*0.5, h*0.50, w*0.6);
+      grad.addColorStop(0, 'rgba(180,20,50,0.20)');
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+      vignette(w, h, 0.60);
+      scanlines(w, h);
+    }
+
+    // Panel 5 — patients emerging from doors with floating terms.
+    function scPatients(w, h, t) {
+      pxRect(0, 0, w, h, '#08030d');
+      // floor with perspective
+      pxRect(0, h*0.70, w, h*0.30, '#0c0712');
+      // 3 doors with figures
+      const slots = [0.20, 0.50, 0.80];
+      slots.forEach((sx, i) => {
+        const dx = w*sx, dy = h*0.30;
+        // doorframe
+        pxRect(dx - w*0.07, dy, w*0.14, h*0.40, '#180814');
+        pxRect(dx - w*0.055, dy + 2, w*0.11, h*0.38, '#2a0218');
+        // figure stepping out (slight bob)
+        const bob = Math.sin(t*0.004 + i) * 2;
+        const figY = dy + h*0.10 + bob;
+        pxRect(dx - w*0.035, figY, w*0.07, h*0.22, '#1a0810');
+        pxCircle(dx, figY - 4, 8, '#241018');
+        // floating term tile above
+        pxRect(dx - w*0.06, dy - h*0.04, w*0.12, h*0.04, '#3a1018');
+        pxRect(dx - w*0.06, dy - h*0.04, w*0.12, 2, '#5a1820');
+      });
+      // red wash
+      const grad = ctx.createLinearGradient(0, 0, 0, h);
+      grad.addColorStop(0, 'rgba(80,10,20,0.4)');
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+      vignette(w, h, 0.65);
+      scanlines(w, h);
+    }
+
+    // Panel 6 — hand reaching to screen + cue.
+    function scHand(w, h, t) {
+      pxRect(0, 0, w, h, '#0a050c');
+      // shadow figure mass
+      const grad = ctx.createRadialGradient(w*0.50, h*0.55, w*0.05, w*0.50, h*0.55, w*0.7);
+      grad.addColorStop(0, 'rgba(40,5,12,1)');
+      grad.addColorStop(0.5, 'rgba(15,2,8,0.95)');
+      grad.addColorStop(1, 'rgba(0,0,0,1)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+      // reaching hand (5 pixel-fingers)
+      const reach = Math.min(1, t / 800);
+      const cx = w*0.50, cy = h*0.55;
+      const hr = w*0.25 * reach;
+      pxCircle(cx, cy, hr, '#3a1820'); // palm
+      // fingers
+      for (let i = 0; i < 5; i++) {
+        const ang = -Math.PI/2 + (i - 2) * 0.35;
+        const fx = cx + Math.cos(ang) * hr * 1.5;
+        const fy = cy + Math.sin(ang) * hr * 1.5;
+        pxRect(fx - 4, fy - hr*0.7, 8, hr*1.0, '#3a1820');
+        pxCircle(fx, fy - hr*0.7, 5, '#4a2030');
+      }
+      // letter on chest (big pixel letter for first word's first letter)
+      pxRect(cx - 14, cy + hr*0.2, 28, 32, '#180a0e');
+      ctx.fillStyle = '#e8609a';
+      ctx.font = 'bold 26px "Courier New", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('B', cx, cy + hr*0.2 + 16);
+      vignette(w, h, 0.50);
+      scanlines(w, h);
+    }
+
+    // Panel 7 — Mai sees herself in mirror with zombie face.
+    function scMirror(w, h, t) {
+      pxRect(0, 0, w, h, '#0a050c');
+      // mirror frame
+      pxRect(w*0.25, h*0.20, w*0.50, h*0.60, '#180812');
+      pxRect(w*0.27, h*0.22, w*0.46, h*0.56, '#020005');
+      // reflection — Mai's hair + zombie face
+      pxRect(w*0.34, h*0.30, w*0.32, h*0.10, '#3a1828'); // hair
+      pxCircle(w*0.50, h*0.45, w*0.12, '#241018'); // face shadow
+      // glowing eyes like Vi
+      pxRect(w*0.44, h*0.43, w*0.04, 2.5, '#ff6090');
+      pxRect(w*0.52, h*0.43, w*0.04, 2.5, '#ff6090');
+      // dripping mouth
+      pxRect(w*0.46, h*0.50, w*0.08, 2, '#000');
+      pxRect(w*0.48, h*0.51, 2, h*0.04, '#6e0a1e');
+      // crack lines from corner
+      ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+      ctx.lineWidth = 1;
+      const crackLen = Math.min(1, t/600);
+      [[-0.15, -0.2],[0.18, -0.05],[-0.08, 0.22],[0.12, 0.18]].forEach(([dx, dy], i) => {
+        ctx.beginPath();
+        ctx.moveTo(w*0.50, h*0.45);
+        ctx.lineTo(w*0.50 + w*dx*crackLen, h*0.45 + h*dy*crackLen);
+        ctx.stroke();
+      });
+      vignette(w, h, 0.70);
+      scanlines(w, h);
+    }
+
+    // Panel 8 — Mai snaps awake at desk, clock at 03:48, mysterious chart.
+    function scAwake(w, h, t) {
+      pxRect(0, 0, w, h, '#08060e');
+      pxRect(0, h*0.72, w, h*0.28, '#0c0813');
+      pxRect(w*0.10, h*0.55, w*0.80, h*0.20, '#1a1018');
+      pxRect(w*0.10, h*0.55, w*0.80, 4, '#2a1828');
+      // Mai head up now, alert
+      pxRect(w*0.40, h*0.40, w*0.20, h*0.18, '#1f1218');
+      pxCircle(w*0.50, h*0.36, w*0.06, '#3a2228');
+      pxRect(w*0.42, h*0.32, w*0.16, 4, '#4a3a40');
+      // wide eyes
+      pxRect(w*0.46, h*0.36, w*0.02, 2, '#fff');
+      pxRect(w*0.52, h*0.36, w*0.02, 2, '#fff');
+      // chart on desk with "???"
+      pxRect(w*0.62, h*0.58, w*0.20, h*0.10, '#e8d4d4');
+      ctx.fillStyle = '#180812';
+      ctx.font = 'bold 13px "Courier New", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('???', w*0.72, h*0.65);
+      // lamp normal
+      pxRect(w*0.485, 0, w*0.03, h*0.16, '#2a2028');
+      pxRect(w*0.46, h*0.16, w*0.08, 4, '#3a3030');
+      const grad = ctx.createRadialGradient(w*0.50, h*0.20, 0, w*0.50, h*0.20, w*0.60);
+      grad.addColorStop(0, 'rgba(255,220,180,0.22)');
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+      vignette(w, h, 0.55);
+      scanlines(w, h);
+    }
+
+    const PANELS = [
+      { scene: scDesk,     clock: '03:47', sfx: 'breath',  textKey: 'c2_p1' },
+      { scene: scCorridor, clock: '03:47', sfx: 'tickSlow', textKey: 'c2_p2' },
+      { scene: scViFar,    clock: '03:47', sfx: 'heart',   textKey: 'c2_p3' },
+      { scene: scViTurn,   clock: '03:47', sfx: 'glitch',  textKey: 'c2_p4' },
+      { scene: scPatients, clock: '03:47', sfx: 'shamble', textKey: 'c2_p5' },
+      { scene: scHand,     clock: '03:47', sfx: 'heart',   textKey: 'c2_p6' },
+      { scene: scMirror,   clock: '03:48', sfx: 'glass',   textKey: 'c2_p7' },
+      { scene: scAwake,    clock: '03:48', sfx: 'tickSlow', textKey: 'c2_p8' },
+    ];
+
+    function size() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+      ctx.imageSmoothingEnabled = false;
+    }
+
+    function renderPanel(t) {
+      const rect = canvas.getBoundingClientRect();
+      const w = rect.width, h = rect.height;
+      ctx.clearRect(0, 0, w, h);
+      const p = PANELS[panelIdx];
+      if (p) p.scene(w, h, t);
+    }
+
+    function loop(now) {
+      if (panelStartT === 0) panelStartT = now;
+      renderPanel(now - panelStartT);
+      animRaf = requestAnimationFrame(loop);
+    }
+
+    function showText() {
+      const p = PANELS[panelIdx];
+      if (!p || !textEl) return;
+      textEl.classList.remove('show');
+      void textEl.offsetWidth; // restart animation
+      textEl.textContent = window.tr ? window.tr(p.textKey) : p.textKey;
+      textEl.classList.add('show');
+      if (clockEl) clockEl.textContent = p.clock;
+      // Trigger SFX
+      try { if (Audio[p.sfx]) Audio[p.sfx](); } catch (e) {}
+    }
+
+    function next() {
+      // advance, or finish range
+      panelIdx++;
+      if (panelIdx > endIdx) {
+        stop();
+        const cb = onDone; onDone = null;
+        if (cb) cb();
+        return;
+      }
+      panelStartT = 0;
+      showText();
+    }
+
+    function stop() {
+      cancelAnimationFrame(animRaf);
+      animRaf = null;
+    }
+
+    function play(startIdx, endIdxIn, onDoneIn) {
+      canvas = document.getElementById('c2p-canvas');
+      ctx = canvas.getContext('2d');
+      textEl = document.getElementById('c2p-text');
+      hintEl = document.getElementById('c2p-tap-hint');
+      clockEl = document.getElementById('c2p-clock');
+      size();
+      window.addEventListener('resize', size);
+      panelIdx = startIdx;
+      endIdx = endIdxIn;
+      onDone = onDoneIn;
+      panelStartT = 0;
+      showText();
+      loop(performance.now());
+    }
+
+    // Tap anywhere on the panel to advance.
+    function bindTap() {
+      const scene = document.getElementById('c2p-scene');
+      if (!scene || scene.__c2bound) return;
+      scene.__c2bound = true;
+      scene.addEventListener('click', () => {
+        if (!animRaf) return;
+        try { Audio.tapHit(); } catch (e) {}
+        next();
+      });
+    }
+
+    // Skip to the end of the current play range. Invokes onDone so the
+    // skip button works during BOTH pre-action panels (→ typing) and
+    // the post-action epilogue (→ c2-levels) — onDone is whatever
+    // callback the most recent play() registered.
+    function skipToEnd() {
+      stop();
+      const cb = onDone;
+      onDone = null;
+      panelIdx = endIdx + 1;
+      if (cb) cb();
+    }
+
+    return { play, stop, bindTap, skipToEnd };
+  })();
+
+  // ---- TYPING MINIGAME ----
+  // 30-second action sequence. Zombies emerge from the top carrying
+  // one letter each on their chests. The target word is shown above.
+  // Tap zombies in word order to dispatch them. Wrong letter shuffles
+  // and zombies step closer.
+  const Typing = (() => {
+    const WORDS = {
+      en: [
+        ['BAND', 'IOD', 'PULSE'],      // wave 1
+        ['SYRINGE', 'SUTURE', 'OXYGEN'], // wave 2
+        ['WAKE UP'],                     // wave 3 (finale)
+      ],
+      ru: [
+        ['БИНТ', 'ЙОД', 'ПУЛЬС'],
+        ['ШПРИЦ', 'ШВЫ', 'КИСЛОРОД'],
+        ['ПРОСНИСЬ'],
+      ],
+    };
+    const WAVE_BOUNDARIES = [10000, 20000, 30000]; // ms
+
+    let canvas = null, ctx = null;
+    let running = false;
+    let raf = null;
+    let startT = 0;
+    let lastT = 0;
+    let lives = 3;
+    let targetWord = '';
+    let typedIdx = 0;
+    let zombies = []; // { x, y, letter, vy, dead, scale, id }
+    let wordQueue = [];
+    let waveIdx = 0;
+    let onWin = null, onLose = null;
+    let zid = 0;
+    let shakeT = 0;
+    let stepDownPending = 0;
+    let score = 0;
+
+    function size() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+      ctx.imageSmoothingEnabled = false;
+    }
+
+    function lang() { return (window.__currentLang === 'ru') ? 'ru' : 'en'; }
+
+    function refillQueue() {
+      wordQueue = [];
+      const list = WORDS[lang()];
+      // Wave 1 cycles slowly, wave 2 medium, wave 3 just the finale.
+      list[0].forEach(w => wordQueue.push({ word: w, wave: 0 }));
+      list[1].forEach(w => wordQueue.push({ word: w, wave: 1 }));
+      list[2].forEach(w => wordQueue.push({ word: w, wave: 2 }));
+    }
+
+    function pickNextWord(elapsed) {
+      // Pick the next queued word that matches the current wave.
+      const targetWave = elapsed < WAVE_BOUNDARIES[0] ? 0 : elapsed < WAVE_BOUNDARIES[1] ? 1 : 2;
+      let item = wordQueue.find(w => w.wave === targetWave);
+      if (!item) {
+        // Refill if exhausted
+        const list = WORDS[lang()][targetWave];
+        item = { word: list[Math.floor(Math.random() * list.length)], wave: targetWave };
+      } else {
+        wordQueue = wordQueue.filter(w => w !== item);
+      }
+      return item;
+    }
+
+    function spawnZombiesForWord(word, wave) {
+      zombies = [];
+      const rect = canvas.getBoundingClientRect();
+      const w = rect.width, h = rect.height;
+      // Render word with possible space — split into characters (skip space).
+      const chars = word.split('').filter(c => c !== ' ');
+      // Layout horizontally across top with slight stagger.
+      const baseY = h * 0.18;
+      const vySpeed = wave === 0 ? h * 0.0000035 : wave === 1 ? h * 0.0000055 : h * 0.0000085;
+      const slots = chars.length;
+      // Letter order positions are shuffled so player must search for next letter.
+      const positions = [];
+      for (let i = 0; i < slots; i++) positions.push(i);
+      // Fisher-Yates shuffle so layout doesn't trivially read left-to-right.
+      for (let i = positions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [positions[i], positions[j]] = [positions[j], positions[i]];
+      }
+      const margin = w * 0.10;
+      for (let i = 0; i < slots; i++) {
+        const slot = positions[i];
+        const x = margin + (slot / Math.max(1, slots - 1)) * (w - 2*margin);
+        const y = baseY + (Math.random() - 0.5) * h * 0.05;
+        zombies.push({
+          id: ++zid,
+          x, y,
+          letter: chars[i],
+          orderIdx: i,
+          vy: vySpeed * (0.9 + Math.random() * 0.3),
+          dead: false,
+          deadT: 0,
+          scale: 1,
+          bobOffset: Math.random() * Math.PI * 2,
+        });
+      }
+      targetWord = word;
+      typedIdx = 0;
+      try { Audio.waveStart(); } catch (e) {}
+    }
+
+    function nextWord() {
+      const elapsed = performance.now() - startT;
+      if (elapsed >= 30000) { return; } // will be handled in loop
+      const next = pickNextWord(elapsed);
+      spawnZombiesForWord(next.word, next.wave);
+    }
+
+    // Render a pixel-art zombie centered at (x, y) with letter and scale.
+    function drawZombie(z, t) {
+      const x = z.x, y = z.y + Math.sin(t*0.004 + z.bobOffset) * 2;
+      const s = z.scale;
+      const W = 36 * s, H = 52 * s;
+      const left = x - W/2;
+      // body (sickly green)
+      ctx.fillStyle = '#3a4a2a';
+      ctx.fillRect(left + 6*s, y - H*0.10, W - 12*s, H*0.55);
+      // arms outstretched
+      ctx.fillStyle = '#2a3820';
+      ctx.fillRect(left, y + H*0.05, W*0.14, H*0.10);
+      ctx.fillRect(left + W - W*0.14, y + H*0.05, W*0.14, H*0.10);
+      // head
+      ctx.fillStyle = '#5a6e3a';
+      ctx.fillRect(left + W*0.20, y - H*0.45, W*0.60, H*0.35);
+      // eye holes
+      ctx.fillStyle = '#1a0e10';
+      ctx.fillRect(left + W*0.30, y - H*0.32, W*0.10, H*0.06);
+      ctx.fillRect(left + W*0.60, y - H*0.32, W*0.10, H*0.06);
+      // glowing eye dots
+      ctx.fillStyle = '#ff5070';
+      ctx.fillRect(left + W*0.33, y - H*0.30, W*0.04, H*0.03);
+      ctx.fillRect(left + W*0.63, y - H*0.30, W*0.04, H*0.03);
+      // mouth (drool)
+      ctx.fillStyle = '#1a0810';
+      ctx.fillRect(left + W*0.35, y - H*0.18, W*0.30, H*0.04);
+      ctx.fillStyle = '#6e0a1e';
+      ctx.fillRect(left + W*0.45, y - H*0.14, W*0.05, H*0.10);
+      // legs
+      ctx.fillStyle = '#2a3820';
+      ctx.fillRect(left + W*0.25, y + H*0.40, W*0.20, H*0.20);
+      ctx.fillRect(left + W*0.55, y + H*0.40, W*0.20, H*0.20);
+      // chest letter tile
+      const tileW = W*0.55, tileH = H*0.22;
+      const tx = left + (W - tileW)/2;
+      const ty = y + H*0.05;
+      ctx.fillStyle = '#0a0810';
+      ctx.fillRect(tx, ty, tileW, tileH);
+      // border highlights when this zombie holds the NEXT required letter
+      const isNext = (z.letter === targetWord.replace(/\s/g, '').charAt(typedIdx));
+      ctx.strokeStyle = isNext ? '#e8609a' : 'rgba(255,255,255,0.18)';
+      ctx.lineWidth = isNext ? 2 : 1;
+      ctx.strokeRect(tx, ty, tileW, tileH);
+      // letter
+      ctx.fillStyle = isNext ? '#ffdce8' : '#c8b4be';
+      ctx.font = `bold ${Math.floor(tileH*0.85)}px "Courier New", monospace`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(z.letter, tx + tileW/2, ty + tileH/2);
+      // bounds for hit test
+      z._bounds = { left: left, top: y - H*0.55, right: left + W, bottom: y + H*0.60 };
+    }
+
+    function loop(now) {
+      if (!running) return;
+      const dt = lastT ? now - lastT : 16;
+      lastT = now;
+      const elapsed = now - startT;
+
+      const rect = canvas.getBoundingClientRect();
+      const w = rect.width, h = rect.height;
+      // Background
+      ctx.fillStyle = '#06020a';
+      ctx.fillRect(0, 0, w, h);
+      // Floor line near bottom (lose zone)
+      const loseY = h * 0.78;
+      ctx.fillStyle = 'rgba(180,30,60,0.18)';
+      ctx.fillRect(0, loseY, w, h - loseY);
+      ctx.strokeStyle = 'rgba(255,80,120,0.5)';
+      ctx.setLineDash([6, 6]);
+      ctx.beginPath();
+      ctx.moveTo(0, loseY);
+      ctx.lineTo(w, loseY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Target word at top
+      ctx.fillStyle = '#ffdce8';
+      ctx.font = `bold 22px "Courier New", monospace`;
+      ctx.textAlign = 'center';
+      // Render targetWord with already-typed prefix highlighted dimmer
+      const noSpace = targetWord.replace(/\s/g, '');
+      let display = '';
+      for (let i = 0; i < noSpace.length; i++) {
+        display += (i < typedIdx ? '·' : noSpace[i]);
+      }
+      ctx.fillText(display, w/2, h*0.08);
+
+      // Shake offset
+      let sx = 0, sy = 0;
+      if (shakeT > 0) {
+        shakeT -= dt;
+        sx = (Math.random() - 0.5) * 6;
+        sy = (Math.random() - 0.5) * 6;
+      }
+      ctx.save();
+      ctx.translate(sx, sy);
+
+      // Step zombies down if a wrong tap stepped them
+      if (stepDownPending > 0) {
+        const step = Math.min(stepDownPending, dt * 0.15);
+        zombies.forEach(z => { if (!z.dead) z.y += step; });
+        stepDownPending -= step;
+      }
+      // Per-frame fall
+      zombies.forEach(z => {
+        if (z.dead) {
+          z.deadT += dt;
+          z.scale = Math.max(0, 1 - z.deadT / 250);
+        } else {
+          z.y += z.vy * dt;
+        }
+      });
+
+      // Draw all zombies
+      zombies.forEach(z => {
+        if (z.dead && z.scale <= 0) return;
+        drawZombie(z, now);
+      });
+      ctx.restore();
+
+      // Check for zombies that crossed lose line
+      let lostOne = false;
+      zombies.forEach(z => {
+        if (!z.dead && z.y > loseY) {
+          z.dead = true;
+          z.scale = 0;
+          lostOne = true;
+        }
+      });
+      if (lostOne) {
+        lives--;
+        try { Audio.hurt(); } catch (e) {}
+        updateLives();
+        if (lives <= 0) { return finish(false); }
+        // Reset current word
+        zombies = [];
+        typedIdx = 0;
+        setTimeout(() => nextWord(), 450);
+      }
+
+      // If all zombies dead → next word
+      const alive = zombies.filter(z => !z.dead).length;
+      if (alive === 0 && typedIdx === noSpace.length && elapsed < 30000) {
+        // Cleared — small pause then next word
+        zombies = [];
+        score += 100 * (1 + waveIdx);
+        setTimeout(() => nextWord(), 400);
+      }
+
+      // Time over
+      if (elapsed >= 30000) { return finish(true); }
+
+      // Update timer UI
+      const t = document.getElementById('c2a-timer');
+      if (t) t.textContent = Math.max(0, Math.ceil((30000 - elapsed) / 1000));
+
+      raf = requestAnimationFrame(loop);
+    }
+
+    function updateLives() {
+      const el = document.getElementById('c2a-lives');
+      if (!el) return;
+      el.innerHTML = '';
+      for (let i = 0; i < 3; i++) {
+        const s = document.createElement('span');
+        s.className = 'c2a-life' + (i < lives ? ' on' : '');
+        s.textContent = '♥';
+        el.appendChild(s);
+      }
+    }
+
+    function onTap(ev) {
+      if (!running) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = (ev.touches ? ev.touches[0].clientX : ev.clientX) - rect.left;
+      const y = (ev.touches ? ev.touches[0].clientY : ev.clientY) - rect.top;
+      const noSpace = targetWord.replace(/\s/g, '');
+      const needed = noSpace.charAt(typedIdx);
+      // Find topmost zombie under tap
+      const hit = zombies.slice().reverse().find(z => !z.dead && z._bounds &&
+        x >= z._bounds.left && x <= z._bounds.right &&
+        y >= z._bounds.top && y <= z._bounds.bottom);
+      if (!hit) return;
+      if (hit.letter === needed) {
+        hit.dead = true;
+        hit.deadT = 0;
+        typedIdx++;
+        score += 25;
+        try { Audio.tapHit(); Audio.zombieHit(); } catch (e) {}
+      } else {
+        try { Audio.tapMiss(); } catch (e) {}
+        shakeT = 200;
+        stepDownPending += 18;
+      }
+    }
+
+    function start(onWinCb, onLoseCb) {
+      canvas = document.getElementById('c2a-canvas');
+      ctx = canvas.getContext('2d');
+      size();
+      window.addEventListener('resize', size);
+      lives = 3;
+      score = 0;
+      typedIdx = 0;
+      zombies = [];
+      shakeT = 0;
+      stepDownPending = 0;
+      onWin = onWinCb;
+      onLose = onLoseCb;
+      refillQueue();
+      updateLives();
+      startT = performance.now();
+      lastT = 0;
+      running = true;
+      // Bind tap once
+      if (!canvas.__c2tap) {
+        canvas.__c2tap = true;
+        canvas.addEventListener('click', onTap);
+      }
+      nextWord();
+      raf = requestAnimationFrame(loop);
+    }
+
+    function finish(won) {
+      running = false;
+      cancelAnimationFrame(raf);
+      raf = null;
+      try { won ? Audio.success() : Audio.fail(); } catch (e) {}
+      if (won && onWin) onWin();
+      else if (!won && onLose) onLose();
+    }
+
+    function stop() {
+      running = false;
+      cancelAnimationFrame(raf);
+      raf = null;
+    }
+
+    return { start, stop };
+  })();
+
+  // ---- INFECTION PUZZLE ----
+  // Containment-style puzzle. Antidote pairs fall (same controls as
+  // Chapter 1 puyo), infection cells spread turn-by-turn. Match 4+
+  // antidotes adjacent to infection to neutralize it.
+  const Infection = (() => {
+    const ROWS = 12, COLS = 6;
+    const COLORS = ['red', 'cyan', 'lime', 'amber'];
+    const COLOR_HEX = { red: '#e8609a', cyan: '#6fd4ff', lime: '#a8e060', amber: '#f0c050', inf: '#7a0a26' };
+    const COLOR_HEX2 = { red: '#a8345e', cyan: '#3a8cb6', lime: '#5fa030', amber: '#a07c20', inf: '#3a0512' };
+
+    const LEVELS = [
+      { id: 1, name: 'M-1', target: 5000,  lives: 3, spreadMs: 4200, seeds: 1, speed: 800, endless: false },
+      { id: 2, name: 'M-2', target: 12000, lives: 2, spreadMs: 2600, seeds: 2, speed: 620, endless: false },
+      { id: 3, name: 'M-3', target: Infinity, lives: 1, spreadMs: 1600, seeds: 1, speed: 700, endless: true, freshSeedEveryMs: 25000 },
+    ];
+
+    let canvas = null, ctx = null;
+    let grid = []; // ROWS x COLS, null or color/'inf'
+    let pair = null, nextPair = null;
+    let running = false;
+    let paused = false;
+    let raf = null;
+    let lastT = 0;
+    let fallTimer = 0;
+    let fallSpeed = 800;
+    let spreadTimer = 0;
+    let endlessSeedTimer = 0;
+    let score = 0;
+    let lives = 3;
+    let currentLevel = null;
+    let cellSize = 30;
+    let combo = 0;
+
+    function freshGrid() {
+      grid = Array.from({length: ROWS}, () => Array(COLS).fill(null));
+    }
+    function seedInfection(n) {
+      // Place n infection cells at random positions on the bottom 2/3 of board.
+      let placed = 0;
+      let tries = 0;
+      while (placed < n && tries < 200) {
+        tries++;
+        const r = Math.floor(ROWS * 0.5 + Math.random() * ROWS * 0.45);
+        const c = Math.floor(Math.random() * COLS);
+        if (!grid[r][c]) { grid[r][c] = 'inf'; placed++; }
+      }
+    }
+    function spawnPair() {
+      const c1 = COLORS[Math.floor(Math.random() * COLORS.length)];
+      const c2 = COLORS[Math.floor(Math.random() * COLORS.length)];
+      return { x: Math.floor(COLS/2) - 1, y: 0, c1, c2, rotation: 0 };
+    }
+    function pairCells(p) {
+      const { x, y, rotation } = p;
+      if (rotation === 0) return [{ x, y, c: p.c1 }, { x,     y: y+1, c: p.c2 }];
+      if (rotation === 1) return [{ x, y, c: p.c1 }, { x: x+1, y,     c: p.c2 }];
+      if (rotation === 2) return [{ x, y, c: p.c1 }, { x,     y: y-1, c: p.c2 }];
+      if (rotation === 3) return [{ x, y, c: p.c1 }, { x: x-1, y,     c: p.c2 }];
+      return [];
+    }
+    function valid(p) {
+      for (const cell of pairCells(p)) {
+        if (cell.x < 0 || cell.x >= COLS || cell.y >= ROWS) return false;
+        if (cell.y >= 0 && grid[cell.y][cell.x] !== null) return false;
+      }
+      return true;
+    }
+    function placePair() {
+      if (!pair) return;
+      for (const cell of pairCells(pair)) {
+        if (cell.y < 0) { pair = null; loseLife(); return; }
+        grid[cell.y][cell.x] = cell.c;
+      }
+      pair = null;
+      gravity();
+      resolveMatches();
+    }
+    function gravity() {
+      for (let c = 0; c < COLS; c++) {
+        let write = ROWS - 1;
+        for (let r = ROWS - 1; r >= 0; r--) {
+          if (grid[r][c] !== null) {
+            grid[write][c] = grid[r][c];
+            if (write !== r) grid[r][c] = null;
+            write--;
+          }
+        }
+      }
+    }
+    function neighbors(r, c) {
+      return [[r-1,c],[r+1,c],[r,c-1],[r,c+1]].filter(([rr,cc]) => rr>=0 && rr<ROWS && cc>=0 && cc<COLS);
+    }
+    function findColorGroup(r, c, color, visited) {
+      const stack = [[r, c]];
+      const group = [];
+      while (stack.length) {
+        const [rr, cc] = stack.pop();
+        const k = rr*COLS+cc;
+        if (visited.has(k)) continue;
+        if (grid[rr][cc] !== color) continue;
+        visited.add(k);
+        group.push([rr, cc]);
+        neighbors(rr, cc).forEach(n => stack.push(n));
+      }
+      return group;
+    }
+    function resolveMatches() {
+      const visited = new Set();
+      const toClear = [];
+      let cleared = 0;
+      let infCleared = 0;
+      // Find connected groups of 4+ antidotes
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const v = grid[r][c];
+          if (!v || v === 'inf') continue;
+          const k = r*COLS+c;
+          if (visited.has(k)) continue;
+          const group = findColorGroup(r, c, v, visited);
+          if (group.length < 4) continue;
+          // Adjacency to infection — at least one neighbor must be 'inf'
+          let touchesInf = false;
+          const infAdj = new Set();
+          group.forEach(([rr, cc]) => {
+            neighbors(rr, cc).forEach(([nr, nc]) => {
+              if (grid[nr][nc] === 'inf') { touchesInf = true; infAdj.add(nr*COLS+nc); }
+            });
+          });
+          if (!touchesInf) continue;
+          // Mark for clearing: group + adjacent infection
+          group.forEach(([rr, cc]) => toClear.push([rr, cc]));
+          infAdj.forEach(k => toClear.push([Math.floor(k/COLS), k%COLS]));
+          cleared += group.length;
+          infCleared += infAdj.size;
+        }
+      }
+      if (toClear.length) {
+        toClear.forEach(([r, c]) => { grid[r][c] = null; });
+        combo++;
+        const pts = cleared * 10 + infCleared * 50 * combo;
+        score += pts;
+        try { Audio.cure(); } catch (e) {}
+        gravity();
+        // Keep resolving for chains
+        setTimeout(() => resolveMatches(), 150);
+      } else {
+        combo = 0;
+        // Check win condition for non-endless levels
+        if (currentLevel && !currentLevel.endless && score >= currentLevel.target) {
+          return finish(true);
+        }
+        // Spawn next pair
+        if (!pair) {
+          pair = nextPair || spawnPair();
+          nextPair = spawnPair();
+          updateHUD();
+          if (!valid(pair)) { pair = null; return loseLife(); }
+        }
+      }
+    }
+    function spreadInfection() {
+      // Each infection cell tries to infect one empty adjacent cell.
+      const adds = [];
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          if (grid[r][c] !== 'inf') continue;
+          const empty = neighbors(r, c).filter(([nr, nc]) => grid[nr][nc] === null);
+          if (!empty.length) continue;
+          // Probability gate so it doesn't blow up instantly
+          if (Math.random() > 0.55) continue;
+          const [nr, nc] = empty[Math.floor(Math.random() * empty.length)];
+          adds.push([nr, nc]);
+        }
+      }
+      adds.forEach(([r, c]) => { if (grid[r][c] === null) grid[r][c] = 'inf'; });
+      if (adds.length) try { Audio.spread(); } catch (e) {}
+      // Lose-life trigger: too much infection
+      const infCount = countInfection();
+      const cap = Math.floor(ROWS * COLS * 0.55);
+      if (infCount >= cap) loseLife();
+    }
+    function countInfection() {
+      let n = 0;
+      for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) if (grid[r][c] === 'inf') n++;
+      return n;
+    }
+    function loseLife() {
+      lives--;
+      try { Audio.hurt(); } catch (e) {}
+      // Clear about half the infection so the player can recover
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          if (grid[r][c] === 'inf' && Math.random() < 0.6) grid[r][c] = null;
+        }
+      }
+      gravity();
+      updateHUD();
+      if (lives <= 0) return finish(false);
+      // Respawn the pair
+      pair = spawnPair();
+      nextPair = spawnPair();
+    }
+
+    function dropStep() {
+      if (!pair) return;
+      const moved = { ...pair, y: pair.y + 1 };
+      if (valid(moved)) pair = moved;
+      else placePair();
+    }
+    function rotate(dir) {
+      if (!pair) return;
+      const rot = ((pair.rotation + (dir > 0 ? 1 : 3)) % 4 + 4) % 4;
+      const test = { ...pair, rotation: rot };
+      if (valid(test)) pair = test;
+      else {
+        // Kick
+        const kicks = [[-1, 0], [1, 0], [0, -1]];
+        for (const [dx, dy] of kicks) {
+          const k = { ...pair, rotation: rot, x: pair.x + dx, y: pair.y + dy };
+          if (valid(k)) { pair = k; return; }
+        }
+      }
+    }
+    function move(dir) {
+      if (!pair) return;
+      const test = { ...pair, x: pair.x + dir };
+      if (valid(test)) pair = test;
+    }
+    function drop() {
+      if (!pair) return;
+      while (true) {
+        const m = { ...pair, y: pair.y + 1 };
+        if (valid(m)) pair = m; else break;
+      }
+      placePair();
+    }
+
+    function sizeCanvas() {
+      const vw = Math.min(window.innerWidth, 430);
+      const vh = window.innerHeight;
+      const HUD = 130;
+      const availW = vw - 80;
+      const availH = vh - HUD;
+      cellSize = Math.max(18, Math.floor(Math.min(availW / COLS, availH / ROWS)));
+      canvas.width = cellSize * COLS;
+      canvas.height = cellSize * ROWS;
+      canvas.style.width = canvas.width + 'px';
+      canvas.style.height = canvas.height + 'px';
+    }
+
+    function drawCell(r, c, v, glow) {
+      const x = c * cellSize, y = r * cellSize;
+      if (v === 'inf') {
+        // Pulsing infection cell
+        const t = performance.now() * 0.003;
+        const pulse = 0.7 + 0.3 * Math.sin(t + r + c);
+        ctx.fillStyle = COLOR_HEX2.inf;
+        ctx.fillRect(x, y, cellSize, cellSize);
+        ctx.fillStyle = `rgba(232, 60, 90, ${0.5 + pulse*0.3})`;
+        ctx.fillRect(x + 3, y + 3, cellSize - 6, cellSize - 6);
+        // veins
+        ctx.strokeStyle = `rgba(255, 80, 120, ${pulse})`;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x + 4, y + cellSize/2);
+        ctx.lineTo(x + cellSize - 4, y + cellSize/2);
+        ctx.moveTo(x + cellSize/2, y + 4);
+        ctx.lineTo(x + cellSize/2, y + cellSize - 4);
+        ctx.stroke();
+      } else {
+        // Antidote pill
+        ctx.fillStyle = COLOR_HEX2[v];
+        ctx.fillRect(x + 1, y + 1, cellSize - 2, cellSize - 2);
+        ctx.fillStyle = COLOR_HEX[v];
+        ctx.fillRect(x + 3, y + 3, cellSize - 6, cellSize - 6);
+        // highlight
+        ctx.fillStyle = 'rgba(255,255,255,0.18)';
+        ctx.fillRect(x + 4, y + 4, 4, 2);
+      }
+    }
+
+    function render() {
+      // Grid background
+      ctx.fillStyle = '#0a050d';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      // Grid lines (subtle)
+      ctx.strokeStyle = 'rgba(180,30,60,0.08)';
+      for (let r = 0; r <= ROWS; r++) {
+        ctx.beginPath();
+        ctx.moveTo(0, r * cellSize);
+        ctx.lineTo(canvas.width, r * cellSize);
+        ctx.stroke();
+      }
+      for (let c = 0; c <= COLS; c++) {
+        ctx.beginPath();
+        ctx.moveTo(c * cellSize, 0);
+        ctx.lineTo(c * cellSize, canvas.height);
+        ctx.stroke();
+      }
+      // Cells
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const v = grid[r][c];
+          if (v) drawCell(r, c, v);
+        }
+      }
+      // Falling pair
+      if (pair) {
+        pairCells(pair).forEach(cell => {
+          if (cell.y < 0) return;
+          drawCell(cell.y, cell.x, cell.c);
+        });
+      }
+    }
+    function loop(now) {
+      if (!running) return;
+      const dt = lastT ? now - lastT : 16;
+      lastT = now;
+      if (!paused) {
+        if (pair) {
+          fallTimer += dt;
+          if (fallTimer >= fallSpeed) { fallTimer = 0; dropStep(); }
+        }
+        spreadTimer += dt;
+        if (currentLevel && spreadTimer >= currentLevel.spreadMs) {
+          spreadTimer = 0;
+          spreadInfection();
+        }
+        if (currentLevel && currentLevel.endless) {
+          endlessSeedTimer += dt;
+          if (endlessSeedTimer >= currentLevel.freshSeedEveryMs) {
+            endlessSeedTimer = 0;
+            seedInfection(1);
+          }
+        }
+        render();
+        updateHUD();
+      }
+      raf = requestAnimationFrame(loop);
+    }
+    function updateHUD() {
+      const s = document.getElementById('c2g-score');
+      const t = document.getElementById('c2g-target');
+      const liv = document.getElementById('c2g-lives');
+      const inf = document.getElementById('c2g-inf');
+      if (s) s.textContent = String(score);
+      if (t && currentLevel) {
+        t.textContent = currentLevel.endless
+          ? (window.tr ? window.tr('c2_endless_hud') : 'SURVIVE')
+          : (window.tr ? window.tr('c2_target_label') : 'TARGET') + ': ' + currentLevel.target.toLocaleString();
+      }
+      if (liv) {
+        liv.innerHTML = '';
+        for (let i = 0; i < (currentLevel ? currentLevel.lives : 0); i++) {
+          const sp = document.createElement('span');
+          sp.className = 'c2g-life' + (i < lives ? ' on' : '');
+          sp.textContent = '♥';
+          liv.appendChild(sp);
+        }
+      }
+      if (inf && currentLevel) {
+        const count = countInfection();
+        const cap = Math.floor(ROWS * COLS * 0.55);
+        const pct = Math.min(100, Math.round(count / cap * 100));
+        inf.style.width = pct + '%';
+      }
+    }
+    function finish(won) {
+      running = false;
+      cancelAnimationFrame(raf);
+      raf = null;
+      try { won ? Audio.success() : Audio.fail(); } catch (e) {}
+      // Mark completion + route back
+      if (won && currentLevel) {
+        try {
+          if (currentLevel.id === 1) window.__c2_state_set('c2_level1complete', true);
+          if (currentLevel.id === 2) window.__c2_state_set('c2_level2complete', true);
+        } catch (e) {}
+      }
+      // Show end overlay
+      const overlay = document.getElementById('c2g-end-overlay');
+      const title = document.getElementById('c2g-end-title');
+      const sub = document.getElementById('c2g-end-sub');
+      if (overlay && title && sub) {
+        title.textContent = won
+          ? (window.tr ? window.tr('c2_level_clear') : 'CONTAINED')
+          : (window.tr ? window.tr('c2_level_fail') : 'OVERRUN');
+        sub.textContent = (window.tr ? window.tr('score_label') : 'Score') + ': ' + score;
+        overlay.classList.add('show');
+      }
+    }
+    function startLevel(levelId) {
+      currentLevel = LEVELS.find(l => l.id === levelId);
+      if (!currentLevel) return;
+      freshGrid();
+      seedInfection(currentLevel.seeds);
+      lives = currentLevel.lives;
+      score = 0;
+      combo = 0;
+      fallSpeed = currentLevel.speed;
+      fallTimer = 0;
+      spreadTimer = 0;
+      endlessSeedTimer = 0;
+      pair = spawnPair();
+      nextPair = spawnPair();
+      canvas = document.getElementById('c2g-canvas');
+      ctx = canvas.getContext('2d');
+      sizeCanvas();
+      window.addEventListener('resize', sizeCanvas);
+      const overlay = document.getElementById('c2g-end-overlay');
+      if (overlay) overlay.classList.remove('show');
+      // Set level name HUD
+      const nm = document.getElementById('c2g-level-name');
+      if (nm) nm.textContent = currentLevel.name;
+      running = true;
+      paused = false;
+      lastT = 0;
+      bindControls();
+      updateHUD();
+      raf = requestAnimationFrame(loop);
+    }
+    function bindControls() {
+      if (canvas.__c2gbound) return;
+      canvas.__c2gbound = true;
+      let touchStartX = 0, touchStartY = 0, touchStartT = 0, lastTap = 0;
+      canvas.addEventListener('touchstart', (e) => {
+        const t = e.touches[0];
+        touchStartX = t.clientX; touchStartY = t.clientY; touchStartT = performance.now();
+      }, { passive: true });
+      canvas.addEventListener('touchend', (e) => {
+        const tEnd = e.changedTouches[0];
+        const dx = tEnd.clientX - touchStartX;
+        const dy = tEnd.clientY - touchStartY;
+        const dt = performance.now() - touchStartT;
+        const adx = Math.abs(dx), ady = Math.abs(dy);
+        if (adx < 14 && ady < 14 && dt < 250) {
+          // tap = rotate
+          const now = performance.now();
+          if (now - lastTap < 280) drop();
+          else rotate(1);
+          lastTap = now;
+          return;
+        }
+        if (adx > ady) move(dx > 0 ? 1 : -1);
+        else if (dy > 0) drop();
+      });
+      // Keyboard for desktop testing
+      window.addEventListener('keydown', (e) => {
+        if (!running) return;
+        if (e.key === 'ArrowLeft') move(-1);
+        else if (e.key === 'ArrowRight') move(1);
+        else if (e.key === 'ArrowDown') drop();
+        else if (e.key === 'ArrowUp' || e.key === ' ') rotate(1);
+        else if (e.key === 'z') rotate(-1);
+      });
+    }
+    function stop() {
+      running = false;
+      cancelAnimationFrame(raf);
+      raf = null;
+    }
+    return { startLevel, stop, LEVELS, rotate, move, drop };
+  })();
+
+  return { Audio, Intro, Typing, Infection };
+})();
+window.C2 = C2;
+
+// Expose the i18n tr() helper so C2 modules can read translations
+// without re-implementing fallback logic.
+window.tr = tr;
 
 // ============================================================
 // TELEGRAM WEB APP INIT
