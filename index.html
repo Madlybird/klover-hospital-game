@@ -3561,8 +3561,11 @@ html, body {
   width: 100%;
   display: block;
   image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
   cursor: crosshair;
+  touch-action: manipulation;
 }
+#c2p-canvas { touch-action: manipulation; }
 .c2a-end-overlay {
   position: absolute;
   inset: 0;
@@ -3654,95 +3657,79 @@ html, body {
   font-style: italic;
 }
 
-/* ---- C2 infection puzzle (#screen-c2-game) ---- */
-.c2g-hud {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px 10px;
-  background: linear-gradient(180deg, rgba(20,5,25,0.95), rgba(8,3,12,0.92));
-  border-bottom: 1px solid rgba(180,40,80,0.30);
-  font-family: 'Courier New', monospace;
-  box-sizing: border-box;
+/* ---- C2 infection puzzle (#screen-c2-game) ----
+   Reuses chapter 1 .game-hud / .game-area / .game-sidebar /
+   .rot-btn / .fact-card / etc. The .c2-theme parent supplies a
+   dark horror palette as overrides. */
+#screen-c2-game .game-hud {
+  background: linear-gradient(180deg, rgba(20,5,25,0.96), rgba(8,3,12,0.94));
+  border-bottom: 1px solid rgba(180,40,80,0.32);
 }
-.c2g-hud-score, .c2g-hud-right {
-  display: flex;
-  flex-direction: column;
+#screen-c2-game .hud-label { color: rgba(255,180,200,0.7); font-family: 'Nunito', sans-serif; }
+#screen-c2-game .hud-value { color: #e8609a; font-family: 'Nunito', sans-serif; text-shadow: 0 0 10px rgba(232,96,154,0.4); }
+#screen-c2-game .hud-level-name { color: #fff; font-family: 'Nunito', sans-serif; letter-spacing: 3px; }
+#screen-c2-game .hud-target { color: #ffaac0; font-family: 'Nunito', sans-serif; }
+#screen-c2-game .next-label { color: rgba(255,180,200,0.7); font-family: 'Nunito', sans-serif; }
+#screen-c2-game .combo-display { color: #ff8050; font-family: 'Nunito', sans-serif; }
+#screen-c2-game #c2g-canvas {
+  background: #08050d;
+  border: 1px solid rgba(180,40,80,0.30);
+  border-radius: 8px;
+  touch-action: none;
+  flex-shrink: 0;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
 }
-.c2g-hud-right { align-items: flex-end; gap: 4px; }
-.c2g-hud-center {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-}
-.c2g-level-name {
-  font-size: 16px;
-  font-weight: 800;
-  letter-spacing: 3px;
-  color: #fff;
-}
-.c2g-hud-target {
-  font-size: 11px;
-  letter-spacing: 2px;
-  color: #ffaac0;
-}
-.c2g-inf-bar {
-  width: 140px;
-  height: 6px;
-  background: rgba(232,96,154,0.12);
-  border-radius: 3px;
-  margin-top: 3px;
-  overflow: hidden;
-}
-.c2g-inf-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #e8609a, #ff3060);
-  width: 0%;
-  transition: width 0.3s ease;
-}
-.c2g-inf-label {
-  font-size: 9px;
-  letter-spacing: 1.6px;
-  color: rgba(255,180,200,0.55);
-  margin-top: 2px;
-}
-.c2g-lives {
-  display: flex;
-  gap: 3px;
-}
-.c2g-life {
-  font-size: 14px;
-  color: rgba(255,255,255,0.18);
-}
-.c2g-life.on { color: #e8609a; text-shadow: 0 0 6px rgba(232,96,154,0.7); }
-.c2g-pause {
-  margin-top: 4px;
-}
-.c2g-area {
-  width: 100%;
-  display: flex;
-  gap: 14px;
-  padding: 10px 12px;
-  height: calc(100vh - 130px);
-  align-items: flex-start;
-  justify-content: center;
-  box-sizing: border-box;
-}
-#c2g-canvas {
-  background: #0a050d;
-  border: 1px solid rgba(180,40,80,0.20);
-  display: block;
+#screen-c2-game #c2g-next-canvas {
+  background: rgba(40,10,30,0.30);
+  border: 1px solid rgba(180,40,80,0.35);
+  border-radius: 6px;
   image-rendering: pixelated;
 }
-.c2-fact-card {
-  background: rgba(20,5,20,0.65) !important;
-  border-color: rgba(180,40,80,0.35) !important;
-  color: rgba(240,224,232,0.8) !important;
+#screen-c2-game .rot-btn {
+  background: #6e1142;
+  border: 2px solid #421030;
+  color: #fff;
 }
-.c2-fact-card b { color: #e8609a !important; }
+#screen-c2-game .rot-btn:hover { background: #8e1858; }
+#screen-c2-game .fact-card {
+  background: rgba(20,5,20,0.85);
+  color: #ffd0d0;
+  border: 1px solid rgba(180,40,80,0.40);
+}
+#screen-c2-game .fact-card b { color: #e8609a; }
+#screen-c2-game .btn-pause { background: rgba(40,10,30,0.6); border-color: rgba(180,40,80,0.4); color: #ffaac0; }
+.c2-stat-row { display: flex; gap: 4px; margin-top: 3px; }
+.c2-inf-pill {
+  background: rgba(40,10,30,0.5) !important;
+  color: #ffaac0 !important;
+  border: 1px solid rgba(180,40,80,0.4) !important;
+  padding: 2px 6px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+}
+.c2-inf-bar {
+  width: 60px;
+  height: 5px;
+  background: rgba(232,96,154,0.18);
+  border-radius: 3px;
+  overflow: hidden;
+  display: inline-block;
+}
+.c2-inf-fill {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #e8609a, #ff3060);
+  transition: width 0.3s ease;
+}
+.c2-inf-text { font-size: 10px; letter-spacing: 1.2px; font-weight: 700; }
+/* Lives use chapter 1's .heart-icon class — c2 just keeps the
+   pink horror tone (chapter 1 uses the same color so no override
+   needed unless we want a different lost-life look). */
+#screen-c2-game .heart-icon { filter: drop-shadow(0 0 6px rgba(232,96,154,0.85)); }
+#screen-c2-game .heart-icon.lost { color: #4a2030; opacity: 0.4; }
 .c2g-end-overlay {
   position: absolute;
   inset: 0;
@@ -3994,33 +3981,41 @@ html, body {
     </div>
   </div>
 
-  <!-- C2: infection puzzle gameplay -->
-  <div id="screen-c2-game" class="screen">
-    <div class="c2g-hud">
-      <div class="c2g-hud-score">
+  <!-- C2: infection puzzle gameplay (reuses chapter 1 DOM classes
+       so it inherits the existing HUD / area / sidebar layout, with
+       a dark horror theme via the .c2-theme modifier). -->
+  <div id="screen-c2-game" class="screen c2-theme">
+    <div class="game-hud">
+      <div class="hud-score">
         <div class="hud-label" data-i18n="c2_score_label">VITALS</div>
         <div class="hud-value" id="c2g-score">0</div>
       </div>
-      <div class="c2g-hud-center">
-        <div class="c2g-level-name" id="c2g-level-name">M-1</div>
-        <div class="c2g-hud-target" id="c2g-target">TARGET: 5,000</div>
-        <div class="c2g-inf-bar"><div class="c2g-inf-fill" id="c2g-inf"></div></div>
-        <div class="c2g-inf-label" data-i18n="c2_infection_label">INFECTION</div>
+      <div class="hud-center">
+        <div class="hud-level-name" id="c2g-level-name">M-1</div>
+        <div class="hud-target" id="c2g-target">TARGET: 5,000</div>
+        <div class="c2-stat-row">
+          <span class="stat-pill c2-inf-pill">
+            <span class="c2-inf-bar"><span class="c2-inf-fill" id="c2g-inf"></span></span>
+            <span class="c2-inf-text" data-i18n="c2_infection_label">INF</span>
+          </span>
+        </div>
       </div>
-      <div class="c2g-hud-right">
-        <div class="c2g-lives" id="c2g-lives"></div>
-        <button class="btn-pause c2g-pause" onclick="Game.pauseC2Game()">&#9646;&#9646;</button>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="hud-lives" id="c2g-lives"></div>
+        <button class="btn-pause" onclick="Game.pauseC2Game()">&#9646;&#9646;</button>
       </div>
     </div>
-    <div class="c2g-area">
-      <canvas id="c2g-canvas"></canvas>
-      <div class="c2g-sidebar">
+    <div class="game-area" id="c2g-area">
+      <canvas id="c2g-canvas" width="252" height="504"></canvas>
+      <div class="game-sidebar">
         <div class="next-label" data-i18n="next_dose">NEXT DOSE</div>
-        <div class="rot-buttons" style="margin-top:auto">
+        <canvas id="c2g-next-canvas" width="60" height="72"></canvas>
+        <div class="combo-display" id="c2g-combo"></div>
+        <div class="rot-buttons">
           <button class="rot-btn" onclick="Game.c2RotateCCW()" aria-label="Rotate left">&#8634;</button>
           <button class="rot-btn" onclick="Game.c2RotateCW()" aria-label="Rotate right">&#8635;</button>
         </div>
-        <div class="fact-card c2-fact-card"><b data-i18n="c2_fact_label">!! FACT</b><span data-i18n="c2_fact_text">Match 4+ antidotes touching infection to neutralize it.</span></div>
+        <div class="fact-card"><b data-i18n="c2_fact_label">!! FACT</b><span data-i18n="c2_fact_text">Match 4+ antidotes touching infection to neutralize it.</span></div>
       </div>
     </div>
     <div class="c2g-end-overlay" id="c2g-end-overlay">
@@ -4596,7 +4591,7 @@ const I18N = {
     c2_score_label: 'VITALS',
     c2_target_label: 'TARGET',
     c2_endless_hud: 'SURVIVE',
-    c2_infection_label: 'INFECTION',
+    c2_infection_label: 'INF',
     c2_fact_label: '!! FACT',
     c2_fact_text: 'Match 4+ antidotes touching infection to neutralize it.',
     c2_level_clear: 'CONTAINED',
@@ -4744,7 +4739,7 @@ const I18N = {
     c2_score_label: 'ПОКАЗАТЕЛИ',
     c2_target_label: 'ЦЕЛЬ',
     c2_endless_hud: 'ВЫЖИВАЙТЕ',
-    c2_infection_label: 'ЗАРАЖЕНИЕ',
+    c2_infection_label: 'ЗАР.',
     c2_fact_label: '!! ФАКТ',
     c2_fact_text: 'Соберите 4+ антидота рядом с заражением, чтобы нейтрализовать.',
     c2_level_clear: 'СДЕРЖАНО',
@@ -5161,7 +5156,20 @@ const Game = (() => {
     if (name === 'settings') updateSettingsUI();
     if (name === 'shop') renderShop();
     if (name === 'levels') updateLevelsUI();
+    if (name === 'c2-levels') updateC2LevelsUI();
     if (name !== 'game' && gameRunning) stopGame();
+
+    // Telegram vertical-swipe collapses the mini app — disable it on
+    // any chapter 2 screen (intro/action/game/levels) so the swipe-down
+    // gesture in the infection puzzle doesn't dismiss the app.
+    try {
+      const tg = window.Telegram?.WebApp;
+      if (tg) {
+        const isC2 = name.startsWith('c2-');
+        if (isC2 && tg.disableVerticalSwipes) tg.disableVerticalSwipes();
+        else if (!isC2 && tg.enableVerticalSwipes) tg.enableVerticalSwipes();
+      }
+    } catch (e) {}
   }
 
   function updateMenuUI() {
@@ -8318,33 +8326,115 @@ const C2 = (() => {
       for (let y = 0; y < h; y += 3) ctx.fillRect(0, y, w, 1);
     }
 
-    // Panel 1 — desk. Mai head down, flickering lamp, clock 03:47.
+    // Pixel-art helper: draws a single block at (lx, ly) with given px size
+    // anchored at origin (ox, oy). Used by character sprites below.
+    function px(ox, oy, lx, ly, sz, color) {
+      if (!color) return;
+      ctx.fillStyle = color;
+      ctx.fillRect(ox + lx * sz, oy + ly * sz, sz, sz);
+    }
+    function pxRow(ox, oy, lx1, lx2, ly, sz, color) {
+      if (!color) return;
+      ctx.fillStyle = color;
+      ctx.fillRect(ox + lx1 * sz, oy + ly * sz, (lx2 - lx1 + 1) * sz, sz);
+    }
+
+    // Mai sprite — pink hair, white coat. Drawn in pixel-art grid.
+    // anchor is the top-left of an 11-wide x 14-tall logical sprite.
+    function drawMai(ox, oy, sz, sleeping) {
+      const HAIR = '#e8609a', HAIR_S = '#a83870';
+      const FACE = '#f5d2c0', FACE_S = '#c89888';
+      const COAT = '#f4f4f4', COAT_S = '#c8c8c8';
+      const EYE  = '#1a0a14';
+      // hair top
+      pxRow(ox, oy, 3, 7, 0, sz, HAIR);
+      pxRow(ox, oy, 2, 8, 1, sz, HAIR);
+      // hair sides
+      pxRow(ox, oy, 1, 9, 2, sz, HAIR);
+      px(ox, oy, 1, 3, sz, HAIR_S); px(ox, oy, 9, 3, sz, HAIR_S);
+      // face
+      pxRow(ox, oy, 2, 8, 3, sz, FACE);
+      pxRow(ox, oy, 2, 8, 4, sz, FACE);
+      pxRow(ox, oy, 2, 8, 5, sz, FACE);
+      // eyes
+      if (sleeping) {
+        // closed eyes — small shadow lines
+        px(ox, oy, 3, 4, sz, FACE_S);
+        px(ox, oy, 7, 4, sz, FACE_S);
+      } else {
+        px(ox, oy, 3, 4, sz, EYE);
+        px(ox, oy, 7, 4, sz, EYE);
+      }
+      // mouth
+      px(ox, oy, 5, 5, sz, FACE_S);
+      // hair sides framing
+      px(ox, oy, 1, 4, sz, HAIR); px(ox, oy, 9, 4, sz, HAIR);
+      px(ox, oy, 1, 5, sz, HAIR); px(ox, oy, 9, 5, sz, HAIR);
+      // chin
+      pxRow(ox, oy, 3, 7, 6, sz, FACE);
+      // collar + coat
+      pxRow(ox, oy, 2, 8, 7, sz, COAT);
+      pxRow(ox, oy, 1, 9, 8, sz, COAT);
+      pxRow(ox, oy, 1, 9, 9, sz, COAT);
+      pxRow(ox, oy, 0, 10, 10, sz, COAT);
+      pxRow(ox, oy, 0, 10, 11, sz, COAT);
+      // coat shadows
+      px(ox, oy, 0, 10, sz, COAT_S); px(ox, oy, 10, 10, sz, COAT_S);
+      px(ox, oy, 0, 11, sz, COAT_S); px(ox, oy, 10, 11, sz, COAT_S);
+      // small medical cross detail
+      px(ox, oy, 5, 9, sz, '#e8609a');
+    }
+
+    // Panel 1 — desk. Mai sleeping at registry, flickering lamp, clock visible.
     function scDesk(w, h, t) {
-      // bg: deep night
+      // night sky bg
       pxRect(0, 0, w, h, '#06030c');
       // floor
-      pxRect(0, h*0.72, w, h*0.28, '#0c0813');
-      // desk
-      pxRect(w*0.10, h*0.55, w*0.80, h*0.20, '#1a1018');
-      pxRect(w*0.10, h*0.55, w*0.80, 4, '#2a1828');
-      // chair back
-      pxRect(w*0.42, h*0.30, w*0.16, h*0.30, '#0a050d');
-      // Mai silhouette (head down)
-      pxRect(w*0.40, h*0.46, w*0.20, h*0.10, '#1f1218'); // body
-      pxCircle(w*0.50, h*0.50, w*0.05, '#2a1820'); // head
-      pxRect(w*0.42, h*0.52, w*0.16, 3, '#4a3a40'); // hair line
-      // lamp glow with flicker
-      const lampOn = (Math.floor(t / 110) % 17 !== 13);
+      pxRect(0, h*0.78, w, h*0.22, '#0c0813');
+      // back wall slats (pixel grid pattern)
+      for (let i = 0; i < 8; i++) {
+        pxRect(i * (w/8), h*0.05, 1, h*0.50, 'rgba(60,30,50,0.25)');
+      }
+      // desk top + front
+      pxRect(w*0.06, h*0.58, w*0.88, h*0.06, '#241620');
+      pxRect(w*0.06, h*0.64, w*0.88, h*0.16, '#1a0e18');
+      pxRect(w*0.06, h*0.58, w*0.88, 3, '#3a2230');
+      // clock on wall (top right)
+      const sz = Math.max(2, Math.floor(w / 120)); // pixel block size
+      const cKx = Math.floor(w * 0.78);
+      const cKy = Math.floor(h * 0.12);
+      // clock face frame
+      pxRect(cKx - sz*5, cKy - sz*5, sz*10, sz*10, '#3a2230');
+      pxRect(cKx - sz*4, cKy - sz*4, sz*8, sz*8, '#08040c');
+      // clock hands (pointing roughly at 3:47)
+      ctx.strokeStyle = '#ffaac0';
+      ctx.lineWidth = sz;
+      ctx.beginPath();
+      ctx.moveTo(cKx, cKy);
+      ctx.lineTo(cKx + sz*3, cKy + sz*1);
+      ctx.moveTo(cKx, cKy);
+      ctx.lineTo(cKx, cKy - sz*3);
+      ctx.stroke();
+      // Mai sleeping at desk
+      const maiSize = Math.max(2, Math.floor(w / 90));
+      const maiOx = Math.floor(w*0.42);
+      const maiOy = Math.floor(h*0.44);
+      drawMai(maiOx, maiOy, maiSize, true);
+      // arm folded on desk hint
+      pxRect(maiOx - maiSize*2, maiOy + maiSize*12, maiSize*15, maiSize*2, '#e8d4dc');
+      // lamp wire + lamp with flicker
+      const lampOn = (Math.floor(t / 110) % 23 !== 13);
       if (lampOn) {
         const grad = ctx.createRadialGradient(w*0.50, h*0.20, 0, w*0.50, h*0.20, w*0.55);
-        grad.addColorStop(0, 'rgba(255,210,170,0.20)');
+        grad.addColorStop(0, 'rgba(255,210,170,0.22)');
         grad.addColorStop(0.4, 'rgba(255,150,180,0.10)');
         grad.addColorStop(1, 'rgba(0,0,0,0)');
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, w, h);
-        pxRect(w*0.485, 0, w*0.03, h*0.16, '#2a2028'); // wire
-        pxRect(w*0.46, h*0.16, w*0.08, 4, '#3a3030'); // lamp
       }
+      pxRect(w*0.485, 0, sz, h*0.16, '#2a2028'); // wire
+      pxRect(w*0.46, h*0.16, sz*5, sz, '#3a3030'); // lamp top
+      pxRect(w*0.47, h*0.17, sz*3, sz*2, lampOn ? '#ffeac0' : '#1a1018'); // bulb
       vignette(w, h, 0.75);
       scanlines(w, h);
     }
@@ -8406,37 +8496,92 @@ const C2 = (() => {
       scanlines(w, h);
     }
 
-    // Panel 4 — Vi turns, glowing eyes, charts pinned to coat.
+    // Pixel-art Vi sprite — darker hair, white coat, but here with
+    // glowing red eyes for the nightmare reveal.
+    function drawVi(ox, oy, sz, glowing) {
+      const HAIR = '#2a1014', HAIR_S = '#180408';
+      const FACE = '#a08070', FACE_S = '#704c40';
+      const COAT = '#d8d8d8', COAT_S = '#9898a0';
+      // hair top — Vi has darker, asymmetric hair
+      pxRow(ox, oy, 2, 8, 0, sz, HAIR);
+      pxRow(ox, oy, 1, 9, 1, sz, HAIR);
+      pxRow(ox, oy, 1, 9, 2, sz, HAIR);
+      // face
+      pxRow(ox, oy, 2, 8, 3, sz, FACE);
+      pxRow(ox, oy, 2, 8, 4, sz, FACE);
+      pxRow(ox, oy, 2, 8, 5, sz, FACE);
+      // hair sides
+      px(ox, oy, 1, 3, sz, HAIR); px(ox, oy, 9, 3, sz, HAIR);
+      px(ox, oy, 1, 4, sz, HAIR); px(ox, oy, 9, 4, sz, HAIR);
+      px(ox, oy, 1, 5, sz, HAIR); px(ox, oy, 9, 5, sz, HAIR);
+      // eyes — sockets
+      px(ox, oy, 3, 4, sz, '#080004');
+      px(ox, oy, 4, 4, sz, '#080004');
+      px(ox, oy, 6, 4, sz, '#080004');
+      px(ox, oy, 7, 4, sz, '#080004');
+      // glowing pupils
+      if (glowing) {
+        px(ox, oy, 3, 4, sz, '#ff3a58');
+        px(ox, oy, 7, 4, sz, '#ff3a58');
+      } else {
+        px(ox, oy, 3, 4, sz, '#1a0a14');
+        px(ox, oy, 7, 4, sz, '#1a0a14');
+      }
+      // grim mouth
+      pxRow(ox, oy, 4, 6, 5, sz, FACE_S);
+      // chin
+      pxRow(ox, oy, 3, 7, 6, sz, FACE);
+      // collar
+      pxRow(ox, oy, 2, 8, 7, sz, COAT);
+      // coat with pinned charts (wide)
+      pxRow(ox, oy, 0, 10, 8, sz, COAT);
+      pxRow(ox, oy, 0, 10, 9, sz, COAT);
+      pxRow(ox, oy, 0, 10, 10, sz, COAT);
+      pxRow(ox, oy, 0, 10, 11, sz, COAT);
+      pxRow(ox, oy, 0, 10, 12, sz, COAT);
+      // pinned patient charts (small dirty rectangles on coat)
+      px(ox, oy, 1, 9, sz, '#3a1828'); px(ox, oy, 2, 9, sz, '#5a2838');
+      px(ox, oy, 7, 9, sz, '#3a1828'); px(ox, oy, 8, 9, sz, '#5a2838');
+      px(ox, oy, 1, 11, sz, '#3a1828'); px(ox, oy, 2, 11, sz, '#5a2838');
+      px(ox, oy, 7, 11, sz, '#3a1828'); px(ox, oy, 8, 11, sz, '#5a2838');
+      px(ox, oy, 4, 10, sz, '#5a2838');
+      px(ox, oy, 6, 10, sz, '#5a2838');
+      // coat shadows
+      px(ox, oy, 0, 8, sz, COAT_S); px(ox, oy, 10, 8, sz, COAT_S);
+      px(ox, oy, 0, 12, sz, COAT_S); px(ox, oy, 10, 12, sz, COAT_S);
+    }
+
+    // Panel 4 — Vi turns, glowing red eyes, charts pinned to coat.
     function scViTurn(w, h, t) {
       pxRect(0, 0, w, h, '#0a0410');
-      // body
-      pxRect(w*0.32, h*0.40, w*0.36, h*0.50, '#180614');
-      // coat fold
-      pxRect(w*0.32, h*0.40, w*0.36, 3, '#28102a');
-      // charts on coat (scale effect)
-      for (let i = 0; i < 8; i++) {
-        const cy = h*0.45 + (i%4) * h*0.10;
-        const cx = w*0.35 + (i>=4 ? w*0.18 : 0);
-        pxRect(cx, cy, w*0.06, h*0.04, '#2a1218');
-        pxRect(cx + 2, cy + 2, w*0.04, 2, '#5a2030');
-      }
-      // head
-      pxCircle(w*0.50, h*0.30, w*0.13, '#1a0810');
-      // glowing eyes
-      const pulse = 0.6 + 0.4 * Math.sin(t * 0.008);
-      pxRect(w*0.43, h*0.28, w*0.05, 3, `rgba(255,${60+50*pulse},${100+50*pulse},${0.9})`);
-      pxRect(w*0.52, h*0.28, w*0.05, 3, `rgba(255,${60+50*pulse},${100+50*pulse},${0.9})`);
-      // mouth shadow
-      pxRect(w*0.47, h*0.34, w*0.06, 1.5, '#000');
-      // hair
-      pxRect(w*0.36, h*0.18, w*0.28, h*0.06, '#3a1828');
-      // red atmosphere
-      const grad = ctx.createRadialGradient(w*0.5, h*0.30, w*0.1, w*0.5, h*0.50, w*0.6);
-      grad.addColorStop(0, 'rgba(180,20,50,0.20)');
+      // background corridor hint
+      const grad0 = ctx.createLinearGradient(0, 0, 0, h);
+      grad0.addColorStop(0, '#1a0a14');
+      grad0.addColorStop(1, '#06020a');
+      ctx.fillStyle = grad0;
+      ctx.fillRect(0, 0, w, h);
+      // floor
+      pxRect(0, h*0.82, w, h*0.18, '#08030d');
+      // Vi sprite, large and centered
+      const sz = Math.max(4, Math.floor(w / 36));
+      const viOx = Math.floor((w - sz * 11) / 2);
+      const viOy = Math.floor(h * 0.20);
+      drawVi(viOx, viOy, sz, true);
+      // ambient red glow around eyes
+      const pulse = 0.55 + 0.45 * Math.sin(t * 0.008);
+      const eyeY = viOy + sz * 4;
+      const grad = ctx.createRadialGradient(w*0.50, eyeY, sz, w*0.50, eyeY, w*0.50);
+      grad.addColorStop(0, `rgba(255,40,80,${0.28 * pulse})`);
       grad.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, w, h);
-      vignette(w, h, 0.60);
+      // red atmosphere bottom
+      const grad2 = ctx.createLinearGradient(0, h*0.6, 0, h);
+      grad2.addColorStop(0, 'rgba(0,0,0,0)');
+      grad2.addColorStop(1, 'rgba(80,10,20,0.6)');
+      ctx.fillStyle = grad2;
+      ctx.fillRect(0, h*0.6, w, h*0.4);
+      vignette(w, h, 0.62);
       scanlines(w, h);
     }
 
@@ -8749,28 +8894,32 @@ const C2 = (() => {
       zombies = [];
       const rect = canvas.getBoundingClientRect();
       const w = rect.width, h = rect.height;
-      // Render word with possible space — split into characters (skip space).
       const chars = word.split('').filter(c => c !== ' ');
-      // Layout horizontally across top with slight stagger.
-      const baseY = h * 0.18;
-      const vySpeed = wave === 0 ? h * 0.0000035 : wave === 1 ? h * 0.0000055 : h * 0.0000085;
       const slots = chars.length;
-      // Letter order positions are shuffled so player must search for next letter.
+      // Pick a pixel-block size that gives each zombie ~14*px of width
+      // and still lets all of them fit across the canvas with margins.
+      // Each zombie sprite is 14 logical pixels wide; aim for ~24-32%
+      // canvas width spacing between zombies.
+      const widthBudgetPerZombie = Math.min(w / Math.max(2, slots), 80);
+      const px = Math.max(3, Math.min(5, Math.floor(widthBudgetPerZombie / 14)));
+      const spriteWidthPx = 14 * px;
+      // Layout zombies in shuffled slots across the canvas.
       const positions = [];
       for (let i = 0; i < slots; i++) positions.push(i);
-      // Fisher-Yates shuffle so layout doesn't trivially read left-to-right.
       for (let i = positions.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [positions[i], positions[j]] = [positions[j], positions[i]];
       }
-      const margin = w * 0.10;
+      const margin = Math.max(spriteWidthPx / 2 + 6, w * 0.10);
+      const baseY = h * 0.24;
+      const vySpeed = wave === 0 ? h * 0.0000040 : wave === 1 ? h * 0.0000060 : h * 0.0000090;
       for (let i = 0; i < slots; i++) {
         const slot = positions[i];
-        const x = margin + (slot / Math.max(1, slots - 1)) * (w - 2*margin);
-        const y = baseY + (Math.random() - 0.5) * h * 0.05;
+        const x = margin + (slot / Math.max(1, slots - 1)) * (w - 2 * margin);
+        const y = baseY + (Math.random() - 0.5) * h * 0.04;
         zombies.push({
           id: ++zid,
-          x, y,
+          x, y, px,
           letter: chars[i],
           orderIdx: i,
           vy: vySpeed * (0.9 + Math.random() * 0.3),
@@ -8792,58 +8941,179 @@ const C2 = (() => {
       spawnZombiesForWord(next.word, next.wave);
     }
 
-    // Render a pixel-art zombie centered at (x, y) with letter and scale.
+    // Pixel-art zombie sprite. Drawn pixel-by-pixel on a strict logical
+    // grid (14 wide x 22 tall) so the result reads as true pixel art
+    // rather than soft scaled vector shapes. Letter is rendered as a
+    // pixelated tile on the chest.
+    const ZPAL = {
+      hair:        '#180a14',
+      hairLight:   '#3a1828',
+      skin:        '#8a9e40',  // sickly yellow-green
+      skinShadow:  '#5e7228',
+      skinDeep:    '#384a18',
+      eyeSocket:   '#080004',
+      eyeGlow:     '#ff3a58',
+      eyeDeep:     '#a01838',
+      mouth:       '#080006',
+      mouthInner:  '#4a000a',
+      teeth:       '#d8b048',
+      drool:       '#6e0a1e',
+      body:        '#2a1c14',
+      bodyShadow:  '#0e0606',
+      bodyHi:      '#4a3220',
+      arm:         '#5e3828',
+      armShadow:   '#2e1812',
+      armHi:       '#7a4a36',
+      leg:         '#160a06',
+      tileBright:  '#fff2e0',
+      tileBg:      '#180812',
+      tileBorder:  '#3a1820',
+      tilePulse:   '#e8609a',
+    };
+
     function drawZombie(z, t) {
-      const x = z.x, y = z.y + Math.sin(t*0.004 + z.bobOffset) * 2;
-      const s = z.scale;
-      const W = 36 * s, H = 52 * s;
-      const left = x - W/2;
-      // body (sickly green)
-      ctx.fillStyle = '#3a4a2a';
-      ctx.fillRect(left + 6*s, y - H*0.10, W - 12*s, H*0.55);
-      // arms outstretched
-      ctx.fillStyle = '#2a3820';
-      ctx.fillRect(left, y + H*0.05, W*0.14, H*0.10);
-      ctx.fillRect(left + W - W*0.14, y + H*0.05, W*0.14, H*0.10);
-      // head
-      ctx.fillStyle = '#5a6e3a';
-      ctx.fillRect(left + W*0.20, y - H*0.45, W*0.60, H*0.35);
-      // eye holes
-      ctx.fillStyle = '#1a0e10';
-      ctx.fillRect(left + W*0.30, y - H*0.32, W*0.10, H*0.06);
-      ctx.fillRect(left + W*0.60, y - H*0.32, W*0.10, H*0.06);
-      // glowing eye dots
-      ctx.fillStyle = '#ff5070';
-      ctx.fillRect(left + W*0.33, y - H*0.30, W*0.04, H*0.03);
-      ctx.fillRect(left + W*0.63, y - H*0.30, W*0.04, H*0.03);
-      // mouth (drool)
-      ctx.fillStyle = '#1a0810';
-      ctx.fillRect(left + W*0.35, y - H*0.18, W*0.30, H*0.04);
-      ctx.fillStyle = '#6e0a1e';
-      ctx.fillRect(left + W*0.45, y - H*0.14, W*0.05, H*0.10);
-      // legs
-      ctx.fillStyle = '#2a3820';
-      ctx.fillRect(left + W*0.25, y + H*0.40, W*0.20, H*0.20);
-      ctx.fillRect(left + W*0.55, y + H*0.40, W*0.20, H*0.20);
-      // chest letter tile
-      const tileW = W*0.55, tileH = H*0.22;
-      const tx = left + (W - tileW)/2;
-      const ty = y + H*0.05;
-      ctx.fillStyle = '#0a0810';
-      ctx.fillRect(tx, ty, tileW, tileH);
-      // border highlights when this zombie holds the NEXT required letter
+      const px = z.px || 4;
+      const bob = Math.sin(t * 0.004 + z.bobOffset) * 1.5;
+      const cx = Math.floor(z.x);
+      const cy = Math.floor(z.y + bob);
+      // Sprite is 14 logical pixels wide, 22 tall, anchored center-bottom.
+      const ZX = cx - 7 * px;
+      const ZY = cy - 12 * px;
+      const p = (lx, ly, color) => {
+        if (color === null || color === undefined) return;
+        ctx.fillStyle = color;
+        ctx.fillRect(ZX + lx * px, ZY + ly * px, px, px);
+      };
+      const hr = (lx1, lx2, ly, color) => {
+        if (!color) return;
+        ctx.fillStyle = color;
+        ctx.fillRect(ZX + lx1 * px, ZY + ly * px, (lx2 - lx1 + 1) * px, px);
+      };
+
+      // --- HAIR (top dome) ---
+      hr(4, 9, 0, ZPAL.hair);
+      hr(3, 10, 1, ZPAL.hair);
+      p(4, 1, ZPAL.hairLight);
+      p(8, 1, ZPAL.hairLight);
+      // hair sides framing the face (rows 2-9)
+      for (let r = 2; r <= 9; r++) {
+        p(2, r, ZPAL.hair);
+        p(11, r, ZPAL.hair);
+      }
+      // jagged hair tips at sides
+      p(2, 2, ZPAL.hairLight);
+      p(11, 2, ZPAL.hairLight);
+
+      // --- FACE ---
+      for (let r = 2; r <= 9; r++) hr(3, 10, r, ZPAL.skin);
+      // cheek shadows
+      p(3, 6, ZPAL.skinShadow);
+      p(10, 6, ZPAL.skinShadow);
+      p(3, 8, ZPAL.skinShadow);
+      p(10, 8, ZPAL.skinShadow);
+      // nose hint
+      p(6, 6, ZPAL.skinDeep);
+      p(7, 6, ZPAL.skinDeep);
+
+      // --- EYES (rows 4-5) ---
+      hr(3, 5, 4, ZPAL.eyeSocket);
+      hr(3, 5, 5, ZPAL.eyeSocket);
+      hr(8, 10, 4, ZPAL.eyeSocket);
+      hr(8, 10, 5, ZPAL.eyeSocket);
+      // glowing pupils — slow flicker
+      const eyeOn = ((t / 220) | 0) % 13 !== 11;
+      if (eyeOn) {
+        p(4, 4, ZPAL.eyeGlow);
+        p(9, 4, ZPAL.eyeGlow);
+        p(4, 5, ZPAL.eyeDeep);
+        p(9, 5, ZPAL.eyeDeep);
+      }
+
+      // --- MOUTH + TEETH (rows 7-9) ---
+      hr(4, 9, 7, ZPAL.mouth);
+      hr(4, 9, 8, ZPAL.mouth);
+      p(5, 8, ZPAL.mouthInner);
+      p(8, 8, ZPAL.mouthInner);
+      // jagged teeth
+      p(4, 7, ZPAL.teeth);
+      p(6, 7, ZPAL.teeth);
+      p(8, 7, ZPAL.teeth);
+      p(9, 8, ZPAL.teeth);
+      // drool stream
+      p(6, 9, ZPAL.drool);
+      p(6, 10, ZPAL.drool);
+      p(6, 11, ZPAL.drool);
+
+      // --- CHIN / NECK ---
+      hr(4, 9, 10, ZPAL.skin);
+      hr(5, 8, 11, ZPAL.skinShadow);
+
+      // --- SHOULDERS + ARMS (rows 12-15) ---
+      hr(3, 10, 12, ZPAL.body);
+      hr(2, 11, 13, ZPAL.body);
+      // outstretched arms
+      hr(0, 2, 13, ZPAL.arm);
+      hr(11, 13, 13, ZPAL.arm);
+      hr(0, 2, 14, ZPAL.arm);
+      hr(11, 13, 14, ZPAL.arm);
+      hr(0, 1, 15, ZPAL.armShadow);
+      hr(12, 13, 15, ZPAL.armShadow);
+      p(2, 14, ZPAL.armHi); // shoulder highlight
+      p(11, 14, ZPAL.armHi);
+
+      // --- TORSO (rows 14-18) — tile is rendered ON the chest ---
+      for (let r = 14; r <= 18; r++) hr(3, 10, r, ZPAL.body);
+      // torn body patches / wounds
+      p(4, 18, ZPAL.bodyShadow);
+      p(9, 18, ZPAL.bodyShadow);
+
+      // --- TILE FRAME (rows 14-17, cols 3-10) ---
+      hr(3, 10, 14, ZPAL.tileBorder);
+      p(3, 15, ZPAL.tileBorder); p(10, 15, ZPAL.tileBorder);
+      p(3, 16, ZPAL.tileBorder); p(10, 16, ZPAL.tileBorder);
+      hr(3, 10, 17, ZPAL.tileBorder);
+
+      // --- LEGS (rows 19-21) ---
+      hr(3, 5, 19, ZPAL.leg);
+      hr(8, 10, 19, ZPAL.leg);
+      hr(3, 5, 20, ZPAL.leg);
+      hr(8, 10, 20, ZPAL.leg);
+      // feet
+      hr(2, 5, 21, ZPAL.body);
+      hr(8, 11, 21, ZPAL.body);
+
+      // --- TILE INTERIOR + LETTER ---
       const isNext = (z.letter === targetWord.replace(/\s/g, '').charAt(typedIdx));
-      ctx.strokeStyle = isNext ? '#e8609a' : 'rgba(255,255,255,0.18)';
-      ctx.lineWidth = isNext ? 2 : 1;
-      ctx.strokeRect(tx, ty, tileW, tileH);
-      // letter
-      ctx.fillStyle = isNext ? '#ffdce8' : '#c8b4be';
-      ctx.font = `bold ${Math.floor(tileH*0.85)}px "Courier New", monospace`;
+      const pulse = 0.6 + 0.4 * Math.sin(t * 0.012);
+      if (isNext) {
+        // pulsing pink border ring around tile
+        ctx.fillStyle = ZPAL.tilePulse;
+        ctx.globalAlpha = pulse;
+        ctx.fillRect(ZX + 2 * px, ZY + 13 * px, 10 * px, px); // top ring
+        ctx.fillRect(ZX + 2 * px, ZY + 18 * px, 10 * px, px); // bottom ring
+        ctx.fillRect(ZX + 2 * px, ZY + 13 * px, px, 6 * px);  // left ring
+        ctx.fillRect(ZX + 11 * px, ZY + 13 * px, px, 6 * px); // right ring
+        ctx.globalAlpha = 1;
+        hr(4, 9, 15, ZPAL.tileBright);
+        hr(4, 9, 16, ZPAL.tileBright);
+      } else {
+        hr(4, 9, 15, ZPAL.tileBg);
+        hr(4, 9, 16, ZPAL.tileBg);
+      }
+      // letter glyph centered on tile
+      ctx.fillStyle = isNext ? '#180812' : '#cab498';
+      ctx.font = `bold ${Math.floor(2.4 * px)}px "Courier New", monospace`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(z.letter, tx + tileW/2, ty + tileH/2);
-      // bounds for hit test
-      z._bounds = { left: left, top: y - H*0.55, right: left + W, bottom: y + H*0.60 };
+      ctx.fillText(z.letter, ZX + 6.5 * px, ZY + 15.7 * px);
+
+      // hit bounds (full sprite area + a little padding)
+      z._bounds = {
+        left:  ZX - px,
+        top:   ZY - px,
+        right: ZX + 14 * px + px,
+        bottom: ZY + 22 * px + px,
+      };
     }
 
     function loop(now) {
@@ -9273,11 +9543,13 @@ const C2 = (() => {
     }
 
     function sizeCanvas() {
+      // Mirror chapter 1's sizing so the infection puzzle slots into
+      // the shared .game-area layout with the same sidebar reserve.
       const vw = Math.min(window.innerWidth, 430);
       const vh = window.innerHeight;
-      const HUD = 130;
-      const availW = vw - 80;
-      const availH = vh - HUD;
+      const HUD_RESERVE = 130;
+      const availW = vw - 70 - 24; // sidebar 64px + paddings + gap
+      const availH = vh - HUD_RESERVE;
       cellSize = Math.max(18, Math.floor(Math.min(availW / COLS, availH / ROWS)));
       canvas.width = cellSize * COLS;
       canvas.height = cellSize * ROWS;
@@ -9380,19 +9652,20 @@ const C2 = (() => {
       const t = document.getElementById('c2g-target');
       const liv = document.getElementById('c2g-lives');
       const inf = document.getElementById('c2g-inf');
-      if (s) s.textContent = String(score);
+      const comboEl = document.getElementById('c2g-combo');
+      if (s) s.textContent = score.toLocaleString();
       if (t && currentLevel) {
         t.textContent = currentLevel.endless
           ? (window.tr ? window.tr('c2_endless_hud') : 'SURVIVE')
           : (window.tr ? window.tr('c2_target_label') : 'TARGET') + ': ' + currentLevel.target.toLocaleString();
       }
-      if (liv) {
+      if (liv && currentLevel) {
         liv.innerHTML = '';
-        for (let i = 0; i < (currentLevel ? currentLevel.lives : 0); i++) {
-          const sp = document.createElement('span');
-          sp.className = 'c2g-life' + (i < lives ? ' on' : '');
-          sp.textContent = '♥';
-          liv.appendChild(sp);
+        for (let i = 0; i < currentLevel.lives; i++) {
+          const h = document.createElement('span');
+          h.className = 'heart-icon' + (i >= lives ? ' lost' : '');
+          h.textContent = '♥';
+          liv.appendChild(h);
         }
       }
       if (inf && currentLevel) {
@@ -9401,6 +9674,33 @@ const C2 = (() => {
         const pct = Math.min(100, Math.round(count / cap * 100));
         inf.style.width = pct + '%';
       }
+      if (comboEl) {
+        comboEl.textContent = combo > 1
+          ? (window.tr ? window.tr('chain_label') : 'CHAIN') + ' x' + combo
+          : '';
+      }
+      drawNextPair();
+    }
+
+    function drawNextPair() {
+      const c = document.getElementById('c2g-next-canvas');
+      if (!c || !nextPair) return;
+      const cx = c.getContext('2d');
+      cx.imageSmoothingEnabled = false;
+      cx.clearRect(0, 0, c.width, c.height);
+      const cs = Math.min(c.width / 2, c.height / 3);
+      const ox = (c.width - cs) / 2;
+      // c1 on top, c2 below (rotation 0)
+      drawCellOn(cx, ox, 0, cs, nextPair.c1);
+      drawCellOn(cx, ox, cs, cs, nextPair.c2);
+    }
+    function drawCellOn(cx, x, y, sz, v) {
+      cx.fillStyle = COLOR_HEX2[v] || '#222';
+      cx.fillRect(x + 1, y + 1, sz - 2, sz - 2);
+      cx.fillStyle = COLOR_HEX[v] || '#888';
+      cx.fillRect(x + 3, y + 3, sz - 6, sz - 6);
+      cx.fillStyle = 'rgba(255,255,255,0.20)';
+      cx.fillRect(x + 4, y + 4, 4, 2);
     }
     function finish(won) {
       running = false;
@@ -9460,35 +9760,51 @@ const C2 = (() => {
       if (canvas.__c2gbound) return;
       canvas.__c2gbound = true;
       let touchStartX = 0, touchStartY = 0, touchStartT = 0, lastTap = 0;
+      // passive:false + preventDefault is critical — without it, Telegram
+      // treats the swipe-down as a "minimize mini-app" gesture and the
+      // app collapses out from under the player.
       canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
         const t = e.touches[0];
         touchStartX = t.clientX; touchStartY = t.clientY; touchStartT = performance.now();
-      }, { passive: true });
+      }, { passive: false });
+      canvas.addEventListener('touchmove', (e) => {
+        // Eat touchmove so Telegram's vertical-swipe gesture doesn't fire.
+        e.preventDefault();
+      }, { passive: false });
       canvas.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        if (!running || paused) return;
         const tEnd = e.changedTouches[0];
         const dx = tEnd.clientX - touchStartX;
         const dy = tEnd.clientY - touchStartY;
         const dt = performance.now() - touchStartT;
         const adx = Math.abs(dx), ady = Math.abs(dy);
-        if (adx < 14 && ady < 14 && dt < 250) {
-          // tap = rotate
+        if (adx < 14 && ady < 14 && dt < 280) {
           const now = performance.now();
-          if (now - lastTap < 280) drop();
+          if (now - lastTap < 300) drop();
           else rotate(1);
           lastTap = now;
           return;
         }
-        if (adx > ady) move(dx > 0 ? 1 : -1);
-        else if (dy > 0) drop();
-      });
+        if (adx > ady) {
+          const cells = Math.max(1, Math.round(adx / cellSize));
+          for (let i = 0; i < cells; i++) move(dx > 0 ? 1 : -1);
+        } else if (dy > 30) {
+          drop();
+        } else if (dy < -30) {
+          rotate(-1);
+        }
+      }, { passive: false });
       // Keyboard for desktop testing
       window.addEventListener('keydown', (e) => {
         if (!running) return;
+        if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' '].includes(e.key)) e.preventDefault();
         if (e.key === 'ArrowLeft') move(-1);
         else if (e.key === 'ArrowRight') move(1);
         else if (e.key === 'ArrowDown') drop();
         else if (e.key === 'ArrowUp' || e.key === ' ') rotate(1);
-        else if (e.key === 'z') rotate(-1);
+        else if (e.key === 'z' || e.key === 'Z') rotate(-1);
       });
     }
     function stop() {
