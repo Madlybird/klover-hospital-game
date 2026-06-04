@@ -3304,6 +3304,113 @@ html, body {
   .lore-result-text { font-size: 17px; }
   .lore-bubble { font-size: 14px; }
 }
+
+/* ============================================================
+   CHAPTER 2 — "Night Shift"
+   Dev-gated nightmare arc. Only renders for DEV_USER_ID until
+   the arc ships to all players.
+   ============================================================ */
+.c2-entry {
+  display: none; /* toggled to flex by updateLevelsUI() when dev */
+  margin: 18px auto 8px;
+  max-width: 360px;
+  padding: 14px 18px;
+  background: linear-gradient(135deg, #160520 0%, #2b0a2b 100%);
+  border: 1px solid rgba(180,40,80,0.45);
+  border-radius: 14px;
+  color: #fff;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  transition: transform 0.15s, box-shadow 0.18s;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(255,255,255,0.04);
+}
+.c2-entry:hover { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(180,40,80,0.35); }
+.c2-entry::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(90deg, transparent 0, transparent 6px, rgba(180,40,80,0.05) 6px, rgba(180,40,80,0.05) 7px);
+  pointer-events: none;
+}
+.c2-entry::after {
+  content: 'DEV';
+  position: absolute;
+  top: 8px; right: 10px;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  font-weight: 800;
+  color: rgba(255,150,180,0.6);
+  background: rgba(180,40,80,0.18);
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid rgba(180,40,80,0.4);
+}
+.c2-entry-label {
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: rgba(220,90,130,0.95);
+  font-weight: 800;
+}
+.c2-entry-title {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  margin-top: 2px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+}
+.c2-entry-sub {
+  font-size: 11px;
+  color: rgba(255,255,255,0.55);
+  font-style: italic;
+}
+
+/* Chapter 2 screens (intro / action / levels / game) share a darker
+   palette so a player who finds them via DOM tools immediately reads
+   "this is a different reality". */
+#screen-c2-intro, #screen-c2-action, #screen-c2-levels, #screen-c2-game {
+  background: #08030d;
+  color: #f0e4ea;
+}
+.c2-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 32px;
+  gap: 18px;
+  text-align: center;
+  font-family: 'Courier New', monospace;
+}
+.c2-placeholder-title {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  color: #e8609a;
+  text-shadow: 0 0 12px rgba(232,96,154,0.4);
+}
+.c2-placeholder-sub {
+  font-size: 13px;
+  color: rgba(240,228,234,0.55);
+  max-width: 280px;
+  line-height: 1.5;
+}
+.c2-placeholder-btn {
+  margin-top: 12px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #420a30, #6e1142);
+  border: 1px solid rgba(232,96,154,0.5);
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.c2-placeholder-btn:hover { background: linear-gradient(135deg, #561240, #851852); }
 </style>
 </head>
 <body>
@@ -3406,6 +3513,59 @@ html, body {
           <div class="level-card-badge badge-locked" id="level-badge-3" data-i18n="locked">&#128274; LOCKED</div>
         </div>
       </div>
+    </div>
+
+    <!-- Chapter 2 entry. Toggled visible by updateLevelsUI() only when
+         Telegram.WebApp user id matches DEV_USER_ID. Non-dev players
+         never see this card. -->
+    <div class="c2-entry" id="c2-entry" onclick="Game.openC2()">
+      <div class="c2-entry-label" data-i18n="c2_label">CHAPTER II</div>
+      <div class="c2-entry-title" data-i18n="c2_title">Night Shift</div>
+      <div class="c2-entry-sub" data-i18n="c2_sub">A nightmare you can't wake from</div>
+    </div>
+  </div>
+
+  <!-- ===== CHAPTER 2 SCREENS (dev-gated stubs, filled in later sprints) ===== -->
+
+  <!-- C2: storyline intro (Sprint 2 will replace placeholder) -->
+  <div id="screen-c2-intro" class="screen">
+    <div class="c2-placeholder">
+      <div class="c2-placeholder-title" data-i18n="c2_intro_stub_title">NIGHT SHIFT</div>
+      <div class="c2-placeholder-sub" data-i18n="c2_intro_stub_sub">Storyline panels arrive in the next build. For now, skip ahead to the level select.</div>
+      <button class="c2-placeholder-btn" onclick="Game.finishC2Intro()" data-i18n="c2_skip_btn">SKIP &rsaquo;</button>
+    </div>
+  </div>
+
+  <!-- C2: typing zombies action (Sprint 3) -->
+  <div id="screen-c2-action" class="screen">
+    <div class="c2-placeholder">
+      <div class="c2-placeholder-title" data-i18n="c2_action_stub_title">TYPE TO SURVIVE</div>
+      <div class="c2-placeholder-sub" data-i18n="c2_action_stub_sub">The typing minigame arrives in Sprint 3. Continue for now.</div>
+      <button class="c2-placeholder-btn" onclick="Game.finishC2Action()" data-i18n="c2_continue_btn">CONTINUE &rsaquo;</button>
+    </div>
+  </div>
+
+  <!-- C2: level select -->
+  <div id="screen-c2-levels" class="screen">
+    <div class="howto-header">
+      <button class="btn-back" onclick="Game.showScreen('levels')">&#8592;</button>
+      <div class="screen-title" data-i18n="c2_levels_title" style="flex:1">Night Shift</div>
+      <button class="btn-story" onclick="Game.replayC2Intro()" data-i18n="story_btn" title="Replay nightmare">Story</button>
+    </div>
+    <div class="patient-subtitle" data-i18n="c2_levels_subtitle">The patients she couldn't save:</div>
+    <div class="c2-placeholder" style="min-height:60vh">
+      <div class="c2-placeholder-title" data-i18n="c2_levels_stub_title">M-1 &middot; M-2 &middot; M-3</div>
+      <div class="c2-placeholder-sub" data-i18n="c2_levels_stub_sub">Level cards arrive after the infection mechanic ships.</div>
+      <button class="c2-placeholder-btn" onclick="Game.startC2Level(1)" data-i18n="c2_preview_l1">PREVIEW LEVEL 1</button>
+    </div>
+  </div>
+
+  <!-- C2: infection puzzle gameplay (Sprint 4) -->
+  <div id="screen-c2-game" class="screen">
+    <div class="c2-placeholder">
+      <div class="c2-placeholder-title" data-i18n="c2_game_stub_title">INFECTION</div>
+      <div class="c2-placeholder-sub" data-i18n="c2_game_stub_sub">The containment puzzle arrives in Sprint 4.</div>
+      <button class="c2-placeholder-btn" onclick="Game.showScreen('c2-levels')" data-i18n="c2_back_btn">&lsaquo; BACK</button>
     </div>
   </div>
 
@@ -3931,6 +4091,24 @@ const I18N = {
     gate_denied_title: 'No MAI / VI NFT found',
     gate_denied_sub: 'in this wallet',
     gate_denied_note: 'Try another wallet, or get a sticker first',
+    // ---- Chapter 2 "Night Shift" (dev-gated arc) ----
+    c2_label: 'CHAPTER II',
+    c2_title: 'Night Shift',
+    c2_sub: "A nightmare you can't wake from",
+    c2_levels_title: 'Night Shift',
+    c2_levels_subtitle: "The patients she couldn't save:",
+    c2_intro_stub_title: 'NIGHT SHIFT',
+    c2_intro_stub_sub: 'Storyline panels arrive in the next build. For now, skip ahead to the level select.',
+    c2_action_stub_title: 'TYPE TO SURVIVE',
+    c2_action_stub_sub: 'The typing minigame arrives in Sprint 3. Continue for now.',
+    c2_levels_stub_title: 'M-1 · M-2 · M-3',
+    c2_levels_stub_sub: 'Level cards arrive after the infection mechanic ships.',
+    c2_game_stub_title: 'INFECTION',
+    c2_game_stub_sub: 'The containment puzzle arrives in Sprint 4.',
+    c2_skip_btn: 'SKIP ›',
+    c2_continue_btn: 'CONTINUE ›',
+    c2_preview_l1: 'PREVIEW LEVEL 1',
+    c2_back_btn: '‹ BACK',
   },
   ru: {
     tagline: 'ИГРА-ГОЛОВОЛОМКА С ТАБЛЕТКАМИ',
@@ -4035,6 +4213,24 @@ const I18N = {
     gate_denied_title: 'NFT MAI / VI не найдены',
     gate_denied_sub: 'в этом кошельке',
     gate_denied_note: 'Попробуйте другой кошелёк или сначала получите стикер',
+    // ---- Chapter 2 «Ночная смена» (dev-арка) ----
+    c2_label: 'ГЛАВА II',
+    c2_title: 'Ночная смена',
+    c2_sub: 'Кошмар, от которого не проснуться',
+    c2_levels_title: 'Ночная смена',
+    c2_levels_subtitle: 'Пациенты, которых она не спасла:',
+    c2_intro_stub_title: 'НОЧНАЯ СМЕНА',
+    c2_intro_stub_sub: 'Сюжетные панели появятся в следующей сборке. Пока — переход к выбору уровней.',
+    c2_action_stub_title: 'НАБЕРИ — ВЫЖИВИ',
+    c2_action_stub_sub: 'Мини-игра с печатанием появится в Спринте 3. Пока — продолжаем.',
+    c2_levels_stub_title: 'М-1 · М-2 · М-3',
+    c2_levels_stub_sub: 'Карточки уровней появятся после механики заражения.',
+    c2_game_stub_title: 'ЗАРАЖЕНИЕ',
+    c2_game_stub_sub: 'Головоломка-сдерживание появится в Спринте 4.',
+    c2_skip_btn: 'ПРОПУСТИТЬ ›',
+    c2_continue_btn: 'ДАЛЬШЕ ›',
+    c2_preview_l1: 'ПРЕВЬЮ УРОВНЯ 1',
+    c2_back_btn: '‹ НАЗАД',
   },
 };
 
@@ -4155,6 +4351,12 @@ const Save = {
       level1complete: false,
       level2complete: false,
       level3unlocked: false,
+      // Chapter 2 ("Night Shift") progress. Hidden behind the dev gate
+      // (only visible to DEV_USER_ID) until the arc ships to everyone.
+      c2_introSeen: false,
+      c2_level1complete: false,
+      c2_level2complete: false,
+      c2_level3unlocked: false,
       lastLogin: null,
       lang: 'en',
       sound: true,
@@ -4506,6 +4708,11 @@ const Game = (() => {
         l3note.className = 'patient-locked-note';
       }
     }
+
+    // Chapter 2 entry — visible to the dev account only. When the arc
+    // is ready to ship publicly, flip isDevAccount() to a feature flag.
+    const c2entry = document.getElementById('c2-entry');
+    if (c2entry) c2entry.style.display = isDevAccount() ? 'flex' : 'none';
   }
 
   // ---- SLIDE TUTORIAL ----
@@ -4638,6 +4845,56 @@ const Game = (() => {
   // ---- LEVEL START ----
   function goToLevels() {
     showScreen('levels');
+  }
+
+  // ---- CHAPTER 2 ("Night Shift") DEV GATE ----
+  // Single source of truth for the dev-only access check. Every Chapter 2
+  // entry point (level card, screen openers, replay buttons) calls this —
+  // when the arc is ready for public release we flip the body of this
+  // function to `return true;` (or check a flag) and nothing else changes.
+  const DEV_USER_ID = 881282443;
+  function isDevAccount() {
+    try {
+      return window.Telegram?.WebApp?.initDataUnsafe?.user?.id === DEV_USER_ID;
+    } catch { return false; }
+  }
+
+  // Open Chapter 2. Routes through the intro on first visit, then sends
+  // the player straight to the c2 level select on subsequent visits.
+  function openC2() {
+    if (!isDevAccount()) return;
+    if (!state.c2_introSeen) {
+      showScreen('c2-intro');
+    } else {
+      showScreen('c2-levels');
+    }
+  }
+
+  // Finish (or skip) the storyline intro. Marks it as seen so the next
+  // openC2() bypasses it, then routes into the typing minigame.
+  function finishC2Intro() {
+    state.c2_introSeen = true;
+    Save.save(state);
+    showScreen('c2-action');
+  }
+
+  // Finish the typing minigame. Routes to the c2 level select.
+  function finishC2Action() {
+    showScreen('c2-levels');
+  }
+
+  // Replay nightmare intro from the c2 level select. Does NOT clear
+  // c2_introSeen — the intro→action chain just plays again.
+  function replayC2Intro() {
+    if (!isDevAccount()) return;
+    showScreen('c2-intro');
+  }
+
+  // Start a Chapter 2 level. Stub until Sprint 4 wires the infection
+  // mechanic; for now it just shows the c2-game placeholder.
+  function startC2Level(levelId) {
+    if (!isDevAccount()) return;
+    showScreen('c2-game');
   }
 
   // One-time-only gift: account 881282443 receives 1,000 coins on first
@@ -6380,6 +6637,13 @@ const Game = (() => {
     closeWalletGate,
     connectWalletGate,
     debugAccess,
+    // Chapter 2 ("Night Shift") — dev-gated entry points.
+    openC2,
+    finishC2Intro,
+    finishC2Action,
+    replayC2Intro,
+    startC2Level,
+    isDevAccount,
   };
 })();
 
