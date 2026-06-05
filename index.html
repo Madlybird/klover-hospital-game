@@ -4014,7 +4014,6 @@ html, body {
         <div class="c2t-phone" id="c2t-phone">📱</div>
         <div class="c2t-title" id="c2t-title" data-i18n="c2_tap_title">WAKE UP</div>
         <div class="c2t-bar"><div class="c2t-bar-fill" id="c2t-bar-fill"></div></div>
-        <div class="c2t-cta" id="c2t-cta" data-i18n="c2_tap_cta">SHAKE THE PHONE!</div>
       </div>
     </div>
   </div>
@@ -9025,59 +9024,26 @@ const C2 = (() => {
       const dw = iw * s, dh = ih * s;
       ctx.drawImage(im, (w - dw) / 2 + (dx || 0), (h - dh) / 2 + (dy || 0), dw, dh);
     }
-    function drawImagePanel(key, w, h, t, fx) {
-      fx = fx || {};
-      ctx.fillStyle = '#04020a';
+    // Draw the slide art clean — cover-fit, no overlay filters.
+    function drawImagePanel(key, w, h) {
+      ctx.fillStyle = '#000';
       ctx.fillRect(0, 0, w, h);
       const im = Assets.img[key];
-      const ok = im && im.complete && im.naturalWidth;
-      const drift = fx.drift == null ? 1 : fx.drift;
-      const dX = Math.sin(t * 0.0004) * 4 * drift;
-      const dY = Math.cos(t * 0.0003) * 3 * drift;
-      if (ok) coverImageDX(im, w, h, dX, dY);
-      // Chromatic ghosting + torn slices for the Vi reveal.
-      if (ok && fx.glitch) {
-        const amp = fx.glitchAmp || 1;
-        ctx.globalAlpha = 0.3;
-        ctx.globalCompositeOperation = 'lighter';
-        coverImageDX(im, w, h, dX - 5 * amp, dY);
-        coverImageDX(im, w, h, dX + 5 * amp, dY);
-        ctx.globalCompositeOperation = 'source-over';
-        ctx.globalAlpha = 1;
-        for (let i = 0; i < 3; i++) {
-          if (Math.random() > 0.55) continue;
-          const by = Math.random() * h, bh = 3 + Math.random() * (h * 0.05);
-          const sx = (Math.random() - 0.5) * 26 * amp;
-          ctx.save();
-          ctx.beginPath(); ctx.rect(0, by, w, bh); ctx.clip();
-          coverImageDX(im, w, h, dX + sx, dY);
-          ctx.restore();
-        }
+      if (im && im.complete && im.naturalWidth) {
+        ctx.imageSmoothingEnabled = false;
+        coverImageDX(im, w, h, 0, 0);
       }
-      // Breathing red atmosphere.
-      if (fx.redPulse) {
-        const a = (fx.redBase || 0.05) + (fx.redAmp || 0.06) * (0.5 + 0.5 * Math.sin(t * (fx.redSpeed || 0.0022)));
-        ctx.fillStyle = `rgba(150,10,30,${a})`;
-        ctx.fillRect(0, 0, w, h);
-      }
-      // Lamp / corridor flicker — brief darken on a pseudo-random beat.
-      if (fx.flicker && Math.floor(t / (fx.flickerMs || 130)) % (fx.flickerMod || 19) === 7) {
-        ctx.fillStyle = 'rgba(0,0,0,0.34)';
-        ctx.fillRect(0, 0, w, h);
-      }
-      vignette(w, h, fx.vignette || 0.5);
-      scanlines(w, h);
     }
 
     // Image-based dream slides. 0-4 play before the zombie fight; index 5
-    // (wake-up) plays as the epilogue after the glitch-tap interlude.
+    // (wake-up) plays as the epilogue after the shake interlude.
     const PANELS = [
-      { scene: (w,h,t) => drawImagePanel('sleep',   w,h,t, { vignette:0.55, flicker:true, flickerMs:150, flickerMod:23, redPulse:true, redBase:0.02, redAmp:0.03 }), clock:'03:47', sfx:'breath',   textKey:'c2_p1' },
-      { scene: (w,h,t) => drawImagePanel('lamp',    w,h,t, { vignette:0.5,  flicker:true, flickerMs:90,  flickerMod:13, redPulse:true, redBase:0.05, redAmp:0.09, redSpeed:0.003 }), clock:'03:47', sfx:'tickSlow', textKey:'c2_p2' },
-      { scene: (w,h,t) => drawImagePanel('walking', w,h,t, { vignette:0.55, redPulse:true, redBase:0.06, redAmp:0.06 }), clock:'03:47', sfx:'heart',   textKey:'c2_p3' },
-      { scene: (w,h,t) => drawImagePanel('vi',      w,h,t, { vignette:0.5,  glitch:true, glitchAmp:1.1, redPulse:true, redBase:0.05, redAmp:0.08, redSpeed:0.004 }), clock:'03:47', sfx:'glitch',  textKey:'c2_p4' },
-      { scene: (w,h,t) => drawImagePanel('lab',     w,h,t, { vignette:0.55, redPulse:true, redBase:0.06, redAmp:0.07, redSpeed:0.0025 }), clock:'03:47', sfx:'shamble', textKey:'c2_p5' },
-      { scene: (w,h,t) => drawImagePanel('wake',    w,h,t, { vignette:0.45, drift:0.5 }), clock:'03:48', sfx:'tickSlow', textKey:'c2_p6' },
+      { scene: (w,h) => drawImagePanel('sleep',   w, h), clock:'03:47', sfx:'breath',   textKey:'c2_p1' },
+      { scene: (w,h) => drawImagePanel('lamp',    w, h), clock:'03:47', sfx:'tickSlow', textKey:'c2_p2' },
+      { scene: (w,h) => drawImagePanel('walking', w, h), clock:'03:47', sfx:'heart',   textKey:'c2_p3' },
+      { scene: (w,h) => drawImagePanel('vi',      w, h), clock:'03:47', sfx:'glitch',  textKey:'c2_p4' },
+      { scene: (w,h) => drawImagePanel('lab',     w, h), clock:'03:47', sfx:'shamble', textKey:'c2_p5' },
+      { scene: (w,h) => drawImagePanel('wake',    w, h), clock:'03:48', sfx:'tickSlow', textKey:'c2_p6' },
     ];
 
     function size() {
@@ -9606,20 +9572,7 @@ const C2 = (() => {
       const key = (Math.floor(now / 110) % 2 === 0) ? 'tap1' : 'tap2';
       const im = Assets.img[key];
       if (im && im.complete && im.naturalWidth) cover(im, w, h, dx, dy);
-      // Unify both frames to a red horror tint (kills the blue in tap1).
-      ctx.globalCompositeOperation = 'multiply';
-      ctx.fillStyle = '#c4283a';
-      ctx.fillRect(-amp * 4, -amp * 4, w + amp * 8, h + amp * 8);
-      ctx.globalCompositeOperation = 'source-over';
       ctx.restore();
-
-      // Scanlines + occasional red flash.
-      ctx.fillStyle = 'rgba(0,0,0,0.16)';
-      for (let y = 0; y < h; y += 3) ctx.fillRect(0, y, w, 1);
-      if (Math.random() < 0.07) {
-        ctx.fillStyle = 'rgba(180,10,30,0.16)';
-        ctx.fillRect(0, 0, w, h);
-      }
 
       const fill = document.getElementById('c2t-bar-fill');
       if (fill) fill.style.width = (progress * 100) + '%';
@@ -9643,12 +9596,10 @@ const C2 = (() => {
       onDone = onDoneIn;
       startT = performance.now();
       running = true;
-      // Localize the overlay copy to match the rest of the chapter.
+      // Localize the overlay title to match the rest of the chapter.
       try {
         const tt = document.getElementById('c2t-title');
-        const cc = document.getElementById('c2t-cta');
         if (tt && window.tr) tt.textContent = window.tr('c2_tap_title');
-        if (cc && window.tr) cc.textContent = window.tr('c2_tap_cta');
       } catch (e) {}
       const fill = document.getElementById('c2t-bar-fill');
       if (fill) fill.style.width = '0%';
