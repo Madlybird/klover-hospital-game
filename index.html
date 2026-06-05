@@ -3621,6 +3621,20 @@ html, body {
   font-family: 'Courier New', monospace;
   z-index: 3;
 }
+.c2t-phone {
+  font-size: 54px;
+  line-height: 1;
+  margin-bottom: 4px;
+  filter: drop-shadow(0 0 14px rgba(255,60,100,0.7));
+  animation: c2t-phoneshake 0.4s ease-in-out infinite;
+  transform-origin: 50% 80%;
+}
+@keyframes c2t-phoneshake {
+  0%, 100% { transform: rotate(-16deg) translateX(-4px); }
+  25%      { transform: rotate(12deg)  translateX(4px); }
+  50%      { transform: rotate(-10deg) translateX(-3px); }
+  75%      { transform: rotate(14deg)  translateX(3px); }
+}
 .c2t-title {
   font-size: 40px;
   font-weight: 900;
@@ -3997,9 +4011,10 @@ html, body {
     <div class="c2t-stage" id="c2t-stage">
       <canvas id="c2t-canvas"></canvas>
       <div class="c2t-overlay">
+        <div class="c2t-phone" id="c2t-phone">📱</div>
         <div class="c2t-title" id="c2t-title" data-i18n="c2_tap_title">WAKE UP</div>
         <div class="c2t-bar"><div class="c2t-bar-fill" id="c2t-bar-fill"></div></div>
-        <div class="c2t-cta" id="c2t-cta" data-i18n="c2_tap_cta">TAP! TAP! TAP!</div>
+        <div class="c2t-cta" id="c2t-cta" data-i18n="c2_tap_cta">SHAKE THE PHONE!</div>
       </div>
     </div>
   </div>
@@ -4657,7 +4672,7 @@ const I18N = {
     c2_p6: '...just a dream. It was just a dream. ...Wasn\'t it?',
     // Glitch-tap interlude (after the zombies fall)
     c2_tap_title: 'WAKE UP',
-    c2_tap_cta: 'TAP! TAP! TAP!',
+    c2_tap_cta: 'SHAKE THE PHONE!',
     // Typing minigame
     c2_time_label: 'TIME',
     c2_action_hint: 'TAP THE RIGHT ONES. STAY ALIVE.',
@@ -4807,7 +4822,7 @@ const I18N = {
     c2_p6: '…сон. Это был просто сон. …Ведь так?',
     // Глитч-тап (после того как зомби пали)
     c2_tap_title: 'ОЧНИСЬ',
-    c2_tap_cta: 'ТАПАЙ! ТАПАЙ! ТАПАЙ!',
+    c2_tap_cta: 'ТРЯСИ ТЕЛЕФОН!',
     // Мини-игра набора
     c2_time_label: 'ВРЕМЯ',
     c2_action_hint: 'БЕЙ ПО НУЖНЫМ. ОСТАНЬСЯ ЖИВОЙ.',
@@ -9258,8 +9273,10 @@ const C2 = (() => {
         [positions[i], positions[j]] = [positions[j], positions[i]];
       }
       const margin = Math.max(spriteW / 2 + 6, w * 0.08);
-      const baseY = h * 0.22;
-      const vySpeed = wave === 0 ? h * 0.0000040 : wave === 1 ? h * 0.0000060 : h * 0.0000090;
+      const baseY = h * 0.18;
+      // Fall speed (px per ms, scaled to canvas height) — fast enough that
+      // the zombies clearly drop toward the lose line if ignored.
+      const vySpeed = wave === 0 ? h * 0.000052 : wave === 1 ? h * 0.000078 : h * 0.000115;
       for (let i = 0; i < slots; i++) {
         const slot = positions[i];
         const x = margin + (slot / Math.max(1, slots - 1)) * (w - 2 * margin);
@@ -9288,20 +9305,15 @@ const C2 = (() => {
       spawnZombiesForWord(next.word, next.wave);
     }
 
-    // A pixelated letter tile rendered on the zombie's chest. The tile for
-    // the next-needed letter glows pink and pulses so it reads at a glance.
-    function drawLetterTile(letter, x, y, w, h, isNext, t) {
+    // A plain letter tile on the zombie's chest. No glow or pulse — the
+    // next-needed letter just reads as a bright tile, the rest stay dark.
+    function drawLetterTile(letter, x, y, w, h, isNext) {
       ctx.save();
       ctx.imageSmoothingEnabled = false;
       ctx.fillStyle = isNext ? '#fff2e0' : 'rgba(8,3,12,0.82)';
       ctx.fillRect(x, y, w, h);
       ctx.lineWidth = Math.max(2, w * 0.08);
-      if (isNext) {
-        const pulse = 0.5 + 0.5 * Math.sin(t * 0.012);
-        ctx.strokeStyle = `rgba(232,96,154,${0.7 + 0.3 * pulse})`;
-      } else {
-        ctx.strokeStyle = 'rgba(232,96,154,0.5)';
-      }
+      ctx.strokeStyle = isNext ? '#e8609a' : 'rgba(232,96,154,0.5)';
       ctx.strokeRect(x, y, w, h);
       ctx.fillStyle = isNext ? '#180812' : '#f0c0d4';
       ctx.font = `bold ${Math.max(10, Math.floor(h * 0.64))}px "Courier New", monospace`;
@@ -9312,28 +9324,18 @@ const C2 = (() => {
     }
 
     // Draw a zombie from the color-keyed sprite, with a chest letter tile.
-    // Anchored at center-bottom-ish: z.x is the horizontal centre, z.y the
-    // vertical centre (kept consistent with the lose-line / step logic).
-    function drawZombie(z, t) {
+    // No glow/halo/bob — the sprite just falls straight down. z.x is the
+    // horizontal centre, z.y the vertical centre.
+    function drawZombie(z) {
       const spr = Assets.zombie();
-      const bob = Math.sin(t * 0.004 + z.bobOffset) * (z.sh * 0.012);
       const sw = z.sw * z.scale, sh = z.sh * z.scale;
-      const cx = z.x, cy = z.y + bob;
+      const cx = z.x, cy = z.y;
       const left = cx - sw / 2, top = cy - sh / 2;
       const isNext = (z.letter === targetWord.replace(/\s/g, '').charAt(typedIdx));
 
       ctx.save();
       ctx.imageSmoothingEnabled = false;
       if (z.dead) ctx.globalAlpha = Math.max(0, z.scale);
-      // Pink halo behind the next-needed zombie.
-      if (isNext && !z.dead && spr) {
-        const pulse = 0.5 + 0.5 * Math.sin(t * 0.012);
-        ctx.save();
-        ctx.shadowColor = `rgba(255,80,130,${0.55 + 0.4 * pulse})`;
-        ctx.shadowBlur = 16 + 12 * pulse;
-        ctx.drawImage(spr, left, top, sw, sh);
-        ctx.restore();
-      }
       if (spr) {
         ctx.drawImage(spr, left, top, sw, sh);
       } else {
@@ -9346,7 +9348,7 @@ const C2 = (() => {
       if (!z.dead) {
         const tileW = sw * 0.5;
         const tileH = tileW * 0.84;
-        drawLetterTile(z.letter, cx - tileW / 2, top + sh * 0.4, tileW, tileH, isNext, t);
+        drawLetterTile(z.letter, cx - tileW / 2, top + sh * 0.4, tileW, tileH, isNext);
       }
 
       z._bounds = { left: left - 4, top: top - 4, right: left + sw + 4, bottom: top + sh + 4 };
@@ -9427,7 +9429,7 @@ const C2 = (() => {
       // Draw all zombies
       zombies.forEach(z => {
         if (z.dead && z.scale <= 0) return;
-        drawZombie(z, now);
+        drawZombie(z);
       });
       ctx.restore();
 
@@ -9553,16 +9555,16 @@ const C2 = (() => {
     return { start, stop };
   })();
 
-  // ---- GLITCH-TAP INTERLUDE ----
-  // After the zombies fall, the dream tears itself apart. Two horror
-  // frames (tap1/tap2) strobe with chromatic/slice glitches for ~10s.
-  // The player taps frantically to "claw awake" — taps fill the bar
-  // faster; if they don't, it still completes on the timer. Then the
-  // wake-up slide plays.
+  // ---- SHAKE INTERLUDE ----
+  // After the zombies fall, the dream convulses. The two horror frames
+  // (tap1/tap2) alternate, both pushed to a common red tint so their
+  // differing palettes don't clash, while the whole view violently
+  // shakes. It's a pure "shake your phone!" animation — no real motion
+  // detection — that auto-advances to the wake-up slide on a timer.
   const GlitchTap = (() => {
-    const DURATION = 10000;
+    const DURATION = 7000;
     let canvas = null, ctx = null, raf = null, running = false;
-    let startT = 0, taps = 0, progress = 0, onDone = null, shakeUntil = 0;
+    let startT = 0, onDone = null;
 
     function size() {
       const rect = canvas.getBoundingClientRect();
@@ -9584,58 +9586,45 @@ const C2 = (() => {
       if (!running) return;
       const rect = canvas.getBoundingClientRect();
       const w = rect.width, h = rect.height;
-      const elapsed = now - startT;
-      // Time guarantees completion by DURATION; taps push it faster.
-      progress = Math.max(progress, elapsed / DURATION);
+      const progress = Math.min(1, (now - startT) / DURATION);
 
-      // Strobe between the two horror frames.
-      const key = (Math.floor(now / 90) % 2 === 0) ? 'tap1' : 'tap2';
-      const im = Assets.img[key];
-      const ok = im && im.complete && im.naturalWidth;
       ctx.fillStyle = '#000';
       ctx.fillRect(0, 0, w, h);
-      const shake = now < shakeUntil ? 9 : 2.5;
-      const dx = (Math.random() - 0.5) * shake, dy = (Math.random() - 0.5) * shake;
-      if (ok) cover(im, w, h, dx, dy);
-      // Chromatic ghosting.
-      if (ok) {
-        ctx.globalAlpha = 0.26;
-        ctx.globalCompositeOperation = 'lighter';
-        cover(im, w, h, dx - 6, dy);
-        cover(im, w, h, dx + 6, dy);
-        ctx.globalCompositeOperation = 'source-over';
-        ctx.globalAlpha = 1;
-      }
-      // Torn horizontal slices.
-      if (ok) {
-        for (let i = 0; i < 4; i++) {
-          if (Math.random() > 0.5) continue;
-          const by = Math.random() * h, bh = 4 + Math.random() * (h * 0.06);
-          const sx = (Math.random() - 0.5) * 42;
-          ctx.save();
-          ctx.beginPath(); ctx.rect(0, by, w, bh); ctx.clip();
-          cover(im, w, h, dx + sx, dy);
-          ctx.restore();
-        }
-      }
+
+      // Violent shake: random translate + a little rotation, applied to a
+      // slightly oversized frame so the edges never reveal the black.
+      const amp = 12;
+      const dx = (Math.random() - 0.5) * amp * 2;
+      const dy = (Math.random() - 0.5) * amp * 2;
+      const rot = (Math.random() - 0.5) * 0.05;
+      ctx.save();
+      ctx.translate(w / 2, h / 2);
+      ctx.rotate(rot);
+      ctx.scale(1.08, 1.08);
+      ctx.translate(-w / 2, -h / 2);
+
+      const key = (Math.floor(now / 110) % 2 === 0) ? 'tap1' : 'tap2';
+      const im = Assets.img[key];
+      if (im && im.complete && im.naturalWidth) cover(im, w, h, dx, dy);
+      // Unify both frames to a red horror tint (kills the blue in tap1).
+      ctx.globalCompositeOperation = 'multiply';
+      ctx.fillStyle = '#c4283a';
+      ctx.fillRect(-amp * 4, -amp * 4, w + amp * 8, h + amp * 8);
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.restore();
+
       // Scanlines + occasional red flash.
       ctx.fillStyle = 'rgba(0,0,0,0.16)';
       for (let y = 0; y < h; y += 3) ctx.fillRect(0, y, w, 1);
-      if (Math.random() < 0.06) {
-        ctx.fillStyle = 'rgba(180,10,30,0.18)';
+      if (Math.random() < 0.07) {
+        ctx.fillStyle = 'rgba(180,10,30,0.16)';
         ctx.fillRect(0, 0, w, h);
       }
+
       const fill = document.getElementById('c2t-bar-fill');
-      if (fill) fill.style.width = Math.min(100, progress * 100) + '%';
+      if (fill) fill.style.width = (progress * 100) + '%';
       if (progress >= 1) { return finish(); }
       raf = requestAnimationFrame(loop);
-    }
-    function onTap() {
-      if (!running) return;
-      taps++;
-      progress = Math.min(1, progress + 0.05);
-      shakeUntil = performance.now() + 130;
-      try { Audio.glitch(0.12); } catch (e) {}
     }
     function finish() {
       running = false;
@@ -9652,14 +9641,8 @@ const C2 = (() => {
       size();
       window.addEventListener('resize', size);
       onDone = onDoneIn;
-      taps = 0; progress = 0; shakeUntil = 0;
       startT = performance.now();
       running = true;
-      const stage = document.getElementById('c2t-stage');
-      if (stage && !stage.__c2tap) {
-        stage.__c2tap = true;
-        stage.addEventListener('click', onTap);
-      }
       // Localize the overlay copy to match the rest of the chapter.
       try {
         const tt = document.getElementById('c2t-title');
