@@ -3370,7 +3370,7 @@ html, body {
 /* Chapter 2 screens (intro / action / levels / game) share a darker
    palette so a player who finds them via DOM tools immediately reads
    "this is a different reality". */
-#screen-c2-intro, #screen-c2-action, #screen-c2-levels, #screen-c2-game {
+#screen-c2-intro, #screen-c2-action, #screen-c2-tap, #screen-c2-levels, #screen-c2-game {
   background: #08030d;
   color: #f0e4ea;
 }
@@ -3587,6 +3587,78 @@ html, body {
   text-shadow: 0 0 16px rgba(232,96,154,0.7);
 }
 .c2a-end-buttons { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
+/* ---- C2 glitch-tap interlude (#screen-c2-tap) ---- */
+.c2t-stage {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  background: #000;
+  overflow: hidden;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+#c2t-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+}
+.c2t-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 12vh;
+  gap: 14px;
+  pointer-events: none;
+  font-family: 'Courier New', monospace;
+  z-index: 3;
+}
+.c2t-title {
+  font-size: 40px;
+  font-weight: 900;
+  letter-spacing: 8px;
+  color: #fff;
+  text-shadow: 2px 0 #ff2a4e, -2px 0 #2af0ff, 0 0 24px rgba(255,42,78,0.7);
+  animation: c2t-shake 0.18s infinite steps(2);
+}
+@keyframes c2t-shake {
+  0% { transform: translate(0,0); }
+  50% { transform: translate(-2px, 1px); }
+  100% { transform: translate(2px, -1px); }
+}
+.c2t-bar {
+  width: 64%;
+  max-width: 320px;
+  height: 12px;
+  background: rgba(40,8,16,0.85);
+  border: 1px solid rgba(255,60,100,0.5);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 0 14px rgba(255,42,78,0.35);
+}
+.c2t-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #6e1142, #ff3a64, #ff8fb0);
+  box-shadow: 0 0 12px rgba(255,80,120,0.8);
+  transition: width 0.08s linear;
+}
+.c2t-cta {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 4px;
+  color: rgba(255,180,200,0.92);
+  text-shadow: 0 0 10px rgba(232,60,90,0.7);
+  animation: c2p-pulse 0.5s ease-in-out infinite;
+}
 
 /* ---- C2 level select (#screen-c2-levels) ---- */
 .c2-levels-grid { gap: 14px; }
@@ -3880,7 +3952,8 @@ html, body {
 
   <!-- ===== CHAPTER 2 SCREENS (dev-gated stubs, filled in later sprints) ===== -->
 
-  <!-- C2: storyline intro panels (8 panels: 6 pre-action, 2 post-action) -->
+  <!-- C2: storyline intro slides (image-based: sleep, lamp, walking,
+       vi close-up, lab; plus a single wake-up epilogue slide) -->
   <div id="screen-c2-intro" class="screen">
     <div class="c2p-stage">
       <div class="c2p-scene" id="c2p-scene">
@@ -3915,6 +3988,18 @@ html, body {
           <button class="c2-placeholder-btn" onclick="Game.restartC2Action()" data-i18n="try_again">TRY AGAIN</button>
           <button class="c2-placeholder-btn" onclick="Game.showScreen('levels')" data-i18n="quit_to_menu">QUIT</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- C2: glitch-tap interlude (10s, alternating tap1/tap2 horror frames) -->
+  <div id="screen-c2-tap" class="screen">
+    <div class="c2t-stage" id="c2t-stage">
+      <canvas id="c2t-canvas"></canvas>
+      <div class="c2t-overlay">
+        <div class="c2t-title" id="c2t-title" data-i18n="c2_tap_title">WAKE UP</div>
+        <div class="c2t-bar"><div class="c2t-bar-fill" id="c2t-bar-fill"></div></div>
+        <div class="c2t-cta" id="c2t-cta" data-i18n="c2_tap_cta">TAP! TAP! TAP!</div>
       </div>
     </div>
   </div>
@@ -4562,18 +4647,20 @@ const I18N = {
     c2_continue_btn: 'CONTINUE ›',
     c2_back_btn: '‹ BACK',
     c2_tap_continue: '◎ tap to continue',
-    // Storyline panels — Mai's nightmare.
-    c2_p1: "Just five minutes... I'll close my eyes for five minutes.",
-    c2_p2: '...Mai?',
-    c2_p3: "Vi! Wait — what are you doing here?",
-    c2_p4: 'You forgot them, Mai. All of them.',
-    c2_p5: 'Remember the treatment. Remember it now.',
-    c2_p6: 'TYPE TO HEAL. TYPE TO SURVIVE.',
-    c2_p7: '...oh.',
-    c2_p8: '...one minute. Just one minute.',
+    // Storyline panels — Mai's nightmare. Mapped to image slides:
+    // p1 sleep · p2 lamp · p3 walking · p4 vi-close · p5 lab · p6 wake.
+    c2_p1: "Just five minutes... I'll close my eyes for just five minutes.",
+    c2_p2: '...why is the light breathing?',
+    c2_p3: 'Vi? What are you doing all the way down here...?',
+    c2_p4: 'You forgot them, Mai. Every single one.',
+    c2_p5: 'Remember the cure. Remember it — before they reach you.',
+    c2_p6: '...just a dream. It was just a dream. ...Wasn\'t it?',
+    // Glitch-tap interlude (after the zombies fall)
+    c2_tap_title: 'WAKE UP',
+    c2_tap_cta: 'TAP! TAP! TAP!',
     // Typing minigame
     c2_time_label: 'TIME',
-    c2_action_hint: 'TYPE TO HEAL. TYPE TO SURVIVE.',
+    c2_action_hint: 'TAP THE RIGHT ONES. STAY ALIVE.',
     c2_action_fail: "SHE DIDN'T WAKE",
     // Level select
     c2_lvl1_priority: 'PATIENT ZERO · First to fall',
@@ -4710,19 +4797,21 @@ const I18N = {
     c2_continue_btn: 'ДАЛЬШЕ ›',
     c2_back_btn: '‹ НАЗАД',
     c2_tap_continue: '◎ нажми чтобы продолжить',
-    // Сюжетные панели — кошмар Май.
-    c2_p1: 'Только пять минут… я закрою глаза на пять минут.',
-    c2_p2: '…Май?',
-    c2_p3: 'Vi! Подожди — что ты здесь делаешь?',
-    c2_p4: 'Ты их забыла, Май. Всех.',
-    c2_p5: 'Вспомни лечение. Вспомни сейчас.',
-    c2_p6: 'НАБЕРИ — ЧТОБЫ ИСЦЕЛИТЬ. НАБЕРИ — ЧТОБЫ ВЫЖИТЬ.',
-    c2_p7: '…ох.',
-    c2_p8: '…одна минута. Всего одна минута.',
+    // Сюжетные панели — кошмар Май. Кадры:
+    // p1 сон · p2 лампа · p3 коридор · p4 Vi крупно · p5 лаба · p6 пробуждение.
+    c2_p1: 'Только пять минут… закрою глаза всего на пять минут.',
+    c2_p2: '…почему свет будто дышит?',
+    c2_p3: 'Vi? Что ты делаешь здесь, внизу…?',
+    c2_p4: 'Ты их забыла, Май. Каждого до единого.',
+    c2_p5: 'Вспомни лечение. Вспомни — пока они не добрались до тебя.',
+    c2_p6: '…сон. Это был просто сон. …Ведь так?',
+    // Глитч-тап (после того как зомби пали)
+    c2_tap_title: 'ОЧНИСЬ',
+    c2_tap_cta: 'ТАПАЙ! ТАПАЙ! ТАПАЙ!',
     // Мини-игра набора
     c2_time_label: 'ВРЕМЯ',
-    c2_action_hint: 'НАБЕРИ — ЧТОБЫ ВЫЖИТЬ',
-    c2_action_fail: 'ОНА НЕ ПРОСНУЛАСЬ',
+    c2_action_hint: 'БЕЙ ПО НУЖНЫМ. ОСТАНЬСЯ ЖИВОЙ.',
+    c2_action_fail: 'ОНА НЕ ОЧНУЛАСЬ',
     // Выбор уровней
     c2_lvl1_priority: 'ПАЦИЕНТ НОЛЬ · Первая пала',
     c2_lvl2_locked_note: 'Сначала сдержите М-1',
@@ -5397,69 +5486,70 @@ const Game = (() => {
     }
   }
 
-  // Plays panels 0..5 (pre-action), then routes to the typing minigame.
+  // Plays the dream slides 0..4 (sleep, lamp, walking, Vi close-up, lab),
+  // then routes to the zombie typing minigame.
   function playC2IntroPart1() {
     showScreen('c2-intro');
     // Defer one frame so the screen is visible before the canvas sizes.
     requestAnimationFrame(() => {
-      C2.Intro.play(0, 5, () => {
-        showScreen('c2-action');
-        requestAnimationFrame(() => {
-          C2.Typing.start(
-            () => { // win
-              // Play epilogue panels 6..7
-              showScreen('c2-intro');
-              requestAnimationFrame(() => {
-                C2.Intro.play(6, 7, () => {
-                  state.c2_introSeen = true;
-                  Save.save(state);
-                  updateC2LevelsUI();
-                  showScreen('c2-levels');
-                });
-              });
-            },
-            () => { // lose — show retry overlay
-              const o = document.getElementById('c2a-end-overlay');
-              if (o) o.classList.add('show');
-            }
-          );
-        });
-      });
+      try { C2.Audio.music('dream'); } catch (e) {}
+      C2.Intro.play(0, 4, () => { startC2Zombies(); });
       C2.Intro.bindTap();
     });
   }
 
+  // Start (or restart) the 30s zombie typing minigame. On win → glitch
+  // tap interlude; on lose → retry overlay.
+  function startC2Zombies() {
+    showScreen('c2-action');
+    requestAnimationFrame(() => {
+      try { C2.Audio.music('game'); } catch (e) {}
+      C2.Typing.start(
+        () => { runC2GlitchTap(); },      // win
+        () => {                            // lose — show retry overlay
+          try { C2.Audio.music('stop'); } catch (e) {}
+          const o = document.getElementById('c2a-end-overlay');
+          if (o) o.classList.add('show');
+        }
+      );
+    });
+  }
+
+  // The 10-second glitch-tap interlude (tap1/tap2 horror frames), then
+  // the wake-up epilogue slide, then the level select.
+  function runC2GlitchTap() {
+    showScreen('c2-tap');
+    requestAnimationFrame(() => {
+      try { C2.Audio.music('glitch'); } catch (e) {}
+      C2.GlitchTap.start(() => {
+        showScreen('c2-intro');
+        requestAnimationFrame(() => {
+          try { C2.Audio.music('wake'); } catch (e) {}
+          C2.Intro.play(5, 5, () => {     // wake-up slide
+            state.c2_introSeen = true;
+            Save.save(state);
+            try { C2.Audio.music('stop'); } catch (e) {}
+            updateC2LevelsUI();
+            showScreen('c2-levels');
+          });
+        });
+      });
+    });
+  }
+
   // Skip whatever Intro range is currently playing. Uses Intro.skipToEnd
-  // so the registered onDone callback fires — that means skipping during
-  // pre-action panels (0-5) lands on the typing minigame, and skipping
-  // during the epilogue (6-7) lands on the c2-levels screen.
+  // so the registered onDone callback fires — skipping the dream slides
+  // (0-4) lands on the zombie minigame; skipping the wake-up slide (5)
+  // lands on the c2-levels screen.
   function skipC2IntroToAction() {
     try { C2.Intro.skipToEnd(); } catch (e) {}
   }
 
-  // Restart the typing minigame from its overlay.
+  // Restart the typing minigame from its retry overlay.
   function restartC2Action() {
     const o = document.getElementById('c2a-end-overlay');
     if (o) o.classList.remove('show');
-    requestAnimationFrame(() => {
-      C2.Typing.start(
-        () => {
-          showScreen('c2-intro');
-          requestAnimationFrame(() => {
-            C2.Intro.play(6, 7, () => {
-              state.c2_introSeen = true;
-              Save.save(state);
-              updateC2LevelsUI();
-              showScreen('c2-levels');
-            });
-          });
-        },
-        () => {
-          const o2 = document.getElementById('c2a-end-overlay');
-          if (o2) o2.classList.add('show');
-        }
-      );
-    });
+    startC2Zombies();
   }
 
   // Replay nightmare intro from the c2 level select. Plays full sequence
@@ -8169,6 +8259,8 @@ const C2 = (() => {
   // touching chapter 1 sounds.
   const Audio = (() => {
     let ctx = null, enabled = true;
+    let music = null;        // active music graph { nodes:[], stop() }
+    let musicMode = null;    // 'dream' | 'game' | 'glitch' | 'wake'
     function getCtx() {
       if (!ctx) {
         try { ctx = new (window.AudioContext || window.webkitAudioContext)(); }
@@ -8209,8 +8301,138 @@ const C2 = (() => {
       src.connect(bp); bp.connect(g); g.connect(c.destination);
       src.start(t); src.stop(t + dur + 0.05);
     }
+
+    // ---- BACKGROUND MUSIC (procedural, looping) ----
+    // Each mode builds a small oscillator/noise graph that drones until
+    // stopMusic() is called. No audio files — everything is synthesized.
+    function stopMusic() {
+      if (!music) return;
+      const g = music;          // capture — `music` is nulled below
+      const c = ctx;
+      try {
+        const t = c ? c.currentTime : 0;
+        g.nodes.forEach(n => {
+          try {
+            if (n.gain) { n.gain.gain.cancelScheduledValues(t); n.gain.gain.setTargetAtTime(0, t, 0.25); }
+          } catch (e) {}
+        });
+        setTimeout(() => { try { g.stop(); } catch (e) {} }, 700);
+      } catch (e) { try { g.stop(); } catch (e2) {} }
+      music = null;
+      musicMode = null;
+    }
+    // A sustained detuned drone with a slow filter sweep. `cfg` tunes the
+    // mood: base frequency, how many voices, filter motion, noise wind,
+    // and an optional rhythmic sub-bass pulse (for the game phase).
+    function buildDrone(cfg) {
+      const c = getCtx(); if (!c) return null;
+      const t = c.currentTime;
+      const out = c.createGain();
+      out.gain.setValueAtTime(0, t);
+      out.gain.linearRampToValueAtTime(cfg.vol, t + 1.2);
+      out.connect(c.destination);
+      const nodes = [{ gain: out }];
+      // Detuned drone voices through a lowpass that drifts.
+      const filt = c.createBiquadFilter();
+      filt.type = 'lowpass';
+      filt.frequency.value = cfg.cutoff;
+      filt.Q.value = cfg.q || 6;
+      filt.connect(out);
+      const lfo = c.createOscillator();
+      const lfoG = c.createGain();
+      lfo.frequency.value = cfg.sweepHz || 0.05;
+      lfoG.gain.value = cfg.sweepDepth || 220;
+      lfo.connect(lfoG); lfoG.connect(filt.frequency);
+      lfo.start(t);
+      (cfg.detunes || [0, 7, -5]).forEach((dt, i) => {
+        const o = c.createOscillator();
+        o.type = cfg.type || 'sawtooth';
+        o.frequency.value = cfg.base * Math.pow(2, i * (cfg.spread || 0));
+        o.detune.value = dt * 4;
+        const g = c.createGain();
+        g.gain.value = cfg.voiceVol || 0.5;
+        o.connect(g); g.connect(filt);
+        o.start(t);
+        nodes.push({ osc: o, _g: g });
+      });
+      // Airy filtered-noise wind bed.
+      if (cfg.wind) {
+        const buf = c.createBuffer(1, c.sampleRate * 2, c.sampleRate);
+        const d = buf.getChannelData(0);
+        for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1);
+        const src = c.createBufferSource(); src.buffer = buf; src.loop = true;
+        const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = cfg.windHz || 600; bp.Q.value = 0.7;
+        const wg = c.createGain(); wg.gain.value = cfg.wind;
+        src.connect(bp); bp.connect(wg); wg.connect(out);
+        src.start(t);
+        nodes.push({ src });
+      }
+      // Optional rhythmic sub-bass pulse (heartbeat / tension).
+      let pulseTimer = null;
+      if (cfg.pulseMs) {
+        const beat = () => {
+          if (!enabled) return;
+          const tt = c.currentTime;
+          const o = c.createOscillator(); o.type = 'sine';
+          o.frequency.setValueAtTime(cfg.pulseHz || 60, tt);
+          o.frequency.exponentialRampToValueAtTime((cfg.pulseHz || 60) * 0.6, tt + 0.18);
+          const g = c.createGain();
+          g.gain.setValueAtTime(0, tt);
+          g.gain.linearRampToValueAtTime(cfg.pulseVol || 0.22, tt + 0.02);
+          g.gain.exponentialRampToValueAtTime(0.001, tt + 0.22);
+          o.connect(g); g.connect(c.destination);
+          o.start(tt); o.stop(tt + 0.26);
+        };
+        beat();
+        pulseTimer = setInterval(beat, cfg.pulseMs);
+      }
+      return {
+        nodes,
+        stop() {
+          if (pulseTimer) clearInterval(pulseTimer);
+          nodes.forEach(n => {
+            try { n.osc && n.osc.stop(); } catch (e) {}
+            try { n.src && n.src.stop(); } catch (e) {}
+          });
+          try { lfo.stop(); } catch (e) {}
+        }
+      };
+    }
+    function setMusic(mode) {
+      if (mode === 'stop') { stopMusic(); return; }
+      if (!enabled) { musicMode = mode; return; }
+      if (musicMode === mode && music) return;
+      stopMusic();
+      let cfg;
+      if (mode === 'dream') {
+        // Soft, woozy, dread building under the dream slides.
+        cfg = { base: 55, type: 'sawtooth', detunes: [0, 7, 12], spread: 1, voiceVol: 0.16,
+                cutoff: 340, q: 7, sweepHz: 0.045, sweepDepth: 260, vol: 0.5,
+                wind: 0.05, windHz: 520, pulseMs: 1500, pulseHz: 52, pulseVol: 0.16 };
+      } else if (mode === 'game') {
+        // Driving, tense bed for the zombie fight.
+        cfg = { base: 49, type: 'sawtooth', detunes: [0, 5, 7, 12], spread: 1, voiceVol: 0.14,
+                cutoff: 520, q: 9, sweepHz: 0.13, sweepDepth: 420, vol: 0.5,
+                wind: 0.04, windHz: 900, pulseMs: 600, pulseHz: 58, pulseVol: 0.24 };
+      } else if (mode === 'glitch') {
+        // Harsh, broken, high-anxiety drone for the tap interlude.
+        cfg = { base: 41, type: 'square', detunes: [0, 1, 6], spread: 0, voiceVol: 0.12,
+                cutoff: 900, q: 3, sweepHz: 0.9, sweepDepth: 700, vol: 0.42,
+                wind: 0.09, windHz: 1600, pulseMs: 280, pulseHz: 70, pulseVol: 0.18 };
+      } else if (mode === 'wake') {
+        // Thin, exhausted, hollow tone for waking up.
+        cfg = { base: 65, type: 'triangle', detunes: [0, 12], spread: 2, voiceVol: 0.14,
+                cutoff: 600, q: 4, sweepHz: 0.06, sweepDepth: 180, vol: 0.4, wind: 0.03, windHz: 700 };
+      } else { return; }
+      music = buildDrone(cfg);
+      musicMode = music ? mode : null;
+    }
+
     return {
-      enable: (v) => { enabled = v; },
+      enable: (v) => { enabled = v; if (!v) stopMusic(); },
+      // Start/stop the procedural background score for a phase.
+      // mode: 'dream' | 'game' | 'glitch' | 'wake' | 'stop'.
+      music: setMusic,
       // Single low heart thump.
       heart: () => {
         const c = getCtx(); if (!c) return;
@@ -8287,6 +8509,75 @@ const C2 = (() => {
         setTimeout(() => tone(880, 0.12, 0.16, 'sine'), 50);
       },
     };
+  })();
+
+  // ---- IMAGE ASSETS ----
+  // Preloads the Chapter-2 story art from `assets/story 2/`. The zombie
+  // sprite is a JPG on a white field, so on load we color-key the white
+  // to transparent and crop to the figure's bounding box — that lets us
+  // drop it cleanly onto the dark corridor background during the fight.
+  const Assets = (() => {
+    const DIR = 'assets/story 2/';
+    const FILES = {
+      sleep: 'sleep.jpg', lamp: 'lamp.jpg', walking: 'walking.jpg',
+      vi: 'vi big screen.jpg', lab: 'remeber lab.jpg', wake: 'wake up.jpg',
+      bg: 'background.jpg', zombie: 'zombie.jpg', tap1: 'tap1.jpg', tap2: 'tap2.jpg',
+    };
+    const img = {};
+    let zombieSprite = null;   // cropped, color-keyed offscreen canvas
+    let started = false;
+
+    function load() {
+      if (started) return;
+      started = true;
+      Object.keys(FILES).forEach(key => {
+        const im = new Image();
+        if (key === 'zombie') im.onload = () => buildZombieSprite(im);
+        im.src = encodeURI(DIR + FILES[key]);
+        img[key] = im;
+      });
+    }
+    function ready(key) {
+      const im = img[key];
+      return !!(im && im.complete && im.naturalWidth > 0);
+    }
+    function buildZombieSprite(im) {
+      try {
+        const iw = im.naturalWidth, ih = im.naturalHeight;
+        const cv = document.createElement('canvas');
+        cv.width = iw; cv.height = ih;
+        const cx = cv.getContext('2d');
+        cx.drawImage(im, 0, 0);
+        const data = cx.getImageData(0, 0, iw, ih);
+        const d = data.data;
+        let minX = iw, minY = ih, maxX = 0, maxY = 0;
+        for (let y = 0; y < ih; y++) {
+          for (let x = 0; x < iw; x++) {
+            const i = (y * iw + x) * 4;
+            const r = d[i], g = d[i + 1], b = d[i + 2];
+            const m = Math.min(r, g, b);
+            if (r > 236 && g > 236 && b > 236) {
+              d[i + 3] = 0;                      // background -> transparent
+            } else if (m > 206) {
+              d[i + 3] = Math.max(0, 255 - (m - 206) * 5.2); // soft edge
+            }
+            if (d[i + 3] > 24) {
+              if (x < minX) minX = x; if (x > maxX) maxX = x;
+              if (y < minY) minY = y; if (y > maxY) maxY = y;
+            }
+          }
+        }
+        cx.putImageData(data, 0, 0);
+        if (maxX <= minX || maxY <= minY) { zombieSprite = cv; return; }
+        const cw = maxX - minX + 1, ch = maxY - minY + 1;
+        const crop = document.createElement('canvas');
+        crop.width = cw; crop.height = ch;
+        crop.getContext('2d').drawImage(cv, minX, minY, cw, ch, 0, 0, cw, ch);
+        zombieSprite = crop;
+      } catch (e) { zombieSprite = im; }
+    }
+    function zombie() { return zombieSprite || (ready('zombie') ? img.zombie : null); }
+    return { load, img, ready, zombie };
   })();
 
   // ---- INTRO STORYLINE ----
@@ -8710,15 +9001,68 @@ const C2 = (() => {
       scanlines(w, h);
     }
 
+    // Draw a story image cover-fit (with a tiny drift offset), then layer
+    // the horror FX requested by the panel config.
+    function coverImageDX(im, w, h, dx, dy) {
+      const iw = im.naturalWidth, ih = im.naturalHeight;
+      if (!iw || !ih) return;
+      const s = Math.max(w / iw, h / ih);
+      const dw = iw * s, dh = ih * s;
+      ctx.drawImage(im, (w - dw) / 2 + (dx || 0), (h - dh) / 2 + (dy || 0), dw, dh);
+    }
+    function drawImagePanel(key, w, h, t, fx) {
+      fx = fx || {};
+      ctx.fillStyle = '#04020a';
+      ctx.fillRect(0, 0, w, h);
+      const im = Assets.img[key];
+      const ok = im && im.complete && im.naturalWidth;
+      const drift = fx.drift == null ? 1 : fx.drift;
+      const dX = Math.sin(t * 0.0004) * 4 * drift;
+      const dY = Math.cos(t * 0.0003) * 3 * drift;
+      if (ok) coverImageDX(im, w, h, dX, dY);
+      // Chromatic ghosting + torn slices for the Vi reveal.
+      if (ok && fx.glitch) {
+        const amp = fx.glitchAmp || 1;
+        ctx.globalAlpha = 0.3;
+        ctx.globalCompositeOperation = 'lighter';
+        coverImageDX(im, w, h, dX - 5 * amp, dY);
+        coverImageDX(im, w, h, dX + 5 * amp, dY);
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.globalAlpha = 1;
+        for (let i = 0; i < 3; i++) {
+          if (Math.random() > 0.55) continue;
+          const by = Math.random() * h, bh = 3 + Math.random() * (h * 0.05);
+          const sx = (Math.random() - 0.5) * 26 * amp;
+          ctx.save();
+          ctx.beginPath(); ctx.rect(0, by, w, bh); ctx.clip();
+          coverImageDX(im, w, h, dX + sx, dY);
+          ctx.restore();
+        }
+      }
+      // Breathing red atmosphere.
+      if (fx.redPulse) {
+        const a = (fx.redBase || 0.05) + (fx.redAmp || 0.06) * (0.5 + 0.5 * Math.sin(t * (fx.redSpeed || 0.0022)));
+        ctx.fillStyle = `rgba(150,10,30,${a})`;
+        ctx.fillRect(0, 0, w, h);
+      }
+      // Lamp / corridor flicker — brief darken on a pseudo-random beat.
+      if (fx.flicker && Math.floor(t / (fx.flickerMs || 130)) % (fx.flickerMod || 19) === 7) {
+        ctx.fillStyle = 'rgba(0,0,0,0.34)';
+        ctx.fillRect(0, 0, w, h);
+      }
+      vignette(w, h, fx.vignette || 0.5);
+      scanlines(w, h);
+    }
+
+    // Image-based dream slides. 0-4 play before the zombie fight; index 5
+    // (wake-up) plays as the epilogue after the glitch-tap interlude.
     const PANELS = [
-      { scene: scDesk,     clock: '03:47', sfx: 'breath',  textKey: 'c2_p1' },
-      { scene: scCorridor, clock: '03:47', sfx: 'tickSlow', textKey: 'c2_p2' },
-      { scene: scViFar,    clock: '03:47', sfx: 'heart',   textKey: 'c2_p3' },
-      { scene: scViTurn,   clock: '03:47', sfx: 'glitch',  textKey: 'c2_p4' },
-      { scene: scPatients, clock: '03:47', sfx: 'shamble', textKey: 'c2_p5' },
-      { scene: scHand,     clock: '03:47', sfx: 'heart',   textKey: 'c2_p6' },
-      { scene: scMirror,   clock: '03:48', sfx: 'glass',   textKey: 'c2_p7' },
-      { scene: scAwake,    clock: '03:48', sfx: 'tickSlow', textKey: 'c2_p8' },
+      { scene: (w,h,t) => drawImagePanel('sleep',   w,h,t, { vignette:0.55, flicker:true, flickerMs:150, flickerMod:23, redPulse:true, redBase:0.02, redAmp:0.03 }), clock:'03:47', sfx:'breath',   textKey:'c2_p1' },
+      { scene: (w,h,t) => drawImagePanel('lamp',    w,h,t, { vignette:0.5,  flicker:true, flickerMs:90,  flickerMod:13, redPulse:true, redBase:0.05, redAmp:0.09, redSpeed:0.003 }), clock:'03:47', sfx:'tickSlow', textKey:'c2_p2' },
+      { scene: (w,h,t) => drawImagePanel('walking', w,h,t, { vignette:0.55, redPulse:true, redBase:0.06, redAmp:0.06 }), clock:'03:47', sfx:'heart',   textKey:'c2_p3' },
+      { scene: (w,h,t) => drawImagePanel('vi',      w,h,t, { vignette:0.5,  glitch:true, glitchAmp:1.1, redPulse:true, redBase:0.05, redAmp:0.08, redSpeed:0.004 }), clock:'03:47', sfx:'glitch',  textKey:'c2_p4' },
+      { scene: (w,h,t) => drawImagePanel('lab',     w,h,t, { vignette:0.55, redPulse:true, redBase:0.06, redAmp:0.07, redSpeed:0.0025 }), clock:'03:47', sfx:'shamble', textKey:'c2_p5' },
+      { scene: (w,h,t) => drawImagePanel('wake',    w,h,t, { vignette:0.45, drift:0.5 }), clock:'03:48', sfx:'tickSlow', textKey:'c2_p6' },
     ];
 
     function size() {
@@ -8776,6 +9120,7 @@ const C2 = (() => {
     }
 
     function play(startIdx, endIdxIn, onDoneIn) {
+      Assets.load();
       canvas = document.getElementById('c2p-canvas');
       ctx = canvas.getContext('2d');
       textEl = document.getElementById('c2p-text');
@@ -8827,13 +9172,13 @@ const C2 = (() => {
     const WORDS = {
       en: [
         ['BAND', 'IOD', 'PULSE'],      // wave 1
-        ['SYRINGE', 'SUTURE', 'OXYGEN'], // wave 2
+        ['SUTURE', 'OXYGEN'],            // wave 2
         ['WAKE UP'],                     // wave 3 (finale)
       ],
       ru: [
         ['БИНТ', 'ЙОД', 'ПУЛЬС'],
-        ['ШПРИЦ', 'ШВЫ', 'КИСЛОРОД'],
-        ['ПРОСНИСЬ'],
+        ['ШВЫ', 'КИСЛОРОД'],
+        ['ОЧНИСЬ'],
       ],
     };
     const WAVE_BOUNDARIES = [10000, 20000, 30000]; // ms
@@ -8896,13 +9241,15 @@ const C2 = (() => {
       const w = rect.width, h = rect.height;
       const chars = word.split('').filter(c => c !== ' ');
       const slots = chars.length;
-      // Pick a pixel-block size that gives each zombie ~14*px of width
-      // and still lets all of them fit across the canvas with margins.
-      // Each zombie sprite is 14 logical pixels wide; aim for ~24-32%
-      // canvas width spacing between zombies.
-      const widthBudgetPerZombie = Math.min(w / Math.max(2, slots), 80);
-      const px = Math.max(3, Math.min(5, Math.floor(widthBudgetPerZombie / 14)));
-      const spriteWidthPx = 14 * px;
+      // Size the zombie sprites so every one in the word fits across the
+      // canvas with margins. Height is the driver; width follows the
+      // sprite's aspect ratio (or a sane fallback before it has loaded).
+      const spr = Assets.zombie();
+      const aspect = (spr && spr.width) ? (spr.width / spr.height) : 0.42;
+      let spriteH = Math.min(h * 0.22, w * 0.5);
+      const maxSpriteW = (w * 0.94) / Math.max(1, slots);
+      let spriteW = spriteH * aspect;
+      if (spriteW > maxSpriteW) { spriteW = maxSpriteW; spriteH = spriteW / aspect; }
       // Layout zombies in shuffled slots across the canvas.
       const positions = [];
       for (let i = 0; i < slots; i++) positions.push(i);
@@ -8910,8 +9257,8 @@ const C2 = (() => {
         const j = Math.floor(Math.random() * (i + 1));
         [positions[i], positions[j]] = [positions[j], positions[i]];
       }
-      const margin = Math.max(spriteWidthPx / 2 + 6, w * 0.10);
-      const baseY = h * 0.24;
+      const margin = Math.max(spriteW / 2 + 6, w * 0.08);
+      const baseY = h * 0.22;
       const vySpeed = wave === 0 ? h * 0.0000040 : wave === 1 ? h * 0.0000060 : h * 0.0000090;
       for (let i = 0; i < slots; i++) {
         const slot = positions[i];
@@ -8919,7 +9266,7 @@ const C2 = (() => {
         const y = baseY + (Math.random() - 0.5) * h * 0.04;
         zombies.push({
           id: ++zid,
-          x, y, px,
+          x, y, sw: spriteW, sh: spriteH,
           letter: chars[i],
           orderIdx: i,
           vy: vySpeed * (0.9 + Math.random() * 0.3),
@@ -8941,179 +9288,68 @@ const C2 = (() => {
       spawnZombiesForWord(next.word, next.wave);
     }
 
-    // Pixel-art zombie sprite. Drawn pixel-by-pixel on a strict logical
-    // grid (14 wide x 22 tall) so the result reads as true pixel art
-    // rather than soft scaled vector shapes. Letter is rendered as a
-    // pixelated tile on the chest.
-    const ZPAL = {
-      hair:        '#180a14',
-      hairLight:   '#3a1828',
-      skin:        '#8a9e40',  // sickly yellow-green
-      skinShadow:  '#5e7228',
-      skinDeep:    '#384a18',
-      eyeSocket:   '#080004',
-      eyeGlow:     '#ff3a58',
-      eyeDeep:     '#a01838',
-      mouth:       '#080006',
-      mouthInner:  '#4a000a',
-      teeth:       '#d8b048',
-      drool:       '#6e0a1e',
-      body:        '#2a1c14',
-      bodyShadow:  '#0e0606',
-      bodyHi:      '#4a3220',
-      arm:         '#5e3828',
-      armShadow:   '#2e1812',
-      armHi:       '#7a4a36',
-      leg:         '#160a06',
-      tileBright:  '#fff2e0',
-      tileBg:      '#180812',
-      tileBorder:  '#3a1820',
-      tilePulse:   '#e8609a',
-    };
-
-    function drawZombie(z, t) {
-      const px = z.px || 4;
-      const bob = Math.sin(t * 0.004 + z.bobOffset) * 1.5;
-      const cx = Math.floor(z.x);
-      const cy = Math.floor(z.y + bob);
-      // Sprite is 14 logical pixels wide, 22 tall, anchored center-bottom.
-      const ZX = cx - 7 * px;
-      const ZY = cy - 12 * px;
-      const p = (lx, ly, color) => {
-        if (color === null || color === undefined) return;
-        ctx.fillStyle = color;
-        ctx.fillRect(ZX + lx * px, ZY + ly * px, px, px);
-      };
-      const hr = (lx1, lx2, ly, color) => {
-        if (!color) return;
-        ctx.fillStyle = color;
-        ctx.fillRect(ZX + lx1 * px, ZY + ly * px, (lx2 - lx1 + 1) * px, px);
-      };
-
-      // --- HAIR (top dome) ---
-      hr(4, 9, 0, ZPAL.hair);
-      hr(3, 10, 1, ZPAL.hair);
-      p(4, 1, ZPAL.hairLight);
-      p(8, 1, ZPAL.hairLight);
-      // hair sides framing the face (rows 2-9)
-      for (let r = 2; r <= 9; r++) {
-        p(2, r, ZPAL.hair);
-        p(11, r, ZPAL.hair);
-      }
-      // jagged hair tips at sides
-      p(2, 2, ZPAL.hairLight);
-      p(11, 2, ZPAL.hairLight);
-
-      // --- FACE ---
-      for (let r = 2; r <= 9; r++) hr(3, 10, r, ZPAL.skin);
-      // cheek shadows
-      p(3, 6, ZPAL.skinShadow);
-      p(10, 6, ZPAL.skinShadow);
-      p(3, 8, ZPAL.skinShadow);
-      p(10, 8, ZPAL.skinShadow);
-      // nose hint
-      p(6, 6, ZPAL.skinDeep);
-      p(7, 6, ZPAL.skinDeep);
-
-      // --- EYES (rows 4-5) ---
-      hr(3, 5, 4, ZPAL.eyeSocket);
-      hr(3, 5, 5, ZPAL.eyeSocket);
-      hr(8, 10, 4, ZPAL.eyeSocket);
-      hr(8, 10, 5, ZPAL.eyeSocket);
-      // glowing pupils — slow flicker
-      const eyeOn = ((t / 220) | 0) % 13 !== 11;
-      if (eyeOn) {
-        p(4, 4, ZPAL.eyeGlow);
-        p(9, 4, ZPAL.eyeGlow);
-        p(4, 5, ZPAL.eyeDeep);
-        p(9, 5, ZPAL.eyeDeep);
-      }
-
-      // --- MOUTH + TEETH (rows 7-9) ---
-      hr(4, 9, 7, ZPAL.mouth);
-      hr(4, 9, 8, ZPAL.mouth);
-      p(5, 8, ZPAL.mouthInner);
-      p(8, 8, ZPAL.mouthInner);
-      // jagged teeth
-      p(4, 7, ZPAL.teeth);
-      p(6, 7, ZPAL.teeth);
-      p(8, 7, ZPAL.teeth);
-      p(9, 8, ZPAL.teeth);
-      // drool stream
-      p(6, 9, ZPAL.drool);
-      p(6, 10, ZPAL.drool);
-      p(6, 11, ZPAL.drool);
-
-      // --- CHIN / NECK ---
-      hr(4, 9, 10, ZPAL.skin);
-      hr(5, 8, 11, ZPAL.skinShadow);
-
-      // --- SHOULDERS + ARMS (rows 12-15) ---
-      hr(3, 10, 12, ZPAL.body);
-      hr(2, 11, 13, ZPAL.body);
-      // outstretched arms
-      hr(0, 2, 13, ZPAL.arm);
-      hr(11, 13, 13, ZPAL.arm);
-      hr(0, 2, 14, ZPAL.arm);
-      hr(11, 13, 14, ZPAL.arm);
-      hr(0, 1, 15, ZPAL.armShadow);
-      hr(12, 13, 15, ZPAL.armShadow);
-      p(2, 14, ZPAL.armHi); // shoulder highlight
-      p(11, 14, ZPAL.armHi);
-
-      // --- TORSO (rows 14-18) — tile is rendered ON the chest ---
-      for (let r = 14; r <= 18; r++) hr(3, 10, r, ZPAL.body);
-      // torn body patches / wounds
-      p(4, 18, ZPAL.bodyShadow);
-      p(9, 18, ZPAL.bodyShadow);
-
-      // --- TILE FRAME (rows 14-17, cols 3-10) ---
-      hr(3, 10, 14, ZPAL.tileBorder);
-      p(3, 15, ZPAL.tileBorder); p(10, 15, ZPAL.tileBorder);
-      p(3, 16, ZPAL.tileBorder); p(10, 16, ZPAL.tileBorder);
-      hr(3, 10, 17, ZPAL.tileBorder);
-
-      // --- LEGS (rows 19-21) ---
-      hr(3, 5, 19, ZPAL.leg);
-      hr(8, 10, 19, ZPAL.leg);
-      hr(3, 5, 20, ZPAL.leg);
-      hr(8, 10, 20, ZPAL.leg);
-      // feet
-      hr(2, 5, 21, ZPAL.body);
-      hr(8, 11, 21, ZPAL.body);
-
-      // --- TILE INTERIOR + LETTER ---
-      const isNext = (z.letter === targetWord.replace(/\s/g, '').charAt(typedIdx));
-      const pulse = 0.6 + 0.4 * Math.sin(t * 0.012);
+    // A pixelated letter tile rendered on the zombie's chest. The tile for
+    // the next-needed letter glows pink and pulses so it reads at a glance.
+    function drawLetterTile(letter, x, y, w, h, isNext, t) {
+      ctx.save();
+      ctx.imageSmoothingEnabled = false;
+      ctx.fillStyle = isNext ? '#fff2e0' : 'rgba(8,3,12,0.82)';
+      ctx.fillRect(x, y, w, h);
+      ctx.lineWidth = Math.max(2, w * 0.08);
       if (isNext) {
-        // pulsing pink border ring around tile
-        ctx.fillStyle = ZPAL.tilePulse;
-        ctx.globalAlpha = pulse;
-        ctx.fillRect(ZX + 2 * px, ZY + 13 * px, 10 * px, px); // top ring
-        ctx.fillRect(ZX + 2 * px, ZY + 18 * px, 10 * px, px); // bottom ring
-        ctx.fillRect(ZX + 2 * px, ZY + 13 * px, px, 6 * px);  // left ring
-        ctx.fillRect(ZX + 11 * px, ZY + 13 * px, px, 6 * px); // right ring
-        ctx.globalAlpha = 1;
-        hr(4, 9, 15, ZPAL.tileBright);
-        hr(4, 9, 16, ZPAL.tileBright);
+        const pulse = 0.5 + 0.5 * Math.sin(t * 0.012);
+        ctx.strokeStyle = `rgba(232,96,154,${0.7 + 0.3 * pulse})`;
       } else {
-        hr(4, 9, 15, ZPAL.tileBg);
-        hr(4, 9, 16, ZPAL.tileBg);
+        ctx.strokeStyle = 'rgba(232,96,154,0.5)';
       }
-      // letter glyph centered on tile
-      ctx.fillStyle = isNext ? '#180812' : '#cab498';
-      ctx.font = `bold ${Math.floor(2.4 * px)}px "Courier New", monospace`;
+      ctx.strokeRect(x, y, w, h);
+      ctx.fillStyle = isNext ? '#180812' : '#f0c0d4';
+      ctx.font = `bold ${Math.max(10, Math.floor(h * 0.64))}px "Courier New", monospace`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(z.letter, ZX + 6.5 * px, ZY + 15.7 * px);
+      ctx.fillText(letter, x + w / 2, y + h / 2 + 1);
+      ctx.restore();
+    }
 
-      // hit bounds (full sprite area + a little padding)
-      z._bounds = {
-        left:  ZX - px,
-        top:   ZY - px,
-        right: ZX + 14 * px + px,
-        bottom: ZY + 22 * px + px,
-      };
+    // Draw a zombie from the color-keyed sprite, with a chest letter tile.
+    // Anchored at center-bottom-ish: z.x is the horizontal centre, z.y the
+    // vertical centre (kept consistent with the lose-line / step logic).
+    function drawZombie(z, t) {
+      const spr = Assets.zombie();
+      const bob = Math.sin(t * 0.004 + z.bobOffset) * (z.sh * 0.012);
+      const sw = z.sw * z.scale, sh = z.sh * z.scale;
+      const cx = z.x, cy = z.y + bob;
+      const left = cx - sw / 2, top = cy - sh / 2;
+      const isNext = (z.letter === targetWord.replace(/\s/g, '').charAt(typedIdx));
+
+      ctx.save();
+      ctx.imageSmoothingEnabled = false;
+      if (z.dead) ctx.globalAlpha = Math.max(0, z.scale);
+      // Pink halo behind the next-needed zombie.
+      if (isNext && !z.dead && spr) {
+        const pulse = 0.5 + 0.5 * Math.sin(t * 0.012);
+        ctx.save();
+        ctx.shadowColor = `rgba(255,80,130,${0.55 + 0.4 * pulse})`;
+        ctx.shadowBlur = 16 + 12 * pulse;
+        ctx.drawImage(spr, left, top, sw, sh);
+        ctx.restore();
+      }
+      if (spr) {
+        ctx.drawImage(spr, left, top, sw, sh);
+      } else {
+        ctx.fillStyle = '#3a4a2a';
+        ctx.fillRect(left, top, sw, sh);
+      }
+      ctx.restore();
+
+      // Chest letter tile (hidden once the zombie is dying).
+      if (!z.dead) {
+        const tileW = sw * 0.5;
+        const tileH = tileW * 0.84;
+        drawLetterTile(z.letter, cx - tileW / 2, top + sh * 0.4, tileW, tileH, isNext, t);
+      }
+
+      z._bounds = { left: left - 4, top: top - 4, right: left + sw + 4, bottom: top + sh + 4 };
     }
 
     function loop(now) {
@@ -9124,9 +9360,17 @@ const C2 = (() => {
 
       const rect = canvas.getBoundingClientRect();
       const w = rect.width, h = rect.height;
-      // Background
+      // Background — the corridor art, cover-fit. Falls back to a flat
+      // dark fill until the image has loaded.
       ctx.fillStyle = '#06020a';
       ctx.fillRect(0, 0, w, h);
+      const bg = Assets.img.bg;
+      if (bg && bg.complete && bg.naturalWidth) {
+        const s = Math.max(w / bg.naturalWidth, h / bg.naturalHeight);
+        const dw = bg.naturalWidth * s, dh = bg.naturalHeight * s;
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(bg, (w - dw) / 2, (h - dh) / 2, dw, dh);
+      }
       // Floor line near bottom (lose zone)
       const loseY = h * 0.78;
       ctx.fillStyle = 'rgba(180,30,60,0.18)';
@@ -9139,17 +9383,20 @@ const C2 = (() => {
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // Target word at top
-      ctx.fillStyle = '#ffdce8';
-      ctx.font = `bold 22px "Courier New", monospace`;
-      ctx.textAlign = 'center';
-      // Render targetWord with already-typed prefix highlighted dimmer
+      // Target word at top — a dark plate keeps it legible over the art.
       const noSpace = targetWord.replace(/\s/g, '');
       let display = '';
       for (let i = 0; i < noSpace.length; i++) {
         display += (i < typedIdx ? '·' : noSpace[i]);
       }
-      ctx.fillText(display, w/2, h*0.08);
+      ctx.font = `bold 24px "Courier New", monospace`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'alphabetic';
+      const tw = ctx.measureText(display).width;
+      ctx.fillStyle = 'rgba(6,2,10,0.6)';
+      ctx.fillRect(w / 2 - tw / 2 - 14, h * 0.05 - 20, tw + 28, 30);
+      ctx.fillStyle = '#ffdce8';
+      ctx.fillText(display, w / 2, h * 0.05);
 
       // Shake offset
       let sx = 0, sy = 0;
@@ -9261,6 +9508,7 @@ const C2 = (() => {
     }
 
     function start(onWinCb, onLoseCb) {
+      Assets.load();
       canvas = document.getElementById('c2a-canvas');
       ctx = canvas.getContext('2d');
       size();
@@ -9302,6 +9550,132 @@ const C2 = (() => {
       raf = null;
     }
 
+    return { start, stop };
+  })();
+
+  // ---- GLITCH-TAP INTERLUDE ----
+  // After the zombies fall, the dream tears itself apart. Two horror
+  // frames (tap1/tap2) strobe with chromatic/slice glitches for ~10s.
+  // The player taps frantically to "claw awake" — taps fill the bar
+  // faster; if they don't, it still completes on the timer. Then the
+  // wake-up slide plays.
+  const GlitchTap = (() => {
+    const DURATION = 10000;
+    let canvas = null, ctx = null, raf = null, running = false;
+    let startT = 0, taps = 0, progress = 0, onDone = null, shakeUntil = 0;
+
+    function size() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+      ctx.imageSmoothingEnabled = false;
+    }
+    function cover(im, w, h, dx, dy) {
+      const iw = im.naturalWidth, ih = im.naturalHeight;
+      if (!iw || !ih) return;
+      const s = Math.max(w / iw, h / ih);
+      const dw = iw * s, dh = ih * s;
+      ctx.drawImage(im, (w - dw) / 2 + (dx || 0), (h - dh) / 2 + (dy || 0), dw, dh);
+    }
+    function loop(now) {
+      if (!running) return;
+      const rect = canvas.getBoundingClientRect();
+      const w = rect.width, h = rect.height;
+      const elapsed = now - startT;
+      // Time guarantees completion by DURATION; taps push it faster.
+      progress = Math.max(progress, elapsed / DURATION);
+
+      // Strobe between the two horror frames.
+      const key = (Math.floor(now / 90) % 2 === 0) ? 'tap1' : 'tap2';
+      const im = Assets.img[key];
+      const ok = im && im.complete && im.naturalWidth;
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, w, h);
+      const shake = now < shakeUntil ? 9 : 2.5;
+      const dx = (Math.random() - 0.5) * shake, dy = (Math.random() - 0.5) * shake;
+      if (ok) cover(im, w, h, dx, dy);
+      // Chromatic ghosting.
+      if (ok) {
+        ctx.globalAlpha = 0.26;
+        ctx.globalCompositeOperation = 'lighter';
+        cover(im, w, h, dx - 6, dy);
+        cover(im, w, h, dx + 6, dy);
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.globalAlpha = 1;
+      }
+      // Torn horizontal slices.
+      if (ok) {
+        for (let i = 0; i < 4; i++) {
+          if (Math.random() > 0.5) continue;
+          const by = Math.random() * h, bh = 4 + Math.random() * (h * 0.06);
+          const sx = (Math.random() - 0.5) * 42;
+          ctx.save();
+          ctx.beginPath(); ctx.rect(0, by, w, bh); ctx.clip();
+          cover(im, w, h, dx + sx, dy);
+          ctx.restore();
+        }
+      }
+      // Scanlines + occasional red flash.
+      ctx.fillStyle = 'rgba(0,0,0,0.16)';
+      for (let y = 0; y < h; y += 3) ctx.fillRect(0, y, w, 1);
+      if (Math.random() < 0.06) {
+        ctx.fillStyle = 'rgba(180,10,30,0.18)';
+        ctx.fillRect(0, 0, w, h);
+      }
+      const fill = document.getElementById('c2t-bar-fill');
+      if (fill) fill.style.width = Math.min(100, progress * 100) + '%';
+      if (progress >= 1) { return finish(); }
+      raf = requestAnimationFrame(loop);
+    }
+    function onTap() {
+      if (!running) return;
+      taps++;
+      progress = Math.min(1, progress + 0.05);
+      shakeUntil = performance.now() + 130;
+      try { Audio.glitch(0.12); } catch (e) {}
+    }
+    function finish() {
+      running = false;
+      cancelAnimationFrame(raf);
+      raf = null;
+      try { Audio.glass(); } catch (e) {}
+      const cb = onDone; onDone = null;
+      if (cb) cb();
+    }
+    function start(onDoneIn) {
+      Assets.load();
+      canvas = document.getElementById('c2t-canvas');
+      ctx = canvas.getContext('2d');
+      size();
+      window.addEventListener('resize', size);
+      onDone = onDoneIn;
+      taps = 0; progress = 0; shakeUntil = 0;
+      startT = performance.now();
+      running = true;
+      const stage = document.getElementById('c2t-stage');
+      if (stage && !stage.__c2tap) {
+        stage.__c2tap = true;
+        stage.addEventListener('click', onTap);
+      }
+      // Localize the overlay copy to match the rest of the chapter.
+      try {
+        const tt = document.getElementById('c2t-title');
+        const cc = document.getElementById('c2t-cta');
+        if (tt && window.tr) tt.textContent = window.tr('c2_tap_title');
+        if (cc && window.tr) cc.textContent = window.tr('c2_tap_cta');
+      } catch (e) {}
+      const fill = document.getElementById('c2t-bar-fill');
+      if (fill) fill.style.width = '0%';
+      raf = requestAnimationFrame(loop);
+    }
+    function stop() {
+      running = false;
+      cancelAnimationFrame(raf);
+      raf = null;
+    }
     return { start, stop };
   })();
 
@@ -9815,7 +10189,7 @@ const C2 = (() => {
     return { startLevel, stop, LEVELS, rotate, move, drop };
   })();
 
-  return { Audio, Intro, Typing, Infection };
+  return { Audio, Intro, Typing, GlitchTap, Infection };
 })();
 window.C2 = C2;
 
