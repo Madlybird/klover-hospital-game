@@ -3915,10 +3915,25 @@ html, body {
     <div class="howto-header">
       <button class="btn-back" onclick="Game.showScreen('menu')">&#8592;</button>
       <div class="screen-title" data-i18n="levels_title" style="flex:1">Patient assignment</div>
-      <button class="btn-story" onclick="Lore.replay()" data-i18n="story_btn" title="Replay intro">Story</button>
+      <div style="width:40px"></div>
     </div>
     <div class="patient-subtitle" data-i18n="levels_subtitle">Select your patient for today's treatment:</div>
     <div class="levels-grid">
+      <div class="level-card" onclick="Game.playStory()">
+        <div class="patient-photo">
+          <img src="assets/story/new2.JPG" alt="Story" class="patient-photo-img">
+        </div>
+        <div class="patient-info">
+          <div class="id-card-label" data-i18n="c1_story_file">CASE FILE</div>
+          <div class="level-card-name" data-i18n="c1_story_name">THE STORY</div>
+          <div class="patient-priority" data-i18n="c1_story_desc">KLover Clinic &middot; How the simulation began</div>
+          <div class="patient-meta-row">CHAPTER <b>I</b></div>
+          <div class="patient-meta-row">KLASS_ID <b>PROLOGUE</b></div>
+        </div>
+        <div class="patient-actions">
+          <button class="btn-proceed" onclick="event.stopPropagation();Game.playStory()" data-i18n="c1_story_play">PLAY STORY</button>
+        </div>
+      </div>
       <div class="level-card" id="level-card-1" onclick="Game.startLevel(1)">
         <div class="patient-photo">
           <img src="assets/character/new.png" alt="Mai" class="patient-photo-img">
@@ -4538,6 +4553,10 @@ const I18N = {
     levels_title: 'Patient assignment',
     levels_subtitle: "Select your patient for today's treatment:",
     story_btn: 'Story',
+    c1_story_file: 'CASE FILE',
+    c1_story_name: 'THE STORY',
+    c1_story_desc: 'KLover Clinic · How the simulation began',
+    c1_story_play: 'PLAY STORY',
     lvl1_priority: 'PRIORITY PATIENT · Requires immediate care',
     begin_treatment: 'Begin treatment',
     review_case: 'Review case',
@@ -4692,6 +4711,10 @@ const I18N = {
     levels_title: 'Назначение пациента',
     levels_subtitle: 'Выберите пациента на сегодня:',
     story_btn: 'История',
+    c1_story_file: 'ДЕЛО',
+    c1_story_name: 'ИСТОРИЯ',
+    c1_story_desc: 'Клиника KLover · С чего началась симуляция',
+    c1_story_play: 'СМОТРЕТЬ ИСТОРИЮ',
     lvl1_priority: 'ВАЖНЫЙ ПАЦИЕНТ · Требуется срочный уход',
     begin_treatment: 'Начать лечение',
     review_case: 'Обзор дела',
@@ -5458,6 +5481,14 @@ const Game = (() => {
   // ---- LEVEL START ----
   function goToLevels() {
     showScreen('levels');
+  }
+
+  // Replay the Chapter 1 intro story from its level-select card, then
+  // return to the levels screen (unlike Lore.replay, which drops the
+  // player straight into level 1).
+  function playStory() {
+    try { Lore.start(() => showScreen('levels')); }
+    catch (e) { showScreen('levels'); }
   }
 
   // ---- CHAPTER 2 ("Night Shift") DEV GATE ----
@@ -7352,6 +7383,7 @@ const Game = (() => {
     showScreen,
     nextSlide,
     goToLevels,
+    playStory,
     startLevel,
     confirmEndlessUnlock,
     closeEndlessUnlock,
