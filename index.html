@@ -3675,9 +3675,19 @@ html, body {
 }
 
 /* ---- C2 level select (#screen-c2-levels) ---- */
-/* Blue theme to match the main (chapter 1) interface. */
-#screen-c2-levels { background: var(--color-bg) !important; }
-.c2-story-card .patient-priority { color: var(--color-blue) !important; }
+/* Light checkered theme — identical to the main chapter-1 levels page. */
+#screen-c2-levels {
+  background-color: #d8eeff !important;
+  background-image:
+    linear-gradient(rgba(180,210,240,0.45) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(180,210,240,0.45) 1px, transparent 1px) !important;
+  background-size: 14px 14px !important;
+  color: #1a2a4a !important;
+  padding: 20px;
+  align-items: stretch;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
 .c2-levels-grid { gap: 14px; }
 .c2-card {
   background: linear-gradient(135deg, rgba(20,5,30,0.95), rgba(40,10,30,0.92)) !important;
@@ -4028,14 +4038,16 @@ html, body {
     </div>
     <div class="patient-subtitle" data-i18n="c2_levels_subtitle">Relive the nightmare:</div>
     <div class="levels-grid">
-      <div class="level-card c2-story-card" onclick="Game.replayC2Intro()">
-        <div class="patient-photo c2-photo">
-          <div class="c2-photo-portrait" data-art="m1"></div>
+      <div class="level-card" onclick="Game.replayC2Intro()">
+        <div class="patient-photo">
+          <img src="assets/story%202/sleep.jpg" alt="The Nightmare" class="patient-photo-img">
         </div>
         <div class="patient-info">
           <div class="id-card-label" data-i18n="c2_story_file">CASE FILE</div>
-          <div class="level-card-name" data-i18n="c2_story_name">The Nightmare</div>
+          <div class="level-card-name" data-i18n="c2_story_name">THE NIGHTMARE</div>
           <div class="patient-priority" data-i18n="c2_story_desc">Night Shift &middot; A nightmare you can't wake from</div>
+          <div class="patient-meta-row">DIFFICULTY <b>&bull;&bull;&bull;</b></div>
+          <div class="patient-meta-row">KLASS_ID <b>NIGHTMARE_00</b></div>
         </div>
         <div class="patient-actions">
           <button class="btn-proceed" onclick="event.stopPropagation();Game.replayC2Intro()" data-i18n="c2_story_play">PLAY STORY</button>
@@ -9545,7 +9557,7 @@ const C2 = (() => {
   // shakes. It's a pure "shake your phone!" animation — no real motion
   // detection — that auto-advances to the wake-up slide on a timer.
   const GlitchTap = (() => {
-    const DURATION = 5000;
+    const DURATION = 2500;
     let canvas = null, ctx = null, raf = null, running = false;
     let startT = 0, onDone = null;
 
