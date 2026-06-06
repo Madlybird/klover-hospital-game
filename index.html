@@ -3630,6 +3630,56 @@ html, body {
   line-height: 1;
 }
 
+/* ---- C2 Ward 2: Don't Breathe (#screen-c2-db) ---- */
+#c2db-canvas, #c2run-canvas {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  display: block;
+  cursor: pointer;
+  touch-action: none;
+}
+.c2db-bar {
+  width: 120px;
+  height: 12px;
+  margin-top: 3px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.c2db-noise-bar { background: rgba(40,8,16,0.85); border: 1px solid rgba(255,60,100,0.5); }
+.c2db-noise-fill { height: 100%; width: 0%; background: linear-gradient(90deg,#3a8050,#f0c030,#ff3a64); transition: width 0.08s linear; }
+.c2db-breath-bar { background: rgba(8,20,30,0.85); border: 1px solid rgba(90,160,220,0.5); }
+.c2db-breath-fill { height: 100%; width: 100%; background: linear-gradient(90deg,#1a4a6e,#3a8fd4,#9fd4ff); transition: width 0.08s linear; }
+.c2db-mic {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #ff5a78;
+  text-shadow: 0 0 8px rgba(255,60,100,0.7);
+  animation: c2p-pulse 1s ease-in-out infinite;
+}
+.c2db-instr {
+  position: absolute;
+  bottom: 7vh;
+  left: 0; right: 0;
+  text-align: center;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  color: rgba(240,224,232,0.85);
+  text-shadow: 0 0 12px rgba(0,0,0,0.8);
+  pointer-events: none;
+  z-index: 3;
+}
+.c2a-end-sub {
+  font-family: 'Courier New', monospace;
+  font-size: 16px;
+  letter-spacing: 2px;
+  color: rgba(255,180,200,0.85);
+  margin-top: -10px;
+}
+
 /* ---- C2 glitch-tap interlude (#screen-c2-tap) ---- */
 .c2t-stage {
   position: relative;
@@ -4110,6 +4160,58 @@ html, body {
     </div>
   </div>
 
+  <!-- C2 Ward 2: Don't Breathe (silence survival) -->
+  <div id="screen-c2-db" class="screen">
+    <div class="c2cb-stage">
+      <div class="c2a-hud">
+        <div class="c2a-timer-wrap">
+          <div class="c2a-timer-label" data-i18n="c2db_noise">NOISE</div>
+          <div class="c2db-bar c2db-noise-bar"><div class="c2db-noise-fill" id="c2db-noise"></div></div>
+        </div>
+        <div class="c2a-hint"><span id="c2db-mic" class="c2db-mic" style="display:none">&#127908; LIVE</span></div>
+        <div class="c2a-timer-wrap" style="align-items:flex-end">
+          <div class="c2a-timer-label" data-i18n="c2db_breath">BREATH</div>
+          <div class="c2db-bar c2db-breath-bar"><div class="c2db-breath-fill" id="c2db-breath"></div></div>
+        </div>
+      </div>
+      <canvas id="c2db-canvas"></canvas>
+      <div class="c2db-instr" id="c2db-instr" data-i18n="c2db_hold">HOLD TO HOLD YOUR BREATH</div>
+      <div class="c2a-end-overlay" id="c2db-end-overlay">
+        <div class="c2a-end-title" id="c2db-end-title">YOU SURVIVED</div>
+        <div class="c2a-end-buttons">
+          <button class="c2-placeholder-btn" onclick="Game.restartC2DontBreathe()" data-i18n="try_again">TRY AGAIN</button>
+          <button class="c2-placeholder-btn" onclick="Game.showScreen('c2-levels')" data-i18n="c2_back_btn">&lsaquo; BACK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- C2 Endless: The Long Night (swipe runner) -->
+  <div id="screen-c2-run" class="screen">
+    <div class="c2cb-stage">
+      <div class="c2a-hud">
+        <div class="c2a-timer-wrap">
+          <div class="c2a-timer-label" data-i18n="c2run_dist">DISTANCE</div>
+          <div class="c2cb-bpm" id="c2run-dist">0</div>
+        </div>
+        <div class="c2a-hint" data-i18n="c2run_hint">SWIPE TO DODGE</div>
+        <div class="c2a-timer-wrap" style="align-items:flex-end">
+          <div class="c2a-timer-label" data-i18n="c2run_best">BEST</div>
+          <div class="c2cb-bpm" id="c2run-best">0</div>
+        </div>
+      </div>
+      <canvas id="c2run-canvas"></canvas>
+      <div class="c2a-end-overlay" id="c2run-end-overlay">
+        <div class="c2a-end-title" id="c2run-end-title">CAUGHT</div>
+        <div class="c2a-end-sub" id="c2run-end-sub">0</div>
+        <div class="c2a-end-buttons">
+          <button class="c2-placeholder-btn" onclick="Game.restartC2Runner()" data-i18n="try_again">TRY AGAIN</button>
+          <button class="c2-placeholder-btn" onclick="Game.showScreen('c2-levels')" data-i18n="c2_back_btn">&lsaquo; BACK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- C2: level select -->
   <div id="screen-c2-levels" class="screen">
     <div class="howto-header">
@@ -4153,8 +4255,8 @@ html, body {
         </div>
       </div>
 
-      <!-- Ward 2: Don't Breathe (coming soon) -->
-      <div class="level-card locked" id="c2-ward-card-2" onclick="Game.c2WardSoon()">
+      <!-- Ward 2: Don't Breathe -->
+      <div class="level-card" id="c2-ward-card-2" onclick="Game.startC2DontBreathe()">
         <div class="patient-photo">
           <img src="assets/story%202/walking.jpg" alt="Don't Breathe" class="patient-photo-img">
         </div>
@@ -4166,12 +4268,13 @@ html, body {
           <div class="patient-meta-row">CLASS_ID <b>NIGHTMARE_02</b></div>
         </div>
         <div class="patient-actions">
-          <div class="level-card-badge badge-locked" data-i18n="c2_soon">SOON</div>
+          <button class="btn-proceed" onclick="event.stopPropagation();Game.startC2DontBreathe()" data-i18n="c2_ward_play">PLAY</button>
+          <div class="level-card-badge badge-play" id="c2-ward2-badge" data-i18n="play">PLAY</div>
         </div>
       </div>
 
-      <!-- Endless: The Long Night (coming soon) -->
-      <div class="level-card locked" id="c2-ward-card-3" onclick="Game.c2WardSoon()">
+      <!-- Endless: The Long Night -->
+      <div class="level-card" id="c2-ward-card-3" onclick="Game.startC2Runner()">
         <div class="patient-photo">
           <img src="assets/story%202/background.jpg" alt="The Long Night" class="patient-photo-img">
         </div>
@@ -4179,11 +4282,12 @@ html, body {
           <div class="id-card-label">ENDLESS</div>
           <div class="level-card-name" data-i18n="c2_ward3_name">THE LONG NIGHT</div>
           <div class="patient-priority" data-i18n="c2_ward3_desc">Run &middot; Outlast the horde</div>
-          <div class="patient-meta-row">DIFFICULTY <b>&infin;</b></div>
+          <div class="patient-meta-row">BEST <b id="c2-ward3-best">0</b></div>
           <div class="patient-meta-row">CLASS_ID <b>NIGHTMARE_INF</b></div>
         </div>
         <div class="patient-actions">
-          <div class="level-card-badge badge-locked" data-i18n="c2_soon">SOON</div>
+          <button class="btn-proceed" onclick="event.stopPropagation();Game.startC2Runner()" data-i18n="c2_ward_play">PLAY</button>
+          <div class="level-card-badge badge-play" data-i18n="c2_endless">ENDLESS</div>
         </div>
       </div>
     </div>
@@ -4789,6 +4893,19 @@ const I18N = {
     c2cb_hint: 'TAP ON THE BEAT. KEEP HER ALIVE.',
     c2cb_win: 'STABILIZED',
     c2cb_lose: 'SHE FLATLINED',
+    c2db_noise: 'NOISE',
+    c2db_breath: 'BREATH',
+    c2db_hold: 'HOLD TO HOLD YOUR BREATH',
+    c2db_holding: 'HOLDING…  (stay silent)',
+    c2db_breathing: 'BREATHING…  (they hear you)',
+    c2db_gasp: 'GASP! ',
+    c2db_win: 'YOU SURVIVED',
+    c2db_lose: 'IT FOUND YOU',
+    c2run_dist: 'DISTANCE',
+    c2run_best: 'BEST',
+    c2run_hint: 'SWIPE TO DODGE',
+    c2run_over: 'CAUGHT',
+    c2run_score: 'SCORE',
     c2_skip_btn: 'SKIP ›',
     c2_continue_btn: 'CONTINUE ›',
     c2_back_btn: '‹ BACK',
@@ -4962,6 +5079,19 @@ const I18N = {
     c2cb_hint: 'НАЖИМАЙ В РИТМ. УДЕРЖИ ЕЁ.',
     c2cb_win: 'СТАБИЛИЗИРОВАНА',
     c2cb_lose: 'ОНА УГАСЛА',
+    c2db_noise: 'ШУМ',
+    c2db_breath: 'ДЫХАНИЕ',
+    c2db_hold: 'ЗАЖМИ, ЧТОБЫ ЗАДЕРЖАТЬ ДЫХАНИЕ',
+    c2db_holding: 'ЗАДЕРЖКА…  (тихо)',
+    c2db_breathing: 'ДЫШИШЬ…  (они слышат)',
+    c2db_gasp: 'ВДОХ! ',
+    c2db_win: 'ТЫ ВЫЖИЛА',
+    c2db_lose: 'ОНО НАШЛО ТЕБЯ',
+    c2run_dist: 'ДИСТАНЦИЯ',
+    c2run_best: 'РЕКОРД',
+    c2run_hint: 'СВАЙП, ЧТОБЫ УВЕРНУТЬСЯ',
+    c2run_over: 'ПОЙМАЛИ',
+    c2run_score: 'СЧЁТ',
     c2_skip_btn: 'ПРОПУСТИТЬ ›',
     c2_continue_btn: 'ДАЛЬШЕ ›',
     c2_back_btn: '‹ НАЗАД',
@@ -5421,6 +5551,8 @@ const Game = (() => {
     if (name === 'c2-levels') updateC2LevelsUI();
     if (name !== 'game' && gameRunning) stopGame();
     if (name !== 'c2-cb') { try { C2.CodeBlue.stop(); } catch (e) {} }
+    if (name !== 'c2-db') { try { C2.DontBreathe.stop(); } catch (e) {} }
+    if (name !== 'c2-run') { try { C2.Runner.stop(); } catch (e) {} }
 
     // Telegram vertical-swipe collapses the mini app — disable it on
     // any chapter 2 screen (intro/action/game/levels) so the swipe-down
@@ -5748,13 +5880,20 @@ const Game = (() => {
     updateC2LevelsUI();
   };
 
-  // Update Chapter 2 ward cards (badges).
+  // Update Chapter 2 ward cards (badges + endless best).
   function updateC2LevelsUI() {
     const b1 = document.getElementById('c2-ward1-badge');
     if (b1) {
       b1.textContent = state.c2_ward1complete ? tr('complete') : tr('play');
       b1.className = 'level-card-badge ' + (state.c2_ward1complete ? 'badge-complete' : 'badge-play');
     }
+    const b2 = document.getElementById('c2-ward2-badge');
+    if (b2) {
+      b2.textContent = state.c2_ward2complete ? tr('complete') : tr('play');
+      b2.className = 'level-card-badge ' + (state.c2_ward2complete ? 'badge-complete' : 'badge-play');
+    }
+    const best = document.getElementById('c2-ward3-best');
+    if (best) best.textContent = state.c2_ward3best || 0;
   }
 
   // Placeholder for the not-yet-built wards (Don't Breathe, The Long Night).
@@ -5784,6 +5923,54 @@ const Game = (() => {
     const o = document.getElementById('c2cb-end-overlay');
     if (o) o.classList.remove('show');
     startC2CodeBlue();
+  }
+
+  // ---- WARD 2: Don't Breathe (silence survival) ----
+  function startC2DontBreathe() {
+    if (!isDevAccount()) return;
+    showScreen('c2-db');
+    requestAnimationFrame(() => {
+      try { C2.Audio.music('dream'); } catch (e) {}
+      C2.DontBreathe.start(
+        () => {                                  // win
+          try { C2.Audio.music('stop'); } catch (e) {}
+          state.c2_ward2complete = true;
+          Save.save(state);
+          updateC2LevelsUI();
+        },
+        () => { try { C2.Audio.music('stop'); } catch (e) {} }   // lose
+      );
+    });
+  }
+  function restartC2DontBreathe() {
+    const o = document.getElementById('c2db-end-overlay');
+    if (o) o.classList.remove('show');
+    startC2DontBreathe();
+  }
+
+  // ---- ENDLESS: The Long Night (swipe runner) ----
+  function startC2Runner() {
+    if (!isDevAccount()) return;
+    showScreen('c2-run');
+    requestAnimationFrame(() => {
+      try { C2.Audio.music('game'); } catch (e) {}
+      C2.Runner.start(
+        (score) => {                             // game over → record best
+          try { C2.Audio.music('stop'); } catch (e) {}
+          if (score > (state.c2_ward3best || 0)) {
+            state.c2_ward3best = score;
+            Save.save(state);
+            updateC2LevelsUI();
+          }
+        },
+        () => (state.c2_ward3best || 0)          // supply current best to the engine
+      );
+    });
+  }
+  function restartC2Runner() {
+    const o = document.getElementById('c2run-end-overlay');
+    if (o) o.classList.remove('show');
+    startC2Runner();
   }
 
   // Start a Chapter 2 level. Enforces unlock chain.
@@ -7570,6 +7757,10 @@ const Game = (() => {
     startC2Level,
     startC2CodeBlue,
     restartC2CodeBlue,
+    startC2DontBreathe,
+    restartC2DontBreathe,
+    startC2Runner,
+    restartC2Runner,
     c2WardSoon,
     c2RotateCW,
     c2RotateCCW,
@@ -10512,7 +10703,257 @@ const C2 = (() => {
     return { start, stop };
   })();
 
-  return { Audio, Intro, Typing, GlitchTap, Infection, CodeBlue };
+  // ---- WARD 2: DON'T BREATHE (silence survival) ----
+  // Hold to hold your breath (silence); release to breathe. The shambler
+  // advances on NOISE and pauses in silence — but you can't hold forever
+  // (the BREATH meter drains → a forced gasp spikes noise). If a mic is
+  // granted, real-world loudness adds to noise too (scream = it hears you).
+  // Fully playable on hold alone, so desktop / mic-denied just works.
+  const DontBreathe = (() => {
+    let canvas = null, ctx = null, raf = null, running = false, bound = false;
+    let startT = 0, lastFrame = 0;
+    let noise = 0, breath = 100, holding = false, gasping = false, gaspUntil = 0, flashUntil = 0;
+    let dist = 1;            // 1 = far, 0 = at you
+    let onWin = null, onLose = null;
+    let micStream = null, micCtx = null, micAnalyser = null, micData = null, micLevel = 0, micActive = false;
+    const DURATION = 40000, NOISE_THRESH = 30;
+
+    function size() { const r = canvas.getBoundingClientRect(); const dpr = window.devicePixelRatio || 1; canvas.width = r.width * dpr; canvas.height = r.height * dpr; ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.scale(dpr, dpr); }
+    function coverImg(im, w, h) { const iw = im.naturalWidth, ih = im.naturalHeight; if (!iw || !ih) return; const s = Math.max(w / iw, h / ih); ctx.drawImage(im, (w - iw * s) / 2, (h - ih * s) / 2, iw * s, ih * s); }
+    function zspr() { const s = Assets.zombie(); return (s && s.tagName !== 'IMG') ? s : null; }
+    function setBars() {
+      const n = document.getElementById('c2db-noise'); if (n) n.style.width = Math.max(0, Math.min(100, noise)) + '%';
+      const b = document.getElementById('c2db-breath'); if (b) b.style.width = Math.max(0, Math.min(100, breath)) + '%';
+    }
+    function setInstr() {
+      const el = document.getElementById('c2db-instr'); if (!el) return;
+      const key = gasping ? 'c2db_gasp' : (holding ? 'c2db_holding' : 'c2db_breathing');
+      el.textContent = window.tr ? window.tr(key) : key;
+    }
+    async function initMic() {
+      try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+        micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        micCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const src = micCtx.createMediaStreamSource(micStream);
+        micAnalyser = micCtx.createAnalyser(); micAnalyser.fftSize = 256;
+        micData = new Uint8Array(micAnalyser.frequencyBinCount);
+        src.connect(micAnalyser);
+        micActive = true;
+        const ind = document.getElementById('c2db-mic'); if (ind) ind.style.display = '';
+      } catch (e) { micActive = false; }
+    }
+    function readMic() {
+      if (!micActive || !micAnalyser) { micLevel = 0; return; }
+      micAnalyser.getByteTimeDomainData(micData);
+      let sum = 0; for (let i = 0; i < micData.length; i++) { const v = (micData[i] - 128) / 128; sum += v * v; }
+      micLevel = Math.min(1, Math.sqrt(sum / micData.length) * 3.2);
+    }
+    function stopMic() {
+      try { if (micStream) micStream.getTracks().forEach(t => t.stop()); } catch (e) {}
+      try { if (micCtx) micCtx.close(); } catch (e) {}
+      micStream = micCtx = micAnalyser = null; micActive = false; micLevel = 0;
+      const ind = document.getElementById('c2db-mic'); if (ind) ind.style.display = 'none';
+    }
+    function draw(now) {
+      const r = canvas.getBoundingClientRect(); const w = r.width, h = r.height;
+      ctx.fillStyle = '#05040a'; ctx.fillRect(0, 0, w, h);
+      const bg = Assets.img['bg'];
+      if (bg && bg.complete && bg.naturalWidth) { ctx.save(); ctx.globalAlpha = 0.5; coverImg(bg, w, h); ctx.restore(); }
+      ctx.fillStyle = 'rgba(0,0,0,0.45)'; ctx.fillRect(0, 0, w, h);
+      const spr = zspr();
+      const scale = 0.25 + (1 - dist) * 1.7;
+      const zy = h * 0.32 + (1 - dist) * h * 0.16;
+      const sway = Math.sin(now * 0.004) * 8 * (1 - dist);
+      if (spr) {
+        const bw = spr.width || 120, bh = spr.height || 200;
+        const dw = Math.min(w * 0.95, bw * scale * 0.9), dh = dw * (bh / bw);
+        ctx.drawImage(spr, w / 2 - dw / 2 + sway, zy - dh / 2, dw, dh);
+      } else {
+        ctx.fillStyle = '#140810';
+        ctx.beginPath(); ctx.arc(w / 2 + sway, zy, 20 + (1 - dist) * w * 0.5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#ff5070';
+        ctx.fillRect(w / 2 - 18 + sway, zy - 6, 6, 4); ctx.fillRect(w / 2 + 12 + sway, zy - 6, 6, 4);
+      }
+      // flashlight vignette
+      const g = ctx.createRadialGradient(w / 2, h * 0.5, Math.min(w, h) * 0.18, w / 2, h * 0.5, Math.max(w, h) * 0.7);
+      g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,0.85)');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+      if (noise > NOISE_THRESH) { ctx.fillStyle = 'rgba(150,0,25,' + Math.min(0.5, (noise - NOISE_THRESH) / 140) + ')'; ctx.fillRect(0, 0, w, h); }
+      if (now < flashUntil) { ctx.fillStyle = 'rgba(255,40,70,0.3)'; ctx.fillRect(0, 0, w, h); }
+      ctx.fillStyle = 'rgba(0,0,0,0.10)'; for (let y = 0; y < h; y += 3) ctx.fillRect(0, y, w, 1);
+    }
+    function loop(ts) {
+      if (!running) return;
+      const now = ts - startT;
+      const dt = lastFrame ? ts - lastFrame : 16; lastFrame = ts;
+      readMic();
+      if (gasping) {
+        if (now >= gaspUntil) gasping = false;
+        noise = Math.min(100, noise + dt * 0.12);
+        breath = Math.min(100, breath + dt * 0.08);
+      } else if (holding) {
+        breath = Math.max(0, breath - dt * 0.032);
+        noise = Math.max(0, noise - dt * 0.06);
+        if (breath <= 0) { gasping = true; gaspUntil = now + 900; flashUntil = now + 200; try { if (navigator.vibrate) navigator.vibrate(60); } catch (e) {} }
+      } else {
+        breath = Math.min(100, breath + dt * 0.05);
+        noise += (52 - noise) * Math.min(1, dt * 0.004);
+      }
+      if (micActive) noise = Math.min(100, noise + micLevel * dt * 0.16);
+      if (noise > NOISE_THRESH) dist = Math.max(0, dist - dt * (noise - NOISE_THRESH) * 0.0000024);
+      else if (noise < 15) dist = Math.min(1, dist + dt * 0.000006);
+      draw(now); setBars(); setInstr();
+      if (dist <= 0) return finish(false);
+      if (now >= DURATION) return finish(true);
+      raf = requestAnimationFrame(loop);
+    }
+    function finish(won) {
+      running = false; cancelAnimationFrame(raf); raf = null; stopMic();
+      try { won ? (Audio.success && Audio.success()) : (Audio.fail && Audio.fail()); } catch (e) {}
+      const tt = document.getElementById('c2db-end-title');
+      if (tt) tt.textContent = window.tr ? window.tr(won ? 'c2db_win' : 'c2db_lose') : (won ? 'YOU SURVIVED' : 'IT FOUND YOU');
+      const ov = document.getElementById('c2db-end-overlay'); if (ov) ov.classList.add('show');
+      const cb = won ? onWin : onLose; if (cb) cb();
+    }
+    function bindInput() {
+      if (bound) return; bound = true;
+      canvas.addEventListener('pointerdown', (e) => { if (running) { e.preventDefault(); holding = true; } });
+      window.addEventListener('pointerup', () => { holding = false; });
+      window.addEventListener('pointercancel', () => { holding = false; });
+      window.addEventListener('keydown', (e) => { if (running && e.key === ' ') { e.preventDefault(); holding = true; } });
+      window.addEventListener('keyup', (e) => { if (e.key === ' ') holding = false; });
+    }
+    function start(onWinIn, onLoseIn) {
+      canvas = document.getElementById('c2db-canvas'); ctx = canvas.getContext('2d');
+      size(); window.addEventListener('resize', size); bindInput();
+      const ov = document.getElementById('c2db-end-overlay'); if (ov) ov.classList.remove('show');
+      noise = 0; breath = 100; holding = false; gasping = false; dist = 1; flashUntil = 0; lastFrame = 0;
+      onWin = onWinIn; onLose = onLoseIn;
+      setBars(); setInstr();
+      Assets.load(); initMic();
+      running = true; startT = performance.now();
+      raf = requestAnimationFrame(loop);
+    }
+    function stop() { running = false; cancelAnimationFrame(raf); raf = null; stopMic(); holding = false; }
+    return { start, stop };
+  })();
+
+  // ---- ENDLESS: THE LONG NIGHT (swipe runner) ----
+  // Three-lane endless runner: Mai flees down a corridor, swipe (or
+  // arrows / tap a side) to change lanes and dodge shamblers and gurneys.
+  // Distance is the score; speed and spawn rate ramp until she's caught.
+  const Runner = (() => {
+    let canvas = null, ctx = null, raf = null, running = false, bound = false;
+    let startT = 0, lastFrame = 0;
+    let lane = 1, laneX = [0, 0, 0], playerX = 0;
+    let obstacles = [], spawnT = 0, speed = 0.22, distance = 0;
+    let onOver = null, getBest = null, best = 0, player = null;
+    const LANES = 3;
+
+    function computeLanes() { const w = canvas.getBoundingClientRect().width; for (let i = 0; i < LANES; i++) laneX[i] = w * (0.5 + (i - 1) * 0.26); }
+    function size() { const r = canvas.getBoundingClientRect(); const dpr = window.devicePixelRatio || 1; canvas.width = r.width * dpr; canvas.height = r.height * dpr; ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.scale(dpr, dpr); computeLanes(); }
+    function coverImg(im, w, h) { const iw = im.naturalWidth, ih = im.naturalHeight; if (!iw || !ih) return; const s = Math.max(w / iw, h / ih); ctx.drawImage(im, (w - iw * s) / 2, (h - ih * s) / 2, iw * s, ih * s); }
+    function zspr() { const s = Assets.zombie(); return (s && s.tagName !== 'IMG') ? s : null; }
+    function setHud() {
+      const d = document.getElementById('c2run-dist'); if (d) d.textContent = Math.floor(distance);
+      const b = document.getElementById('c2run-best'); if (b) b.textContent = Math.max(best, Math.floor(distance));
+    }
+    function move(dir) {
+      if (!running) return;
+      lane = Math.max(0, Math.min(LANES - 1, lane + dir));
+      try { if (window.Telegram?.WebApp?.HapticFeedback) Telegram.WebApp.HapticFeedback.selectionChanged(); } catch (e) {}
+    }
+    function draw(w, h, py, now) {
+      ctx.fillStyle = '#05040a'; ctx.fillRect(0, 0, w, h);
+      const bg = Assets.img['bg'];
+      if (bg && bg.complete && bg.naturalWidth) { ctx.save(); ctx.globalAlpha = 0.4; coverImg(bg, w, h); ctx.restore(); }
+      ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.fillRect(0, 0, w, h);
+      ctx.strokeStyle = 'rgba(255,80,120,0.12)'; ctx.lineWidth = 2;
+      for (let i = 0; i < LANES; i++) { ctx.beginPath(); ctx.moveTo(laneX[i], 0); ctx.lineTo(laneX[i], h); ctx.stroke(); }
+      const spr = zspr();
+      for (const o of obstacles) {
+        const x = laneX[o.lane];
+        if (o.type === 'zombie' && spr) {
+          const bw = spr.width || 120, bh = spr.height || 200;
+          const dw = Math.min(w * 0.26, 92), dh = dw * (bh / bw);
+          ctx.drawImage(spr, x - dw / 2, o.y - dh / 2, dw, dh);
+        } else {
+          ctx.fillStyle = '#6a7a88'; ctx.fillRect(x - 38, o.y - 13, 76, 26);
+          ctx.fillStyle = '#2a3640'; ctx.fillRect(x - 38, o.y + 5, 76, 6);
+        }
+      }
+      const pw = 64;
+      if (player && player.complete && player.naturalWidth) {
+        const ph = pw * (player.naturalHeight / player.naturalWidth);
+        ctx.drawImage(player, playerX - pw / 2, py - ph * 0.72, pw, ph);
+      } else {
+        ctx.fillStyle = '#ff6a98'; ctx.beginPath(); ctx.arc(playerX, py, 22, 0, Math.PI * 2); ctx.fill();
+      }
+      const g = ctx.createRadialGradient(w / 2, h * 0.62, Math.min(w, h) * 0.32, w / 2, h * 0.62, Math.max(w, h) * 0.7);
+      g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,0.6)');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    }
+    function loop(ts) {
+      if (!running) return;
+      const now = ts - startT;
+      const dt = lastFrame ? ts - lastFrame : 16; lastFrame = ts;
+      const r = canvas.getBoundingClientRect(); const w = r.width, h = r.height, py = h * 0.80;
+      speed = 0.22 + Math.min(0.55, now / 120000);
+      distance += speed * dt * 0.25;
+      spawnT -= dt;
+      if (spawnT <= 0) { obstacles.push({ lane: Math.floor(Math.random() * LANES), y: -60, type: Math.random() < 0.6 ? 'zombie' : 'gurney' }); spawnT = Math.max(420, 1000 - now / 120); }
+      for (const o of obstacles) o.y += speed * dt;
+      playerX += (laneX[lane] - playerX) * Math.min(1, dt * 0.02);
+      for (const o of obstacles) { if (o.lane === lane && Math.abs(o.y - py) < 46) return over(); }
+      obstacles = obstacles.filter(o => o.y < h + 80);
+      draw(w, h, py, now); setHud();
+      raf = requestAnimationFrame(loop);
+    }
+    function over() {
+      running = false; cancelAnimationFrame(raf); raf = null;
+      try { Audio.fail && Audio.fail(); } catch (e) {}
+      try { if (window.Telegram?.WebApp?.HapticFeedback) Telegram.WebApp.HapticFeedback.notificationOccurred('error'); } catch (e) {}
+      const score = Math.floor(distance);
+      const tt = document.getElementById('c2run-end-title'); if (tt) tt.textContent = window.tr ? window.tr('c2run_over') : 'CAUGHT';
+      const sub = document.getElementById('c2run-end-sub');
+      if (sub) sub.textContent = (window.tr ? window.tr('c2run_score') : 'SCORE') + ' ' + score + (score > best ? '  ★' : '');
+      const ov = document.getElementById('c2run-end-overlay'); if (ov) ov.classList.add('show');
+      if (onOver) onOver(score);
+    }
+    function bindInput() {
+      if (bound) return; bound = true;
+      let sx = 0, sy = 0, st = 0;
+      canvas.addEventListener('pointerdown', (e) => { sx = e.clientX; sy = e.clientY; st = performance.now(); });
+      canvas.addEventListener('pointerup', (e) => {
+        const dx = e.clientX - sx, dy = e.clientY - sy, dtp = performance.now() - st;
+        if (Math.abs(dx) > 30 && Math.abs(dx) > Math.abs(dy)) move(dx > 0 ? 1 : -1);
+        else if (dtp < 300 && Math.abs(dx) < 30 && Math.abs(dy) < 30) { const rc = canvas.getBoundingClientRect(); move(e.clientX - rc.left < rc.width / 2 ? -1 : 1); }
+      });
+      window.addEventListener('keydown', (e) => {
+        if (!running) return;
+        if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') { e.preventDefault(); move(-1); }
+        else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') { e.preventDefault(); move(1); }
+      });
+    }
+    function start(onOverIn, getBestIn) {
+      canvas = document.getElementById('c2run-canvas'); ctx = canvas.getContext('2d');
+      size(); window.addEventListener('resize', size); bindInput();
+      if (!player) { player = new Image(); player.src = 'assets/character/new.png'; }
+      Assets.load();
+      const ov = document.getElementById('c2run-end-overlay'); if (ov) ov.classList.remove('show');
+      onOver = onOverIn; getBest = getBestIn; best = getBest ? (getBest() || 0) : 0;
+      lane = 1; computeLanes(); playerX = laneX[1];
+      obstacles = []; spawnT = 700; speed = 0.22; distance = 0; lastFrame = 0;
+      setHud();
+      running = true; startT = performance.now();
+      raf = requestAnimationFrame(loop);
+    }
+    function stop() { running = false; cancelAnimationFrame(raf); raf = null; }
+    return { start, stop };
+  })();
+
+  return { Audio, Intro, Typing, GlitchTap, Infection, CodeBlue, DontBreathe, Runner };
 })();
 window.C2 = C2;
 
