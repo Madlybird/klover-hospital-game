@@ -3883,7 +3883,6 @@ html, body {
         <span class="coin-icon"></span>
         <span id="menu-coins">0</span>
       </div>
-      <button class="ton-btn-small" id="menu-ton-btn" onclick="Game.toggleTonConnect()">CONNECT WALLET</button>
     </div>
 
     <div class="logo-area">
@@ -5285,10 +5284,10 @@ const Game = (() => {
   function updateMenuUI() {
     document.getElementById('menu-coins').textContent = state.coins;
     const btn = document.getElementById('menu-ton-btn');
-    if (walletAddress) {
-      btn.textContent = walletAddress.slice(0,6) + '...' + walletAddress.slice(-4);
-    } else {
-      btn.textContent = tr('connect_wallet');
+    if (btn) {
+      btn.textContent = walletAddress
+        ? walletAddress.slice(0,6) + '...' + walletAddress.slice(-4)
+        : tr('connect_wallet');
     }
   }
 
