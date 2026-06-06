@@ -3675,6 +3675,9 @@ html, body {
 }
 
 /* ---- C2 level select (#screen-c2-levels) ---- */
+/* Blue theme to match the main (chapter 1) interface. */
+#screen-c2-levels { background: var(--color-bg) !important; }
+.c2-story-card .patient-priority { color: var(--color-blue) !important; }
 .c2-levels-grid { gap: 14px; }
 .c2-card {
   background: linear-gradient(135deg, rgba(20,5,30,0.95), rgba(40,10,30,0.92)) !important;
@@ -4011,8 +4014,6 @@ html, body {
     <div class="c2t-stage" id="c2t-stage">
       <canvas id="c2t-canvas"></canvas>
       <div class="c2t-overlay">
-        <div class="c2t-phone" id="c2t-phone">📱</div>
-        <div class="c2t-title" id="c2t-title" data-i18n="c2_tap_title">WAKE UP</div>
         <div class="c2t-bar"><div class="c2t-bar-fill" id="c2t-bar-fill"></div></div>
       </div>
     </div>
@@ -4023,60 +4024,23 @@ html, body {
     <div class="howto-header">
       <button class="btn-back" onclick="Game.showScreen('levels')">&#8592;</button>
       <div class="screen-title" data-i18n="c2_levels_title" style="flex:1">Night Shift</div>
-      <button class="btn-story" onclick="Game.replayC2Intro()" data-i18n="story_btn" title="Replay nightmare">Story</button>
+      <div style="width:40px"></div>
     </div>
-    <div class="patient-subtitle" data-i18n="c2_levels_subtitle">The patients she couldn't save:</div>
-    <div class="levels-grid c2-levels-grid">
-      <div class="level-card c2-card" id="c2-level-card-1" onclick="Game.startC2Level(1)">
+    <div class="patient-subtitle" data-i18n="c2_levels_subtitle">Relive the nightmare:</div>
+    <div class="levels-grid">
+      <div class="level-card c2-story-card" onclick="Game.replayC2Intro()">
         <div class="patient-photo c2-photo">
           <div class="c2-photo-portrait" data-art="m1"></div>
         </div>
         <div class="patient-info">
-          <div class="id-card-label">ID CARD</div>
-          <div class="level-card-name">M-1</div>
-          <div class="patient-priority c2-priority" data-i18n="c2_lvl1_priority">PATIENT ZERO &middot; First to fall</div>
-          <div class="patient-meta-row">DIFFICULTY <b>&bull;</b></div>
-          <div class="patient-meta-row">CLASS_ID <b>NIGHTMARE_01</b></div>
+          <div class="id-card-label" data-i18n="c2_story_file">CASE FILE</div>
+          <div class="level-card-name" data-i18n="c2_story_name">The Nightmare</div>
+          <div class="patient-priority" data-i18n="c2_story_desc">Night Shift &middot; A nightmare you can't wake from</div>
         </div>
         <div class="patient-actions">
-          <button class="btn-proceed c2-btn-proceed" onclick="event.stopPropagation();Game.startC2Level(1)" data-i18n="c2_contain">CONTAIN</button>
-          <div class="level-card-badge c2-badge" id="c2-level-badge-1" data-i18n="play">PLAY</div>
+          <button class="btn-proceed" onclick="event.stopPropagation();Game.replayC2Intro()" data-i18n="c2_story_play">PLAY STORY</button>
         </div>
       </div>
-      <div class="level-card c2-card locked" id="c2-level-card-2" onclick="Game.startC2Level(2)">
-        <div class="patient-photo c2-photo">
-          <div class="c2-photo-portrait" data-art="m2"></div>
-        </div>
-        <div class="patient-info">
-          <div class="id-card-label">ID CARD</div>
-          <div class="level-card-name">M-2</div>
-          <div class="patient-locked-note c2-locked" id="c2-level2-note" data-i18n="c2_lvl2_locked_note">Contain M-1 first</div>
-          <div class="patient-meta-row">DIFFICULTY <b>&bull;&bull;&bull;</b></div>
-          <div class="patient-meta-row">CLASS_ID <b>NIGHTMARE_02</b></div>
-        </div>
-        <div class="patient-actions">
-          <div class="level-card-badge badge-locked c2-badge-locked" id="c2-level-badge-2" data-i18n="locked">&#128274; LOCKED</div>
-        </div>
-      </div>
-      <div class="level-card c2-card locked" id="c2-level-card-3" onclick="Game.startC2Level(3)">
-        <div class="patient-photo c2-photo">
-          <div class="c2-photo-portrait" data-art="m3"></div>
-        </div>
-        <div class="patient-info">
-          <div class="id-card-label">ID CARD</div>
-          <div class="level-card-name">M-3</div>
-          <div class="patient-locked-note c2-locked" id="c2-level3-note" data-i18n="c2_lvl3_locked_note">Contain M-1 and M-2 first</div>
-          <div class="patient-meta-row">DIFFICULTY <b>&infin;</b></div>
-          <div class="patient-meta-row">CLASS_ID <b>NIGHTMARE_INF</b></div>
-        </div>
-        <div class="patient-actions">
-          <div class="level-card-badge badge-locked c2-badge-locked" id="c2-level-badge-3" data-i18n="locked">&#128274; LOCKED</div>
-        </div>
-      </div>
-    </div>
-    <div class="c2-mystery-card" id="c2-mystery-card">
-      <div class="c2-mystery-label" data-i18n="c2_mystery_label">PATIENT FILE &mdash; ???</div>
-      <div class="c2-mystery-body" data-i18n="c2_mystery_body">Found on the registry desk after the nightmare. Name field empty. Coming soon.</div>
     </div>
   </div>
 
@@ -4656,7 +4620,11 @@ const I18N = {
     c2_title: 'Night Shift',
     c2_sub: "A nightmare you can't wake from",
     c2_levels_title: 'Night Shift',
-    c2_levels_subtitle: "The patients she couldn't save:",
+    c2_levels_subtitle: 'Relive the nightmare:',
+    c2_story_file: 'CASE FILE',
+    c2_story_name: 'The Nightmare',
+    c2_story_desc: "Night Shift · A nightmare you can't wake from",
+    c2_story_play: 'PLAY STORY',
     c2_skip_btn: 'SKIP ›',
     c2_continue_btn: 'CONTINUE ›',
     c2_back_btn: '‹ BACK',
@@ -4806,7 +4774,11 @@ const I18N = {
     c2_title: 'Ночная смена',
     c2_sub: 'Кошмар, от которого не проснуться',
     c2_levels_title: 'Ночная смена',
-    c2_levels_subtitle: 'Пациенты, которых она не спасла:',
+    c2_levels_subtitle: 'Переживите кошмар заново:',
+    c2_story_file: 'ДЕЛО',
+    c2_story_name: 'Кошмар',
+    c2_story_desc: 'Ночная смена · Кошмар, от которого не проснуться',
+    c2_story_play: 'СМОТРЕТЬ ИСТОРИЮ',
     c2_skip_btn: 'ПРОПУСТИТЬ ›',
     c2_continue_btn: 'ДАЛЬШЕ ›',
     c2_back_btn: '‹ НАЗАД',
@@ -8606,6 +8578,7 @@ const C2 = (() => {
     let animRaf = null;
     let panelStartT = 0;
     let textEl = null, hintEl = null, clockEl = null;
+    let glitching = false, glitchStart = 0; // brief glitch when leaving the Vi close-up
 
     // Scene drawers — each takes ctx, w, h, t (ms since panel start).
     // Pixel-style: limited palette, no anti-aliasing, blocky shapes.
@@ -9035,11 +9008,45 @@ const C2 = (() => {
       }
     }
 
+    // Same as drawImagePanel, but with a flickering-lamp overlay: brief,
+    // random darkening dips so the slide reads like a failing light.
+    function drawImagePanelFlicker(key, w, h) {
+      drawImagePanel(key, w, h);
+      const r = Math.random();
+      let dark = 0;
+      if (r > 0.90) dark = 0.6;       // hard flick to near-black
+      else if (r > 0.76) dark = 0.28; // soft dip
+      if (dark > 0) {
+        ctx.fillStyle = 'rgba(0,0,0,' + dark + ')';
+        ctx.fillRect(0, 0, w, h);
+      }
+    }
+
+    // Digital glitch: horizontal slice displacement (copied from the
+    // already-rendered canvas) plus a few RGB scanline flashes. Drawn on
+    // top of the current panel while leaving the Vi close-up.
+    function drawGlitch(w, h) {
+      const dpr = window.devicePixelRatio || 1;
+      const bands = 12;
+      for (let i = 0; i < bands; i++) {
+        if (Math.random() < 0.5) {
+          const sy = (i / bands) * h, sh = h / bands;
+          const dx = (Math.random() - 0.5) * w * 0.3;
+          ctx.drawImage(canvas, 0, Math.round(sy * dpr), canvas.width, Math.round(sh * dpr), dx, sy, w, sh);
+        }
+      }
+      const tints = ['rgba(255,0,60,0.18)', 'rgba(0,255,200,0.15)', 'rgba(255,255,255,0.12)'];
+      for (let i = 0; i < 6; i++) {
+        ctx.fillStyle = tints[i % 3];
+        ctx.fillRect(0, Math.random() * h, w, 2 + Math.random() * 6);
+      }
+    }
+
     // Image-based dream slides. 0-4 play before the zombie fight; index 5
     // (wake-up) plays as the epilogue after the shake interlude.
     const PANELS = [
       { scene: (w,h) => drawImagePanel('sleep',   w, h), clock:'03:47', sfx:'breath',   textKey:'c2_p1' },
-      { scene: (w,h) => drawImagePanel('lamp',    w, h), clock:'03:47', sfx:'tickSlow', textKey:'c2_p2' },
+      { scene: (w,h) => drawImagePanelFlicker('lamp', w, h), clock:'03:47', sfx:'tickSlow', textKey:'c2_p2' },
       { scene: (w,h) => drawImagePanel('walking', w, h), clock:'03:47', sfx:'heart',   textKey:'c2_p3' },
       { scene: (w,h) => drawImagePanel('vi',      w, h), clock:'03:47', sfx:'glitch',  textKey:'c2_p4' },
       { scene: (w,h) => drawImagePanel('lab',     w, h), clock:'03:47', sfx:'shamble', textKey:'c2_p5' },
@@ -9062,6 +9069,7 @@ const C2 = (() => {
       ctx.clearRect(0, 0, w, h);
       const p = PANELS[panelIdx];
       if (p) p.scene(w, h, t);
+      if (glitching) drawGlitch(w, h);
     }
 
     function loop(now) {
@@ -9113,6 +9121,7 @@ const C2 = (() => {
       endIdx = endIdxIn;
       onDone = onDoneIn;
       panelStartT = 0;
+      glitching = false;
       showText();
       loop(performance.now());
     }
@@ -9123,9 +9132,17 @@ const C2 = (() => {
       if (!scene || scene.__c2bound) return;
       scene.__c2bound = true;
       scene.addEventListener('click', () => {
-        if (!animRaf) return;
+        if (!animRaf || glitching) return;
         try { Audio.tapHit(); } catch (e) {}
-        next();
+        // Vi close-up (panel idx 3) glitches out before advancing.
+        if (panelIdx === 3) {
+          glitching = true;
+          glitchStart = performance.now();
+          try { if (Audio.glitch) Audio.glitch(); } catch (e) {}
+          setTimeout(() => { glitching = false; next(); }, 420);
+        } else {
+          next();
+        }
       });
     }
 
@@ -9528,7 +9545,7 @@ const C2 = (() => {
   // shakes. It's a pure "shake your phone!" animation — no real motion
   // detection — that auto-advances to the wake-up slide on a timer.
   const GlitchTap = (() => {
-    const DURATION = 7000;
+    const DURATION = 5000;
     let canvas = null, ctx = null, raf = null, running = false;
     let startT = 0, onDone = null;
 
