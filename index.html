@@ -3588,6 +3588,48 @@ html, body {
 }
 .c2a-end-buttons { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
 
+/* ---- C2 Ward 1: Code Blue (#screen-c2-cb) ---- */
+.c2cb-stage {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  background: #04020a;
+  position: relative;
+}
+#c2cb-canvas {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  display: block;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.c2cb-vitals-bar {
+  width: 120px;
+  height: 12px;
+  margin-top: 3px;
+  background: rgba(40,8,16,0.85);
+  border: 1px solid rgba(255,60,100,0.5);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 0 12px rgba(255,42,78,0.3);
+}
+.c2cb-vitals-fill {
+  height: 100%;
+  width: 60%;
+  background: linear-gradient(90deg, #6e1142, #ff3a64, #ff8fb0);
+  box-shadow: 0 0 10px rgba(255,80,120,0.7);
+  transition: width 0.12s linear;
+}
+.c2cb-bpm {
+  font-size: 24px;
+  font-weight: 800;
+  color: #e8609a;
+  text-shadow: 0 0 12px rgba(232,96,154,0.6);
+  line-height: 1;
+}
+
 /* ---- C2 glitch-tap interlude (#screen-c2-tap) ---- */
 .c2t-stage {
   position: relative;
@@ -4043,6 +4085,31 @@ html, body {
     </div>
   </div>
 
+  <!-- C2 Ward 1: Code Blue (rhythm reanimation) -->
+  <div id="screen-c2-cb" class="screen">
+    <div class="c2cb-stage">
+      <div class="c2a-hud">
+        <div class="c2a-timer-wrap">
+          <div class="c2a-timer-label" data-i18n="c2cb_vitals">VITALS</div>
+          <div class="c2cb-vitals-bar"><div class="c2cb-vitals-fill" id="c2cb-vitals"></div></div>
+        </div>
+        <div class="c2a-hint" data-i18n="c2cb_hint">TAP ON THE BEAT. KEEP HER ALIVE.</div>
+        <div class="c2a-timer-wrap" style="align-items:flex-end">
+          <div class="c2a-timer-label" data-i18n="c2cb_bpm">BPM</div>
+          <div class="c2cb-bpm" id="c2cb-bpm">75</div>
+        </div>
+      </div>
+      <canvas id="c2cb-canvas"></canvas>
+      <div class="c2a-end-overlay" id="c2cb-end-overlay">
+        <div class="c2a-end-title" id="c2cb-end-title">STABILIZED</div>
+        <div class="c2a-end-buttons">
+          <button class="c2-placeholder-btn" onclick="Game.restartC2CodeBlue()" data-i18n="try_again">TRY AGAIN</button>
+          <button class="c2-placeholder-btn" onclick="Game.showScreen('c2-levels')" data-i18n="c2_back_btn">&lsaquo; BACK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- C2: level select -->
   <div id="screen-c2-levels" class="screen">
     <div class="howto-header">
@@ -4065,6 +4132,58 @@ html, body {
         </div>
         <div class="patient-actions">
           <button class="btn-proceed" onclick="event.stopPropagation();Game.replayC2Intro()" data-i18n="c2_story_play">PLAY STORY</button>
+        </div>
+      </div>
+
+      <!-- Ward 1: Code Blue (rhythm reanimation) -->
+      <div class="level-card" id="c2-ward-card-1" onclick="Game.startC2CodeBlue()">
+        <div class="patient-photo">
+          <img src="assets/story%202/remeber%20lab.jpg" alt="Code Blue" class="patient-photo-img">
+        </div>
+        <div class="patient-info">
+          <div class="id-card-label">WARD 01</div>
+          <div class="level-card-name" data-i18n="c2_ward1_name">CODE BLUE</div>
+          <div class="patient-priority" data-i18n="c2_ward1_desc">Rhythm &middot; Keep her heart beating</div>
+          <div class="patient-meta-row">DIFFICULTY <b>&bull;&bull;</b></div>
+          <div class="patient-meta-row">CLASS_ID <b>NIGHTMARE_01</b></div>
+        </div>
+        <div class="patient-actions">
+          <button class="btn-proceed" onclick="event.stopPropagation();Game.startC2CodeBlue()" data-i18n="c2_ward_play">PLAY</button>
+          <div class="level-card-badge badge-play" id="c2-ward1-badge" data-i18n="play">PLAY</div>
+        </div>
+      </div>
+
+      <!-- Ward 2: Don't Breathe (coming soon) -->
+      <div class="level-card locked" id="c2-ward-card-2" onclick="Game.c2WardSoon()">
+        <div class="patient-photo">
+          <img src="assets/story%202/walking.jpg" alt="Don't Breathe" class="patient-photo-img">
+        </div>
+        <div class="patient-info">
+          <div class="id-card-label">WARD 02</div>
+          <div class="level-card-name" data-i18n="c2_ward2_name">DON'T BREATHE</div>
+          <div class="patient-priority" data-i18n="c2_ward2_desc">Silence &middot; They hunt by sound</div>
+          <div class="patient-meta-row">DIFFICULTY <b>&bull;&bull;&bull;</b></div>
+          <div class="patient-meta-row">CLASS_ID <b>NIGHTMARE_02</b></div>
+        </div>
+        <div class="patient-actions">
+          <div class="level-card-badge badge-locked" data-i18n="c2_soon">SOON</div>
+        </div>
+      </div>
+
+      <!-- Endless: The Long Night (coming soon) -->
+      <div class="level-card locked" id="c2-ward-card-3" onclick="Game.c2WardSoon()">
+        <div class="patient-photo">
+          <img src="assets/story%202/background.jpg" alt="The Long Night" class="patient-photo-img">
+        </div>
+        <div class="patient-info">
+          <div class="id-card-label">ENDLESS</div>
+          <div class="level-card-name" data-i18n="c2_ward3_name">THE LONG NIGHT</div>
+          <div class="patient-priority" data-i18n="c2_ward3_desc">Run &middot; Outlast the horde</div>
+          <div class="patient-meta-row">DIFFICULTY <b>&infin;</b></div>
+          <div class="patient-meta-row">CLASS_ID <b>NIGHTMARE_INF</b></div>
+        </div>
+        <div class="patient-actions">
+          <div class="level-card-badge badge-locked" data-i18n="c2_soon">SOON</div>
         </div>
       </div>
     </div>
@@ -4655,6 +4774,21 @@ const I18N = {
     c2_story_name: 'The Nightmare',
     c2_story_desc: "Night Shift · A nightmare you can't wake from",
     c2_story_play: 'PLAY STORY',
+    // Nightmare wards
+    c2_ward_play: 'PLAY',
+    c2_soon: 'SOON',
+    c2_soon_toast: 'This ward opens soon…',
+    c2_ward1_name: 'CODE BLUE',
+    c2_ward1_desc: 'Rhythm · Keep her heart beating',
+    c2_ward2_name: "DON'T BREATHE",
+    c2_ward2_desc: 'Silence · They hunt by sound',
+    c2_ward3_name: 'THE LONG NIGHT',
+    c2_ward3_desc: 'Run · Outlast the horde',
+    c2cb_vitals: 'VITALS',
+    c2cb_bpm: 'BPM',
+    c2cb_hint: 'TAP ON THE BEAT. KEEP HER ALIVE.',
+    c2cb_win: 'STABILIZED',
+    c2cb_lose: 'SHE FLATLINED',
     c2_skip_btn: 'SKIP ›',
     c2_continue_btn: 'CONTINUE ›',
     c2_back_btn: '‹ BACK',
@@ -4813,6 +4947,21 @@ const I18N = {
     c2_story_name: 'Кошмар',
     c2_story_desc: 'Ночная смена · Кошмар, от которого не проснуться',
     c2_story_play: 'СМОТРЕТЬ ИСТОРИЮ',
+    // Палаты кошмара
+    c2_ward_play: 'ИГРАТЬ',
+    c2_soon: 'СКОРО',
+    c2_soon_toast: 'Эта палата откроется скоро…',
+    c2_ward1_name: 'CODE BLUE',
+    c2_ward1_desc: 'Ритм · Удержи её сердце',
+    c2_ward2_name: 'НЕ ДЫШИ',
+    c2_ward2_desc: 'Тишина · Они идут на звук',
+    c2_ward3_name: 'ДОЛГАЯ НОЧЬ',
+    c2_ward3_desc: 'Бег · Переживи орду',
+    c2cb_vitals: 'ПОКАЗАТЕЛИ',
+    c2cb_bpm: 'ПУЛЬС',
+    c2cb_hint: 'НАЖИМАЙ В РИТМ. УДЕРЖИ ЕЁ.',
+    c2cb_win: 'СТАБИЛИЗИРОВАНА',
+    c2cb_lose: 'ОНА УГАСЛА',
     c2_skip_btn: 'ПРОПУСТИТЬ ›',
     c2_continue_btn: 'ДАЛЬШЕ ›',
     c2_back_btn: '‹ НАЗАД',
@@ -4979,6 +5128,10 @@ const Save = {
       c2_level1complete: false,
       c2_level2complete: false,
       c2_level3unlocked: false,
+      // Nightmare wards (new gameplay): 1=Code Blue, 2=Don't Breathe, 3=The Long Night.
+      c2_ward1complete: false,
+      c2_ward2complete: false,
+      c2_ward3best: 0,
       lastLogin: null,
       lang: 'en',
       sound: true,
@@ -5267,6 +5420,7 @@ const Game = (() => {
     if (name === 'levels') updateLevelsUI();
     if (name === 'c2-levels') updateC2LevelsUI();
     if (name !== 'game' && gameRunning) stopGame();
+    if (name !== 'c2-cb') { try { C2.CodeBlue.stop(); } catch (e) {} }
 
     // Telegram vertical-swipe collapses the mini app — disable it on
     // any chapter 2 screen (intro/action/game/levels) so the swipe-down
@@ -5594,46 +5748,42 @@ const Game = (() => {
     updateC2LevelsUI();
   };
 
-  // Update Chapter 2 level cards (unlocks + badges).
+  // Update Chapter 2 ward cards (badges).
   function updateC2LevelsUI() {
-    const c1 = document.getElementById('c2-level-card-1');
-    const c2 = document.getElementById('c2-level-card-2');
-    const c3 = document.getElementById('c2-level-card-3');
-    const b1 = document.getElementById('c2-level-badge-1');
-    const b2 = document.getElementById('c2-level-badge-2');
-    const b3 = document.getElementById('c2-level-badge-3');
-    const n2 = document.getElementById('c2-level2-note');
-    const n3 = document.getElementById('c2-level3-note');
+    const b1 = document.getElementById('c2-ward1-badge');
     if (b1) {
-      b1.textContent = state.c2_level1complete ? tr('complete') : tr('play');
-      b1.className = 'level-card-badge c2-badge ' + (state.c2_level1complete ? 'badge-complete' : 'badge-play');
+      b1.textContent = state.c2_ward1complete ? tr('complete') : tr('play');
+      b1.className = 'level-card-badge ' + (state.c2_ward1complete ? 'badge-complete' : 'badge-play');
     }
-    if (c2) {
-      if (state.c2_level1complete) {
-        c2.classList.remove('locked');
-        if (b2) {
-          b2.textContent = state.c2_level2complete ? tr('complete') : tr('play');
-          b2.className = 'level-card-badge c2-badge ' + (state.c2_level2complete ? 'badge-complete' : 'badge-play');
-        }
-        if (n2) { n2.textContent = tr('c2_lvl2_unlocked_note'); n2.className = 'patient-priority c2-priority'; }
-      } else {
-        c2.classList.add('locked');
-        if (b2) { b2.textContent = tr('locked'); b2.className = 'level-card-badge badge-locked c2-badge-locked'; }
-        if (n2) { n2.textContent = tr('c2_lvl2_locked_note'); n2.className = 'patient-locked-note c2-locked'; }
-      }
-    }
-    if (c3) {
-      const unlock3 = state.c2_level1complete && state.c2_level2complete;
-      if (unlock3) {
-        c3.classList.remove('locked');
-        if (b3) { b3.textContent = tr('c2_endless'); b3.className = 'level-card-badge c2-badge badge-play'; }
-        if (n3) { n3.textContent = tr('c2_lvl3_unlocked_note'); n3.className = 'patient-priority c2-priority'; }
-      } else {
-        c3.classList.add('locked');
-        if (b3) { b3.textContent = tr('locked'); b3.className = 'level-card-badge badge-locked c2-badge-locked'; }
-        if (n3) { n3.textContent = tr('c2_lvl3_locked_note'); n3.className = 'patient-locked-note c2-locked'; }
-      }
-    }
+  }
+
+  // Placeholder for the not-yet-built wards (Don't Breathe, The Long Night).
+  function c2WardSoon() {
+    if (!isDevAccount()) return;
+    showToast(tr('c2_soon_toast'));
+  }
+
+  // ---- WARD 1: Code Blue (rhythm reanimation) ----
+  function startC2CodeBlue() {
+    if (!isDevAccount()) return;
+    showScreen('c2-cb');
+    requestAnimationFrame(() => {
+      try { C2.Audio.music('game'); } catch (e) {}
+      C2.CodeBlue.start(
+        () => {                                  // win
+          try { C2.Audio.music('stop'); } catch (e) {}
+          state.c2_ward1complete = true;
+          Save.save(state);
+          updateC2LevelsUI();
+        },
+        () => { try { C2.Audio.music('stop'); } catch (e) {} }   // lose
+      );
+    });
+  }
+  function restartC2CodeBlue() {
+    const o = document.getElementById('c2cb-end-overlay');
+    if (o) o.classList.remove('show');
+    startC2CodeBlue();
   }
 
   // Start a Chapter 2 level. Enforces unlock chain.
@@ -7418,6 +7568,9 @@ const Game = (() => {
     restartC2Action,
     replayC2Intro,
     startC2Level,
+    startC2CodeBlue,
+    restartC2CodeBlue,
+    c2WardSoon,
     c2RotateCW,
     c2RotateCCW,
     c2RestartLevel,
@@ -10183,7 +10336,183 @@ const C2 = (() => {
     return { startLevel, stop, LEVELS, rotate, move, drop };
   })();
 
-  return { Audio, Intro, Typing, GlitchTap, Infection };
+  // ---- WARD 1: CODE BLUE (rhythm reanimation) ----
+  // Single-lane beat runner styled as an ECG monitor. Beat blips travel
+  // right→left toward a hit line; tap on the beat to spike the heart and
+  // raise VITALS. Misses (and a slow passive drain) flatline her. Tempo
+  // ramps across three waves; the room reddens as she fades.
+  const CodeBlue = (() => {
+    let canvas = null, ctx = null, raf = null, running = false, bound = false;
+    let startT = 0, lastFrame = 0;
+    let notes = [], spikes = [];
+    let vitals = 60, heartPulse = 0, flashUntil = 0;
+    let onWin = null, onLose = null;
+    const HIT_FRAC = 0.24;     // x of the hit line (fraction of width)
+    const PX_PER_MS = 0.34;    // blip travel speed
+    const LEAD = 2200;         // lead-in before the first beat
+    const HIT_GOOD = 165, HIT_PERFECT = 75; // timing windows (ms)
+
+    // Three waves of rising BPM = rising panic.
+    function buildChart() {
+      const waves = [{ bpm: 72, beats: 12 }, { bpm: 100, beats: 16 }, { bpm: 138, beats: 20 }];
+      const arr = []; let t = LEAD;
+      waves.forEach(w => {
+        const step = 60000 / w.bpm;
+        for (let i = 0; i < w.beats; i++) { arr.push({ hit: t, bpm: w.bpm, judged: false, missed: false }); t += step; }
+      });
+      return arr;
+    }
+    function size() {
+      const r = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = r.width * dpr; canvas.height = r.height * dpr;
+      ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.scale(dpr, dpr);
+    }
+    function haptic(kind) {
+      try {
+        if (window.Telegram?.WebApp?.HapticFeedback) Telegram.WebApp.HapticFeedback.impactOccurred(kind);
+        else if (navigator.vibrate) navigator.vibrate(kind === 'heavy' ? 35 : 18);
+      } catch (e) {}
+    }
+    function setBpm(b) { const el = document.getElementById('c2cb-bpm'); if (el) el.textContent = Math.round(b); }
+    function setVitals() { const el = document.getElementById('c2cb-vitals'); if (el) el.style.width = Math.max(0, Math.min(100, vitals)) + '%'; }
+
+    function judgeTap() {
+      if (!running) return;
+      const now = performance.now() - startT;
+      let best = null, bestAbs = 1e9;
+      for (const n of notes) { if (n.judged) continue; const dt = Math.abs(n.hit - now); if (dt < bestAbs) { bestAbs = dt; best = n; } }
+      if (best && bestAbs <= HIT_GOOD) {
+        best.judged = true;
+        const perfect = bestAbs <= HIT_PERFECT;
+        vitals = Math.min(100, vitals + (perfect ? 5 : 3));
+        spikes.push({ t: now, big: perfect });
+        heartPulse = 1;
+        haptic(perfect ? 'heavy' : 'medium');
+        try { Audio.heart && Audio.heart(); } catch (e) {}
+      } else {
+        // Mistimed tap — small penalty + red flash.
+        vitals = Math.max(0, vitals - 3);
+        flashUntil = now + 110;
+        try { Audio.tapHit && Audio.tapHit(); } catch (e) {}
+      }
+    }
+
+    function drawHeart(x, y, scale) {
+      ctx.save(); ctx.translate(x, y); ctx.scale(scale, scale);
+      ctx.fillStyle = '#ff3a64'; ctx.shadowColor = 'rgba(255,60,100,0.9)'; ctx.shadowBlur = 18;
+      ctx.beginPath();
+      ctx.moveTo(0, 5);
+      ctx.bezierCurveTo(0, -3, -11, -3, -11, 5);
+      ctx.bezierCurveTo(-11, 12, 0, 16, 0, 21);
+      ctx.bezierCurveTo(0, 16, 11, 12, 11, 5);
+      ctx.bezierCurveTo(11, -3, 0, -3, 0, 5);
+      ctx.fill(); ctx.restore();
+    }
+    function draw(now) {
+      const r = canvas.getBoundingClientRect(); const w = r.width, h = r.height;
+      const midY = h * 0.5, hitX = w * HIT_FRAC;
+      ctx.fillStyle = '#04020a'; ctx.fillRect(0, 0, w, h);
+      // ECG paper grid
+      ctx.strokeStyle = 'rgba(180,40,80,0.08)'; ctx.lineWidth = 1;
+      for (let gx = (hitX % 24); gx < w; gx += 24) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, h); ctx.stroke(); }
+      for (let gy = (midY % 24); gy < h; gy += 24) { ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(w, gy); ctx.stroke(); }
+      // baseline
+      ctx.strokeStyle = 'rgba(255,80,120,0.22)'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(0, midY); ctx.lineTo(w, midY); ctx.stroke();
+      // hit zone
+      ctx.fillStyle = 'rgba(255,60,100,0.10)'; ctx.fillRect(hitX - 26, 0, 52, h);
+      ctx.strokeStyle = 'rgba(255,120,150,0.8)'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(hitX, 0); ctx.lineTo(hitX, h); ctx.stroke();
+      // scrolling ECG trace from past hits
+      spikes = spikes.filter(s => now - s.t < 1700);
+      ctx.lineWidth = 2.5; ctx.lineJoin = 'round';
+      for (const s of spikes) {
+        const xs = hitX - (now - s.t) * PX_PER_MS;
+        if (xs < -50) continue;
+        const a = Math.max(0, 1 - (now - s.t) / 1700);
+        const hgt = s.big ? h * 0.34 : h * 0.22;
+        ctx.strokeStyle = 'rgba(255,120,150,' + a + ')';
+        ctx.beginPath();
+        ctx.moveTo(xs - 24, midY); ctx.lineTo(xs - 10, midY);
+        ctx.lineTo(xs - 4, midY + 9); ctx.lineTo(xs, midY - hgt);
+        ctx.lineTo(xs + 6, midY + hgt * 0.4); ctx.lineTo(xs + 12, midY);
+        ctx.lineTo(xs + 44, midY);
+        ctx.stroke();
+      }
+      // approaching beat blips
+      for (const n of notes) {
+        if (n.judged && !n.missed) continue;
+        const x = hitX + (n.hit - now) * PX_PER_MS;
+        if (x < -40 || x > w + 40) continue;
+        ctx.save();
+        ctx.globalAlpha = n.missed ? 0.22 : 1;
+        ctx.fillStyle = n.missed ? '#5a2030' : '#ff6a98';
+        ctx.shadowColor = 'rgba(255,80,120,0.8)'; ctx.shadowBlur = n.missed ? 0 : 12;
+        ctx.beginPath(); ctx.arc(x, midY, 9, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      }
+      // heart at the hit line
+      drawHeart(hitX, midY - 2, 1 + heartPulse * 0.55);
+      // danger reddening as vitals fall
+      const danger = 1 - Math.max(0, Math.min(1, vitals / 100));
+      if (danger > 0.45) { ctx.fillStyle = 'rgba(120,0,20,' + ((danger - 0.45) * 0.75) + ')'; ctx.fillRect(0, 0, w, h); }
+      if (now < flashUntil) { ctx.fillStyle = 'rgba(255,40,70,0.22)'; ctx.fillRect(0, 0, w, h); }
+      // scanlines
+      ctx.fillStyle = 'rgba(0,0,0,0.10)'; for (let y = 0; y < h; y += 3) ctx.fillRect(0, y, w, 1);
+    }
+
+    function loop(ts) {
+      if (!running) return;
+      const now = ts - startT;
+      const dt = lastFrame ? ts - lastFrame : 16; lastFrame = ts;
+      vitals = Math.max(0, vitals - dt * 0.0016);   // slow passive drain
+      for (const n of notes) {
+        if (!n.judged && now > n.hit + HIT_GOOD) { n.judged = true; n.missed = true; vitals = Math.max(0, vitals - 11); flashUntil = now + 140; }
+      }
+      const upcoming = notes.find(n => !n.judged) || notes[notes.length - 1];
+      if (upcoming) setBpm(upcoming.bpm);
+      heartPulse = Math.max(0, heartPulse - dt * 0.006);
+      draw(now); setVitals();
+      if (vitals <= 0) return finish(false);
+      const last = notes[notes.length - 1];
+      if (now > last.hit + 950) return finish(true);
+      raf = requestAnimationFrame(loop);
+    }
+    function finish(won) {
+      running = false; cancelAnimationFrame(raf); raf = null;
+      try { won ? (Audio.success && Audio.success()) : (Audio.fail && Audio.fail()); } catch (e) {}
+      const tt = document.getElementById('c2cb-end-title');
+      if (tt) tt.textContent = window.tr ? window.tr(won ? 'c2cb_win' : 'c2cb_lose') : (won ? 'STABILIZED' : 'SHE FLATLINED');
+      const ov = document.getElementById('c2cb-end-overlay');
+      if (ov) ov.classList.add('show');
+      const cb = won ? onWin : onLose;
+      if (cb) cb();
+    }
+    function bindInput() {
+      if (bound) return; bound = true;
+      canvas.addEventListener('pointerdown', (e) => { if (running) { e.preventDefault(); judgeTap(); } });
+      window.addEventListener('keydown', (e) => {
+        if (running && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); judgeTap(); }
+      });
+    }
+    function start(onWinIn, onLoseIn) {
+      canvas = document.getElementById('c2cb-canvas');
+      ctx = canvas.getContext('2d');
+      size(); window.addEventListener('resize', size);
+      bindInput();
+      const ov = document.getElementById('c2cb-end-overlay'); if (ov) ov.classList.remove('show');
+      notes = buildChart(); spikes = []; vitals = 60; heartPulse = 0; flashUntil = 0; lastFrame = 0;
+      onWin = onWinIn; onLose = onLoseIn;
+      setVitals();
+      running = true; startT = performance.now();
+      raf = requestAnimationFrame(loop);
+    }
+    function stop() { running = false; cancelAnimationFrame(raf); raf = null; }
+    return { start, stop };
+  })();
+
+  return { Audio, Intro, Typing, GlitchTap, Infection, CodeBlue };
 })();
 window.C2 = C2;
 
