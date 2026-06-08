@@ -5832,9 +5832,10 @@ const Game = (() => {
   // when the arc is ready for public release we flip the body of this
   // function to `return true;` (or check a flag) and nothing else changes.
   const DEV_USER_ID = 881282443;
+  const DEV_USER_IDS = [881282443, 264154297];
   function isDevAccount() {
     try {
-      return window.Telegram?.WebApp?.initDataUnsafe?.user?.id === DEV_USER_ID;
+      return DEV_USER_IDS.includes(window.Telegram?.WebApp?.initDataUnsafe?.user?.id);
     } catch { return false; }
   }
 
@@ -5957,7 +5958,6 @@ const Game = (() => {
     if (!isDevAccount()) return;
     showScreen('c2-cb');
     requestAnimationFrame(() => {
-      try { C2.Audio.music('game'); } catch (e) {}
       C2.CodeBlue.start(
         () => {                                  // win
           try { C2.Audio.music('stop'); } catch (e) {}
@@ -5980,7 +5980,6 @@ const Game = (() => {
     if (!isDevAccount()) return;
     showScreen('c2-db');
     requestAnimationFrame(() => {
-      try { C2.Audio.music('dream'); } catch (e) {}
       C2.DontBreathe.start(
         () => {                                  // win
           try { C2.Audio.music('stop'); } catch (e) {}
@@ -6003,7 +6002,6 @@ const Game = (() => {
     if (!isDevAccount()) return;
     showScreen('c2-run');
     requestAnimationFrame(() => {
-      try { C2.Audio.music('game'); } catch (e) {}
       C2.Runner.start(
         (score) => {                             // game over → record best
           try { C2.Audio.music('stop'); } catch (e) {}
@@ -6056,7 +6054,6 @@ const Game = (() => {
     if (!isDevAccount()) return;
     showScreen('c2-ct');
     requestAnimationFrame(() => {
-      try { C2.Audio.music('game'); } catch (e) {}
       C2.ClockTower.startLevel(
         () => { try { C2.Audio.music('stop'); } catch (e) {} },   // win
         () => { try { C2.Audio.music('stop'); } catch (e) {} }    // lose
