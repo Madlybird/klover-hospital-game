@@ -4237,38 +4237,38 @@ html, body {
         </div>
       </div>
 
-      <!-- Ward 1: Code Blue (rhythm reanimation) -->
-      <div class="level-card" id="c2-ward-card-1" onclick="Game.startC2CodeBlue()">
+      <!-- PROTOTYPE A: Dr. Mario (infection puzzle on the pill engine) -->
+      <div class="level-card" id="c2-ward-card-1" onclick="Game.startC2Level(1)">
         <div class="patient-photo">
-          <img src="assets/story%202/remeber%20lab.jpg" alt="Code Blue" class="patient-photo-img">
+          <img src="assets/story%202/remeber%20lab.jpg" alt="Dr. Mario" class="patient-photo-img">
         </div>
         <div class="patient-info">
-          <div class="id-card-label">WARD 01</div>
-          <div class="level-card-name" data-i18n="c2_ward1_name">CODE BLUE</div>
-          <div class="patient-priority" data-i18n="c2_ward1_desc">Rhythm &middot; Keep her heart beating</div>
+          <div class="id-card-label">PROTOTYPE A</div>
+          <div class="level-card-name">DR. MARIO</div>
+          <div class="patient-priority">Infection &middot; Match antidotes onto the virus</div>
           <div class="patient-meta-row">DIFFICULTY <b>&bull;&bull;</b></div>
-          <div class="patient-meta-row">CLASS_ID <b>NIGHTMARE_01</b></div>
+          <div class="patient-meta-row">CLASS_ID <b>PROTO_VIRUS</b></div>
         </div>
         <div class="patient-actions">
-          <button class="btn-proceed" onclick="event.stopPropagation();Game.startC2CodeBlue()" data-i18n="c2_ward_play">PLAY</button>
+          <button class="btn-proceed" onclick="event.stopPropagation();Game.startC2Level(1)">PLAY</button>
           <div class="level-card-badge badge-play" id="c2-ward1-badge" data-i18n="play">PLAY</div>
         </div>
       </div>
 
-      <!-- Ward 2: Don't Breathe -->
-      <div class="level-card" id="c2-ward-card-2" onclick="Game.startC2DontBreathe()">
+      <!-- PROTOTYPE B: Clock Tower (stalker on the pill engine) -->
+      <div class="level-card" id="c2-ward-card-2" onclick="Game.startC2ClockTower()">
         <div class="patient-photo">
-          <img src="assets/story%202/walking.jpg" alt="Don't Breathe" class="patient-photo-img">
+          <img src="assets/story%202/walking.jpg" alt="Clock Tower" class="patient-photo-img">
         </div>
         <div class="patient-info">
-          <div class="id-card-label">WARD 02</div>
-          <div class="level-card-name" data-i18n="c2_ward2_name">DON'T BREATHE</div>
-          <div class="patient-priority" data-i18n="c2_ward2_desc">Silence &middot; They hunt by sound</div>
+          <div class="id-card-label">PROTOTYPE B</div>
+          <div class="level-card-name">CLOCK TOWER</div>
+          <div class="patient-priority">Stalker &middot; Clear combos to scare it back</div>
           <div class="patient-meta-row">DIFFICULTY <b>&bull;&bull;&bull;</b></div>
-          <div class="patient-meta-row">CLASS_ID <b>NIGHTMARE_02</b></div>
+          <div class="patient-meta-row">CLASS_ID <b>PROTO_STALKER</b></div>
         </div>
         <div class="patient-actions">
-          <button class="btn-proceed" onclick="event.stopPropagation();Game.startC2DontBreathe()" data-i18n="c2_ward_play">PLAY</button>
+          <button class="btn-proceed" onclick="event.stopPropagation();Game.startC2ClockTower()">PLAY</button>
           <div class="level-card-badge badge-play" id="c2-ward2-badge" data-i18n="play">PLAY</div>
         </div>
       </div>
@@ -4336,6 +4336,55 @@ html, body {
         <div class="c2g-end-sub" id="c2g-end-sub">Score: 0</div>
         <div class="c2g-end-buttons">
           <button class="c2-placeholder-btn" onclick="Game.c2RestartLevel()" data-i18n="try_again">TRY AGAIN</button>
+          <button class="c2-placeholder-btn" onclick="Game.showScreen('c2-levels')" data-i18n="c2_back_btn">&lsaquo; BACK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- C2 alt prototype: Clock Tower (stalker descends; clears repel it).
+       Reuses the chapter-1 HUD/area/sidebar classes like the infection
+       puzzle, but renders a creeping stalker band instead of infection. -->
+  <div id="screen-c2-ct" class="screen c2-theme">
+    <div class="game-hud">
+      <div class="hud-score">
+        <div class="hud-label" data-i18n="c2_score_label">VITALS</div>
+        <div class="hud-value" id="c2ct-score">0</div>
+      </div>
+      <div class="hud-center">
+        <div class="hud-level-name" id="c2ct-level-name">CLOCK TOWER</div>
+        <div class="hud-target" id="c2ct-target">ESCAPE: 4,000</div>
+        <div class="c2-stat-row">
+          <span class="stat-pill c2-inf-pill">
+            <span class="c2-inf-bar"><span class="c2-inf-fill" id="c2ct-prox"></span></span>
+            <span class="c2-inf-text">DREAD</span>
+          </span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="hud-lives" id="c2ct-lives"></div>
+        <button class="btn-pause" onclick="Game.pauseC2ClockTower()">&#9646;&#9646;</button>
+      </div>
+    </div>
+    <div class="game-area" id="c2ct-area">
+      <canvas id="c2ct-canvas" width="252" height="504"></canvas>
+      <div class="game-sidebar">
+        <div class="next-label" data-i18n="next_dose">NEXT DOSE</div>
+        <canvas id="c2ct-next-canvas" width="60" height="72"></canvas>
+        <div class="combo-display" id="c2ct-combo"></div>
+        <div class="rot-buttons">
+          <button class="rot-btn" onclick="Game.c2ctRotateCCW()" aria-label="Rotate left">&#8634;</button>
+          <button class="rot-btn" onclick="Game.c2ctRotateCW()" aria-label="Rotate right">&#8635;</button>
+        </div>
+        <div class="fact-card"><b>!! FACT</b><span>Clear 4+ to scare the stalker back. Big chains push it further.</span></div>
+      </div>
+    </div>
+    <div class="c2g-end-overlay" id="c2ct-end-overlay">
+      <div class="c2g-end-card">
+        <div class="c2g-end-title" id="c2ct-end-title">ESCAPED</div>
+        <div class="c2g-end-sub" id="c2ct-end-sub">Score: 0</div>
+        <div class="c2g-end-buttons">
+          <button class="c2-placeholder-btn" onclick="Game.c2ctRestart()" data-i18n="try_again">TRY AGAIN</button>
           <button class="c2-placeholder-btn" onclick="Game.showScreen('c2-levels')" data-i18n="c2_back_btn">&lsaquo; BACK</button>
         </div>
       </div>
@@ -5553,6 +5602,7 @@ const Game = (() => {
     if (name !== 'c2-cb') { try { C2.CodeBlue.stop(); } catch (e) {} }
     if (name !== 'c2-db') { try { C2.DontBreathe.stop(); } catch (e) {} }
     if (name !== 'c2-run') { try { C2.Runner.stop(); } catch (e) {} }
+    if (name !== 'c2-ct')  { try { C2.ClockTower.stop(); } catch (e) {} }
 
     // Telegram vertical-swipe collapses the mini app — disable it on
     // any chapter 2 screen (intro/action/game/levels) so the swipe-down
@@ -5999,6 +6049,30 @@ const Game = (() => {
   function pauseC2Game() {
     showScreen('c2-levels');
     try { C2.Infection.stop(); } catch (e) {}
+  }
+
+  // ---- ALT PROTOTYPE: Clock Tower (stalker) ----
+  function startC2ClockTower() {
+    if (!isDevAccount()) return;
+    showScreen('c2-ct');
+    requestAnimationFrame(() => {
+      try { C2.Audio.music('game'); } catch (e) {}
+      C2.ClockTower.startLevel(
+        () => { try { C2.Audio.music('stop'); } catch (e) {} },   // win
+        () => { try { C2.Audio.music('stop'); } catch (e) {} }    // lose
+      );
+    });
+  }
+  function c2ctRotateCW()  { try { C2.ClockTower.rotate(1); }  catch (e) {} }
+  function c2ctRotateCCW() { try { C2.ClockTower.rotate(-1); } catch (e) {} }
+  function c2ctRestart() {
+    const o = document.getElementById('c2ct-end-overlay');
+    if (o) o.classList.remove('show');
+    startC2ClockTower();
+  }
+  function pauseC2ClockTower() {
+    showScreen('c2-levels');
+    try { C2.ClockTower.stop(); } catch (e) {}
   }
 
   // Legacy stub names kept as aliases so the old c2 onclick handlers
@@ -7766,6 +7840,11 @@ const Game = (() => {
     c2RotateCCW,
     c2RestartLevel,
     pauseC2Game,
+    startC2ClockTower,
+    c2ctRotateCW,
+    c2ctRotateCCW,
+    c2ctRestart,
+    pauseC2ClockTower,
     isDevAccount,
   };
 })();
@@ -10527,6 +10606,423 @@ const C2 = (() => {
     return { startLevel, stop, LEVELS, rotate, move, drop };
   })();
 
+  // ============================================================
+  // CLOCK TOWER (alt prototype) — Scissorman/stalker on the pill engine.
+  // Same falling-pair puzzle as Infection, but instead of curing cells you
+  // are being HUNTED: a stalker creeps down the board. Every locked pair
+  // lures it closer; every 4+ clear scares it back, and big chains shove it
+  // far up. If it reaches the floor it grabs you (lose a life). Escape by
+  // reaching the target score before it catches you. Combo = your weapon,
+  // so the player is constantly weighing "build a big chain vs. stay safe".
+  // ============================================================
+  const ClockTower = (() => {
+    const ROWS = 12, COLS = 6;
+    const COLORS = ['red', 'cyan', 'lime', 'amber'];
+    const COLOR_HEX  = { red: '#e8609a', cyan: '#6fd4ff', lime: '#a8e060', amber: '#f0c050' };
+    const COLOR_HEX2 = { red: '#a8345e', cyan: '#3a8cb6', lime: '#5fa030', amber: '#a07c20' };
+
+    const LEVELS = [
+      // descendMs: how often the stalker creeps down one row when idle.
+      // lurePerDrop: rows it gains each time you lock a pair (no clear).
+      // repelPerCombo: rows it is shoved back per chain step on a clear.
+      { id: 1, name: 'CLOCK TOWER', target: 4000, lives: 3, speed: 760, descendMs: 1700, lurePerDrop: 0.55, repelPerCombo: 1.6, startDepth: 2.5 },
+    ];
+
+    let canvas = null, ctx = null;
+    let grid = [];
+    let pair = null, nextPair = null;
+    let running = false, paused = false;
+    let raf = null, lastT = 0;
+    let fallTimer = 0, fallSpeed = 760;
+    let descendTimer = 0;
+    let score = 0, lives = 3, combo = 0;
+    let currentLevel = null;
+    let cellSize = 30;
+    let depth = 0;          // stalker position, 0 (top) .. ROWS (floor = caught)
+    let caughtFlash = 0;    // ms of red flash after a grab
+    let onWin = null, onLose = null;
+
+    function freshGrid() { grid = Array.from({ length: ROWS }, () => Array(COLS).fill(null)); }
+    function spawnPair() {
+      const c1 = COLORS[Math.floor(Math.random() * COLORS.length)];
+      const c2 = COLORS[Math.floor(Math.random() * COLORS.length)];
+      return { x: Math.floor(COLS / 2) - 1, y: 0, c1, c2, rotation: 0 };
+    }
+    function pairCells(p) {
+      const { x, y, rotation } = p;
+      if (rotation === 0) return [{ x, y, c: p.c1 }, { x,     y: y + 1, c: p.c2 }];
+      if (rotation === 1) return [{ x, y, c: p.c1 }, { x: x + 1, y,     c: p.c2 }];
+      if (rotation === 2) return [{ x, y, c: p.c1 }, { x,     y: y - 1, c: p.c2 }];
+      if (rotation === 3) return [{ x, y, c: p.c1 }, { x: x - 1, y,     c: p.c2 }];
+      return [];
+    }
+    function valid(p) {
+      for (const cell of pairCells(p)) {
+        if (cell.x < 0 || cell.x >= COLS || cell.y >= ROWS) return false;
+        if (cell.y >= 0 && grid[cell.y][cell.x] !== null) return false;
+      }
+      return true;
+    }
+    function placePair() {
+      if (!pair) return;
+      for (const cell of pairCells(pair)) {
+        if (cell.y < 0) { pair = null; loseLife(); return; }
+        grid[cell.y][cell.x] = cell.c;
+      }
+      pair = null;
+      gravity();
+      // Locking a pair makes noise — the stalker is lured closer. A clear
+      // immediately afterwards will push it back, so safe play means always
+      // landing pieces INTO a match.
+      depth = Math.min(ROWS, depth + currentLevel.lurePerDrop);
+      resolveMatches();
+    }
+    function gravity() {
+      for (let c = 0; c < COLS; c++) {
+        let write = ROWS - 1;
+        for (let r = ROWS - 1; r >= 0; r--) {
+          if (grid[r][c] !== null) {
+            grid[write][c] = grid[r][c];
+            if (write !== r) grid[r][c] = null;
+            write--;
+          }
+        }
+      }
+    }
+    function neighbors(r, c) {
+      return [[r - 1, c], [r + 1, c], [r, c - 1], [r, c + 1]]
+        .filter(([rr, cc]) => rr >= 0 && rr < ROWS && cc >= 0 && cc < COLS);
+    }
+    function findColorGroup(r, c, color, visited) {
+      const stack = [[r, c]], group = [];
+      while (stack.length) {
+        const [rr, cc] = stack.pop();
+        const k = rr * COLS + cc;
+        if (visited.has(k)) continue;
+        if (grid[rr][cc] !== color) continue;
+        visited.add(k);
+        group.push([rr, cc]);
+        neighbors(rr, cc).forEach(n => stack.push(n));
+      }
+      return group;
+    }
+    function resolveMatches() {
+      const visited = new Set();
+      const toClear = [];
+      let cleared = 0;
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const v = grid[r][c];
+          if (!v) continue;
+          const k = r * COLS + c;
+          if (visited.has(k)) continue;
+          const group = findColorGroup(r, c, v, visited);
+          if (group.length < 4) continue;
+          group.forEach(g => toClear.push(g));
+          cleared += group.length;
+        }
+      }
+      if (toClear.length) {
+        toClear.forEach(([r, c]) => { grid[r][c] = null; });
+        combo++;
+        const pts = cleared * 10 * combo;
+        score += pts;
+        // The clear is loud and bright — it drives the stalker back. Bigger
+        // chains scare it further, so the risk of building a chain pays off.
+        depth = Math.max(0, depth - currentLevel.repelPerCombo * combo);
+        try { Audio.cure(); } catch (e) {}
+        gravity();
+        setTimeout(() => resolveMatches(), 150);
+      } else {
+        combo = 0;
+        if (currentLevel && score >= currentLevel.target) return finish(true);
+        if (!pair) {
+          pair = nextPair || spawnPair();
+          nextPair = spawnPair();
+          updateHUD();
+          if (!valid(pair)) { pair = null; return loseLife(); }
+        }
+      }
+    }
+    function descendStalker() {
+      depth = Math.min(ROWS, depth + 1);
+      try { Audio.spread(); } catch (e) {}
+      if (depth >= ROWS) grab();
+    }
+    function grab() {
+      // The stalker reached the floor — it gets you. Lose a life, knock the
+      // top of the stack loose in the panic, and shove it back up a little.
+      lives--;
+      caughtFlash = 600;
+      try { Audio.hurt(); } catch (e) {}
+      // Knock 2 rows off the top of the tallest columns so you get breathing room.
+      for (let c = 0; c < COLS; c++) {
+        let knocked = 0;
+        for (let r = 0; r < ROWS && knocked < 2; r++) {
+          if (grid[r][c] !== null) { grid[r][c] = null; knocked++; }
+        }
+      }
+      gravity();
+      depth = ROWS * 0.35;
+      updateHUD();
+      if (lives <= 0) return finish(false);
+    }
+    function loseLife() {
+      // Stack overflow (pieces locked above the top) — same penalty as a grab.
+      grab();
+      if (lives > 0) { pair = spawnPair(); nextPair = spawnPair(); }
+    }
+
+    function dropStep() {
+      if (!pair) return;
+      const moved = { ...pair, y: pair.y + 1 };
+      if (valid(moved)) pair = moved; else placePair();
+    }
+    function rotate(dir) {
+      if (!pair) return;
+      const rot = ((pair.rotation + (dir > 0 ? 1 : 3)) % 4 + 4) % 4;
+      const test = { ...pair, rotation: rot };
+      if (valid(test)) { pair = test; return; }
+      const kicks = [[-1, 0], [1, 0], [0, -1]];
+      for (const [dx, dy] of kicks) {
+        const k = { ...pair, rotation: rot, x: pair.x + dx, y: pair.y + dy };
+        if (valid(k)) { pair = k; return; }
+      }
+    }
+    function move(dir) {
+      if (!pair) return;
+      const test = { ...pair, x: pair.x + dir };
+      if (valid(test)) pair = test;
+    }
+    function drop() {
+      if (!pair) return;
+      while (true) {
+        const m = { ...pair, y: pair.y + 1 };
+        if (valid(m)) pair = m; else break;
+      }
+      placePair();
+    }
+
+    function sizeCanvas() {
+      const vw = Math.min(window.innerWidth, 430);
+      const vh = window.innerHeight;
+      const HUD_RESERVE = 130;
+      const availW = vw - 70 - 24;
+      const availH = vh - HUD_RESERVE;
+      cellSize = Math.max(18, Math.floor(Math.min(availW / COLS, availH / ROWS)));
+      canvas.width = cellSize * COLS;
+      canvas.height = cellSize * ROWS;
+      canvas.style.width = canvas.width + 'px';
+      canvas.style.height = canvas.height + 'px';
+    }
+    function drawCell(r, c, v) {
+      const x = c * cellSize, y = r * cellSize;
+      ctx.fillStyle = COLOR_HEX2[v] || '#222';
+      ctx.fillRect(x + 1, y + 1, cellSize - 2, cellSize - 2);
+      ctx.fillStyle = COLOR_HEX[v] || '#888';
+      ctx.fillRect(x + 3, y + 3, cellSize - 6, cellSize - 6);
+      ctx.fillStyle = 'rgba(255,255,255,0.18)';
+      ctx.fillRect(x + 4, y + 4, 4, 2);
+    }
+    function drawStalker() {
+      // A creeping band of darkness with a thin pixel silhouette riding its
+      // lower edge. Sits at row=depth and descends. The closer it is, the
+      // redder and taller the dread gradient over the board.
+      const t = performance.now() * 0.004;
+      const yBand = depth * cellSize;
+      const W = canvas.width;
+      // Dread gradient from the top down to the stalker line.
+      const g = ctx.createLinearGradient(0, 0, 0, Math.max(1, yBand));
+      const intensity = Math.min(1, depth / ROWS);
+      g.addColorStop(0, `rgba(80,0,12,${0.12 + intensity * 0.45})`);
+      g.addColorStop(1, `rgba(120,0,18,${0.02 + intensity * 0.25})`);
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, yBand);
+      // The stalker line itself.
+      const pulse = 0.6 + 0.4 * Math.sin(t * 2);
+      ctx.fillStyle = `rgba(180,10,40,${0.45 + 0.4 * pulse})`;
+      ctx.fillRect(0, yBand - 2, W, 4);
+      // Pixel silhouette (tall, thin, clawed) hanging from the line.
+      const cx = W / 2 + Math.sin(t) * cellSize * 0.6;
+      const s = cellSize;
+      ctx.fillStyle = `rgba(8,0,6,${0.85})`;
+      // head
+      ctx.fillRect(cx - s * 0.22, yBand - s * 0.05, s * 0.44, s * 0.5);
+      // body
+      ctx.fillRect(cx - s * 0.14, yBand + s * 0.4, s * 0.28, s * 0.9);
+      // two long arms / shears
+      ctx.fillRect(cx - s * 0.7, yBand + s * 0.45, s * 0.55, s * 0.12);
+      ctx.fillRect(cx + s * 0.15, yBand + s * 0.45, s * 0.55, s * 0.12);
+      // glowing eyes
+      ctx.fillStyle = `rgba(255,${40 + 80 * pulse | 0},60,${0.7 + 0.3 * pulse})`;
+      ctx.fillRect(cx - s * 0.13, yBand + s * 0.12, s * 0.08, s * 0.08);
+      ctx.fillRect(cx + s * 0.05, yBand + s * 0.12, s * 0.08, s * 0.08);
+    }
+    function render() {
+      ctx.fillStyle = '#0a050d';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = 'rgba(180,30,60,0.08)';
+      for (let r = 0; r <= ROWS; r++) {
+        ctx.beginPath(); ctx.moveTo(0, r * cellSize); ctx.lineTo(canvas.width, r * cellSize); ctx.stroke();
+      }
+      for (let c = 0; c <= COLS; c++) {
+        ctx.beginPath(); ctx.moveTo(c * cellSize, 0); ctx.lineTo(c * cellSize, canvas.height); ctx.stroke();
+      }
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) { if (grid[r][c]) drawCell(r, c, grid[r][c]); }
+      }
+      if (pair) pairCells(pair).forEach(cell => { if (cell.y >= 0) drawCell(cell.y, cell.x, cell.c); });
+      drawStalker();
+      // Red full-screen flash on a grab.
+      if (caughtFlash > 0) {
+        ctx.fillStyle = `rgba(180,0,30,${Math.min(0.5, caughtFlash / 1200)})`;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+    function loop(now) {
+      if (!running) return;
+      const dt = lastT ? now - lastT : 16;
+      lastT = now;
+      if (!paused) {
+        if (caughtFlash > 0) caughtFlash = Math.max(0, caughtFlash - dt);
+        if (pair) {
+          fallTimer += dt;
+          if (fallTimer >= fallSpeed) { fallTimer = 0; dropStep(); }
+        }
+        descendTimer += dt;
+        if (currentLevel && descendTimer >= currentLevel.descendMs) {
+          descendTimer = 0;
+          descendStalker();
+        }
+        render();
+        updateHUD();
+      }
+      raf = requestAnimationFrame(loop);
+    }
+    function updateHUD() {
+      const s = document.getElementById('c2ct-score');
+      const t = document.getElementById('c2ct-target');
+      const liv = document.getElementById('c2ct-lives');
+      const prox = document.getElementById('c2ct-prox');
+      const comboEl = document.getElementById('c2ct-combo');
+      if (s) s.textContent = score.toLocaleString();
+      if (t && currentLevel) t.textContent = 'ESCAPE: ' + currentLevel.target.toLocaleString();
+      if (liv && currentLevel) {
+        liv.innerHTML = '';
+        for (let i = 0; i < currentLevel.lives; i++) {
+          const h = document.createElement('span');
+          h.className = 'heart-icon' + (i >= lives ? ' lost' : '');
+          h.textContent = '♥';
+          liv.appendChild(h);
+        }
+      }
+      if (prox) prox.style.width = Math.min(100, Math.round(depth / ROWS * 100)) + '%';
+      if (comboEl) comboEl.textContent = combo > 1
+        ? (window.tr ? window.tr('chain_label') : 'CHAIN') + ' x' + combo : '';
+      drawNextPair();
+    }
+    function drawNextPair() {
+      const c = document.getElementById('c2ct-next-canvas');
+      if (!c || !nextPair) return;
+      const cx = c.getContext('2d');
+      cx.imageSmoothingEnabled = false;
+      cx.clearRect(0, 0, c.width, c.height);
+      const cs = Math.min(c.width / 2, c.height / 3);
+      const ox = (c.width - cs) / 2;
+      drawCellOn(cx, ox, 0, cs, nextPair.c1);
+      drawCellOn(cx, ox, cs, cs, nextPair.c2);
+    }
+    function drawCellOn(cx, x, y, sz, v) {
+      cx.fillStyle = COLOR_HEX2[v] || '#222';
+      cx.fillRect(x + 1, y + 1, sz - 2, sz - 2);
+      cx.fillStyle = COLOR_HEX[v] || '#888';
+      cx.fillRect(x + 3, y + 3, sz - 6, sz - 6);
+      cx.fillStyle = 'rgba(255,255,255,0.20)';
+      cx.fillRect(x + 4, y + 4, 4, 2);
+    }
+    function finish(won) {
+      running = false;
+      cancelAnimationFrame(raf);
+      raf = null;
+      try { won ? Audio.success() : Audio.fail(); } catch (e) {}
+      if (won) { try { onWin && onWin(); } catch (e) {} }
+      else { try { onLose && onLose(); } catch (e) {} }
+      const overlay = document.getElementById('c2ct-end-overlay');
+      const title = document.getElementById('c2ct-end-title');
+      const sub = document.getElementById('c2ct-end-sub');
+      if (overlay && title && sub) {
+        title.textContent = won ? 'ESCAPED' : 'CAUGHT';
+        sub.textContent = 'Score: ' + score;
+        overlay.classList.add('show');
+      }
+    }
+    function startLevel(winCb, loseCb) {
+      onWin = winCb; onLose = loseCb;
+      currentLevel = LEVELS[0];
+      freshGrid();
+      lives = currentLevel.lives;
+      score = 0; combo = 0;
+      fallSpeed = currentLevel.speed;
+      fallTimer = 0; descendTimer = 0;
+      depth = currentLevel.startDepth;
+      caughtFlash = 0;
+      pair = spawnPair();
+      nextPair = spawnPair();
+      canvas = document.getElementById('c2ct-canvas');
+      ctx = canvas.getContext('2d');
+      sizeCanvas();
+      window.addEventListener('resize', sizeCanvas);
+      const overlay = document.getElementById('c2ct-end-overlay');
+      if (overlay) overlay.classList.remove('show');
+      const nm = document.getElementById('c2ct-level-name');
+      if (nm) nm.textContent = currentLevel.name;
+      running = true; paused = false; lastT = 0;
+      bindControls();
+      updateHUD();
+      raf = requestAnimationFrame(loop);
+    }
+    function bindControls() {
+      if (canvas.__c2ctbound) return;
+      canvas.__c2ctbound = true;
+      let sx = 0, sy = 0, st = 0, lastTap = 0;
+      canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        const t = e.touches[0];
+        sx = t.clientX; sy = t.clientY; st = performance.now();
+      }, { passive: false });
+      canvas.addEventListener('touchmove', (e) => { e.preventDefault(); }, { passive: false });
+      canvas.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        if (!running || paused) return;
+        const tEnd = e.changedTouches[0];
+        const dx = tEnd.clientX - sx, dy = tEnd.clientY - sy;
+        const dt = performance.now() - st;
+        const adx = Math.abs(dx), ady = Math.abs(dy);
+        if (adx < 14 && ady < 14 && dt < 280) {
+          const now = performance.now();
+          if (now - lastTap < 300) drop(); else rotate(1);
+          lastTap = now; return;
+        }
+        if (adx > ady) {
+          const cells = Math.max(1, Math.round(adx / cellSize));
+          for (let i = 0; i < cells; i++) move(dx > 0 ? 1 : -1);
+        } else if (dy > 30) drop();
+        else if (dy < -30) rotate(-1);
+      }, { passive: false });
+      window.addEventListener('keydown', (e) => {
+        if (!running || paused) return;
+        if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' '].includes(e.key)) e.preventDefault();
+        if (e.key === 'ArrowLeft') move(-1);
+        else if (e.key === 'ArrowRight') move(1);
+        else if (e.key === 'ArrowDown') drop();
+        else if (e.key === 'ArrowUp' || e.key === ' ') rotate(1);
+        else if (e.key === 'z' || e.key === 'Z') rotate(-1);
+      });
+    }
+    function stop() { running = false; cancelAnimationFrame(raf); raf = null; }
+    return { startLevel, stop, LEVELS, rotate, move, drop };
+  })();
+
   // ---- WARD 1: CODE BLUE (rhythm reanimation) ----
   // Single-lane beat runner styled as an ECG monitor. Beat blips travel
   // right→left toward a hit line; tap on the beat to spike the heart and
@@ -10953,7 +11449,7 @@ const C2 = (() => {
     return { start, stop };
   })();
 
-  return { Audio, Intro, Typing, GlitchTap, Infection, CodeBlue, DontBreathe, Runner };
+  return { Audio, Intro, Typing, GlitchTap, Infection, ClockTower, CodeBlue, DontBreathe, Runner };
 })();
 window.C2 = C2;
 
