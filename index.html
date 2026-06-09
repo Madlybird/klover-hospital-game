@@ -10797,6 +10797,11 @@ const C2 = (() => {
     // Bomb power-up — same as Chapter 1: start with 1, earn one on a tier-4
     // chain, hold the button to detonate and blast a clutch of random cells.
     let bombs = 1, bombHoldTimer = null, bombHoldActive = false;
+    // Bonus pickup (Chapter 2 only): every 30s a collectible drifts across the
+    // board — tap it to catch it. It's a bomb normally, or a heart when a life
+    // has been lost (catching it refills the life bar).
+    let pickup = null, pickupTimer = 0;
+    const PICKUP_INTERVAL = 30000;
 
     function freshGrid() { grid = Array.from({ length: ROWS }, () => Array(COLS).fill(null)); }
     function spawnPair() {
@@ -11054,6 +11059,7 @@ const C2 = (() => {
       }
       if (pair) pairCells(pair).forEach(cell => { if (cell.y >= 0) drawCell(cell.y, cell.x, cell.c); });
       drawStalker();
+      drawPickup();
       // Red full-screen flash on a grab.
       if (caughtFlash > 0) {
         ctx.fillStyle = `rgba(180,0,30,${Math.min(0.5, caughtFlash / 1200)})`;
@@ -11083,6 +11089,7 @@ const C2 = (() => {
           shambleTimer += dt;
           if (shambleTimer >= 850) { shambleTimer = 0; try { Audio.shamble(); } catch (e) {} }
         }
+        updatePickup(dt);
         render();
         updateHUD();
       }
@@ -11188,6 +11195,67 @@ const C2 = (() => {
       resolveMatches();
       updateHUD();
     }
+    // ---- BONUS PICKUP (Chapter 2 only) ----
+    function spawnPickup() {
+      if (!canvas) return;
+      // Heart if a life has been lost (so it can refill the bar); otherwise a
+      // bonus bomb. Endless (1 life) therefore only ever drops bombs.
+      const missingLife = currentLevel && lives < currentLevel.lives;
+      const r = Math.max(15, cellSize * 0.85);
+      pickup = {
+        x: r + Math.random() * Math.max(1, canvas.width - 2 * r),
+        y: r + 2,
+        vx: (Math.random() < 0.5 ? -1 : 1) * (0.025 + Math.random() * 0.02),
+        vy: 0.045,
+        r,
+        type: missingLife ? 'life' : 'bomb',
+        life: 9000,   // ms on screen before it escapes
+      };
+      try { Audio.tapHit(); } catch (e) {}
+    }
+    function updatePickup(dt) {
+      pickupTimer += dt;
+      if (!pickup && pickupTimer >= PICKUP_INTERVAL) { pickupTimer = 0; spawnPickup(); }
+      if (!pickup) return;
+      pickup.x += pickup.vx * dt;
+      pickup.y += pickup.vy * dt;
+      pickup.life -= dt;
+      const r = pickup.r;
+      if (pickup.x < r) { pickup.x = r; pickup.vx = Math.abs(pickup.vx); }
+      if (pickup.x > canvas.width - r) { pickup.x = canvas.width - r; pickup.vx = -Math.abs(pickup.vx); }
+      if (pickup.y > canvas.height - r) { pickup.y = canvas.height - r; pickup.vy = -Math.abs(pickup.vy); }
+      if (pickup.y < r) { pickup.y = r; pickup.vy = Math.abs(pickup.vy); }
+      if (pickup.life <= 0) pickup = null;
+    }
+    function collectPickup() {
+      if (!pickup) return;
+      if (pickup.type === 'life') {
+        if (currentLevel && lives < currentLevel.lives) { lives++; updateHUD(); }
+        try { Audio.heart(); } catch (e) {}
+      } else {
+        bombs++; updateBombUI();
+        try { Audio.success(); } catch (e) {}
+      }
+      pickup = null;
+    }
+    function drawPickup() {
+      if (!pickup) return;
+      const { x, y, r, type } = pickup;
+      const t = performance.now() * 0.006;
+      const pulse = 0.7 + 0.3 * Math.sin(t * 3);
+      const col = type === 'life' ? '255,80,120' : '255,200,80';
+      ctx.save();
+      const grad = ctx.createRadialGradient(x, y, 1, x, y, r * 1.7);
+      grad.addColorStop(0, `rgba(${col},${0.55 * pulse})`);
+      grad.addColorStop(1, `rgba(${col},0)`);
+      ctx.fillStyle = grad;
+      ctx.beginPath(); ctx.arc(x, y, r * 1.7, 0, Math.PI * 2); ctx.fill();
+      ctx.font = Math.round(r * 1.8) + 'px serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(type === 'life' ? '❤️' : '💣', x, y);
+      ctx.restore();
+    }
     function finish(won) {
       running = false;
       cancelAnimationFrame(raf);
@@ -11213,6 +11281,7 @@ const C2 = (() => {
       score = 0; combo = 0;
       fallSpeed = currentLevel.speed;
       fallTimer = 0; elapsedSec = 0; shambleTimer = 0;
+      pickup = null; pickupTimer = 0;
       depth = currentLevel.startDepth;
       caughtFlash = 0;
       pair = spawnPair();
@@ -11254,6 +11323,12 @@ const C2 = (() => {
         // (so tapping twice rotates twice — no double-tap hard-drop), swipe up
         // rotates CCW, swipe down hard-drops, horizontal swipe moves.
         if (adx < 12 && ady < 12 && dt < 300) {
+          // A tap on a floating pickup catches it instead of rotating.
+          if (pickup) {
+            const rect = canvas.getBoundingClientRect();
+            const tx = tEnd.clientX - rect.left, ty = tEnd.clientY - rect.top;
+            if (Math.hypot(tx - pickup.x, ty - pickup.y) <= pickup.r * 1.5) { collectPickup(); return; }
+          }
           rotate(1); return;
         }
         if (ady > adx && dy < -30) rotate(-1);
