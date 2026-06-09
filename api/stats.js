@@ -9,11 +9,19 @@
 // GET /api/stats?secret=...&user=<tg_id>
 //   returns single-user row.
 
+import crypto from 'node:crypto';
 import { createClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
 const ADMIN_SECRET = process.env.ADMIN_DEBUG_SECRET;
+
+function safeEqual(a, b) {
+  const x = Buffer.from(String(a || ''));
+  const y = Buffer.from(String(b || ''));
+  if (x.length !== y.length) return false;
+  return crypto.timingSafeEqual(x, y);
+}
 
 const sb = SUPABASE_URL && SUPABASE_SERVICE_KEY
   ? createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, { auth: { persistSession: false } })
@@ -49,7 +57,8 @@ export default async function handler(req, res) {
     res.setHeader('Allow', 'GET');
     return res.status(405).json({ error: 'method_not_allowed' });
   }
-  if (!ADMIN_SECRET || (req.query?.secret || '') !== ADMIN_SECRET) {
+  const provided = req.headers['x-admin-secret'] || req.query?.secret || '';
+  if (!ADMIN_SECRET || !safeEqual(provided, ADMIN_SECRET)) {
     return res.status(401).json({ error: 'unauthorized' });
   }
   if (!sb) {

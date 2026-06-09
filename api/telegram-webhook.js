@@ -50,11 +50,16 @@ export default async function handler(req, res) {
     console.error('[webhook] TELEGRAM_BOT_TOKEN missing');
     return res.status(500).json({ error: 'bot_token_missing' });
   }
-  // Optional shared-secret check — set the same value as X-Telegram-Bot-Api-Secret-Token
-  // when you register the webhook via setWebhook.
-  if (WEBHOOK_SECRET) {
-    const got = req.headers['x-telegram-bot-api-secret-token'];
-    if (got !== WEBHOOK_SECRET) return res.status(401).json({ error: 'bad_secret' });
+  // Fail closed: the webhook MUST be protected by a shared secret, otherwise
+  // anyone could POST forged Bot API updates and make the bot message
+  // arbitrary chats. Register it with setWebhook's secret_token set to the
+  // same value as TELEGRAM_WEBHOOK_SECRET.
+  if (!WEBHOOK_SECRET) {
+    console.error('[webhook] TELEGRAM_WEBHOOK_SECRET not set — refusing update (fail closed)');
+    return res.status(500).json({ error: 'webhook_secret_not_configured' });
+  }
+  if (req.headers['x-telegram-bot-api-secret-token'] !== WEBHOOK_SECRET) {
+    return res.status(401).json({ error: 'bad_secret' });
   }
 
   const update = req.body || {};

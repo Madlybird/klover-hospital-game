@@ -2,23 +2,29 @@
 // it can't be abused as an open broadcast tool. Sends a short teaser +
 // a "play" Mini App button (no GIF). Safe to delete after use.
 
+import crypto from 'node:crypto';
+
 export const config = { maxDuration: 60 };
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const PUBLIC_URL = process.env.PUBLIC_URL || '';
 const ADMIN_SECRET = process.env.ADMIN_DEBUG_SECRET || '';
 
+function safeEqual(a, b) {
+  const x = Buffer.from(String(a || ''));
+  const y = Buffer.from(String(b || ''));
+  if (x.length !== y.length) return false;
+  return crypto.timingSafeEqual(x, y);
+}
+
 const PUSH_TEXT = '🩷 Psst. Something new opened at the clinic.';
 
-const RECIPIENTS = [
-  94949077, 1343650209, 7202438438, 2133452507, 1260924167, 5307320541,
-  409155307, 774584443, 732598648, 1771331434, 6818694588, 5693136429,
-  1004645139, 6108347682, 1499301854, 6970579900, 5913860512, 306879508,
-  379330457, 264154297, 614064165, 653553977, 7886533512, 786080766,
-  750416265, 5167327900, 798788289, 1436864216, 876422083, 1936355542,
-  8778600118, 406338059, 6803823540, 956153693, 75244491, 5257747965,
-  5258024367, 881282443, 791036913, 6593483146,
-];
+// Recipient list comes from env (comma-separated Telegram IDs). Never
+// hardcode real user IDs in source — that leaks PII into the repo.
+const RECIPIENTS = (process.env.PUSH_RECIPIENTS || '')
+  .split(',')
+  .map((s) => Number(s.trim()))
+  .filter(Number.isFinite);
 
 async function tg(method, payload) {
   const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/${method}`, {
@@ -43,7 +49,8 @@ export default async function handler(req, res) {
   }
   // Admin-gated: this fires a real broadcast, so require the shared secret.
   // Without it, anyone hitting the URL could spam the recipient list.
-  if (!ADMIN_SECRET || (req.query?.secret || '') !== ADMIN_SECRET) {
+  const provided = req.headers['x-admin-secret'] || req.query?.secret || '';
+  if (!ADMIN_SECRET || !safeEqual(provided, ADMIN_SECRET)) {
     return res.status(401).json({ error: 'unauthorized' });
   }
 
@@ -62,6 +69,9 @@ export default async function handler(req, res) {
   };
 
   const ids = [...new Set(RECIPIENTS)];
+  if (!ids.length) {
+    return res.status(200).json({ ok: true, total: 0, sent: 0, failed: 0, note: 'no recipients configured (set PUSH_RECIPIENTS)' });
+  }
   const results = [];
   let sent = 0;
   let failed = 0;

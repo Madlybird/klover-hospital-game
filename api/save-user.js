@@ -5,6 +5,14 @@ const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
 const REPORT_CHAT_ID = process.env.REPORT_CHAT_ID || '';
+const ADMIN_SECRET = process.env.ADMIN_DEBUG_SECRET || '';
+
+function safeEqual(a, b) {
+  const x = Buffer.from(String(a || ''));
+  const y = Buffer.from(String(b || ''));
+  if (x.length !== y.length) return false;
+  return crypto.timingSafeEqual(x, y);
+}
 
 // Fire-and-forget notify the admin channel that a user opened the app.
 // Called once per session (client already gates with sessionStorage).
@@ -72,6 +80,11 @@ function readBody(req) {
 
 export default async function handler(req, res) {
   if (req.method === 'GET') {
+    // Diagnostics disclose which env vars are configured — admin only.
+    const provided = req.headers['x-admin-secret'] || req.query?.secret || '';
+    if (!ADMIN_SECRET || !safeEqual(provided, ADMIN_SECRET)) {
+      return res.status(200).json({ ok: true });
+    }
     return res.status(200).json({
       ok: true,
       env: {

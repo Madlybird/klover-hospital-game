@@ -83,10 +83,15 @@ export default async function handler(req, res) {
       return res.status(200).json({ user: data, created: false });
     }
 
-    // POST — sync client progress; server keeps the maximum value seen
+    // POST — sync client progress; server keeps the maximum value seen.
+    // NOTE: coins/high_score are still client-supplied — these caps only
+    // bound absurd values. True anti-cheat needs server-authoritative
+    // scoring before any of this can gate real money (see ROADMAP.md).
+    const COINS_MAX = 10_000_000;
+    const HIGH_SCORE_MAX = 10_000_000;
     const body = readBody(req);
-    const clientCoins = Number.isFinite(body.coins) ? Math.max(0, Math.floor(body.coins)) : null;
-    const clientHigh = Number.isFinite(body.highScore) ? Math.max(0, Math.floor(body.highScore)) : null;
+    const clientCoins = Number.isFinite(body.coins) ? Math.min(COINS_MAX, Math.max(0, Math.floor(body.coins))) : null;
+    const clientHigh = Number.isFinite(body.highScore) ? Math.min(HIGH_SCORE_MAX, Math.max(0, Math.floor(body.highScore))) : null;
     const referredBy = Number.isFinite(body.referredBy) ? Math.floor(body.referredBy) : null;
 
     const { data: current } = await supabase

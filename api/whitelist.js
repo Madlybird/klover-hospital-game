@@ -12,11 +12,19 @@
 //   holder lists) and upserts them all with has_access=true.
 //   Run this once after deploying to pre-warm the cache.
 
+import crypto from 'node:crypto';
 import { createClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
 const ADMIN_SECRET = process.env.ADMIN_DEBUG_SECRET;
+
+function safeEqual(a, b) {
+  const x = Buffer.from(String(a || ''));
+  const y = Buffer.from(String(b || ''));
+  if (x.length !== y.length) return false;
+  return crypto.timingSafeEqual(x, y);
+}
 const GOODIES_USERNAME = process.env.GOODIES_USERNAME;
 const GOODIES_PASSWORD = process.env.GOODIES_PASSWORD;
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
@@ -68,7 +76,8 @@ async function fetchHoldersList(endpoint) {
 }
 
 export default async function handler(req, res) {
-  if (!ADMIN_SECRET || (req.query?.secret || '') !== ADMIN_SECRET) {
+  const provided = req.headers['x-admin-secret'] || req.query?.secret || '';
+  if (!ADMIN_SECRET || !safeEqual(provided, ADMIN_SECRET)) {
     return res.status(401).json({ error: 'unauthorized' });
   }
   // sb may be null (Supabase env removed) — POST/notify still work,

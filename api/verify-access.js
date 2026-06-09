@@ -63,6 +63,13 @@ function readBody(req) {
   return {};
 }
 
+function safeEqual(a, b) {
+  const x = Buffer.from(String(a || ''));
+  const y = Buffer.from(String(b || ''));
+  if (x.length !== y.length) return false;
+  return crypto.timingSafeEqual(x, y);
+}
+
 function goodiesAuth() {
   return 'Basic ' + Buffer.from(`${GOODIES_USERNAME}:${GOODIES_PASSWORD}`).toString('base64');
 }
@@ -147,9 +154,10 @@ export default async function handler(req, res) {
   // GET diagnostic (env + optional admin user check)
   if (req.method === 'GET') {
     const adminSecret = process.env.ADMIN_DEBUG_SECRET || '';
-    const secret = (req.query && req.query.secret) || '';
+    const secret = (req.headers['x-admin-secret']) || (req.query && req.query.secret) || '';
+    const isAdmin = !!adminSecret && safeEqual(secret, adminSecret);
     const tg = (req.query && (req.query.tg || req.query.telegramUserId)) || '';
-    if (adminSecret && secret === adminSecret && tg) {
+    if (isAdmin && tg) {
       const attempts = [];
       const drop = await goodiesVerifyDrop(tg, attempts);
       let mai = false, vi = false;
@@ -166,20 +174,24 @@ export default async function handler(req, res) {
         hasAccess, cached, drop: drop.owner, mai, vi, attempts,
       });
     }
-    return res.status(200).json({
-      ok: true,
-      env: {
-        TELEGRAM_BOT_TOKEN: !!BOT_TOKEN,
-        GOODIES_USERNAME:   !!GOODIES_USERNAME,
-        GOODIES_PASSWORD:   !!GOODIES_PASSWORD,
-        TONAPI_KEY:         !!TONAPI_KEY,
-        SUPABASE_URL:       !!SUPABASE_URL,
-        SUPABASE_SERVICE_KEY: !!SUPABASE_SERVICE_KEY,
-        ADMIN_DEBUG_SECRET: !!adminSecret,
-      },
-      dropId: DROP_ID, collections: COLLECTIONS, collectionsTon: COLLECTIONS_TON,
-      build: 'verify-access v6 (supabase has_access cache)',
-    });
+    if (isAdmin) {
+      return res.status(200).json({
+        ok: true,
+        env: {
+          TELEGRAM_BOT_TOKEN: !!BOT_TOKEN,
+          GOODIES_USERNAME:   !!GOODIES_USERNAME,
+          GOODIES_PASSWORD:   !!GOODIES_PASSWORD,
+          TONAPI_KEY:         !!TONAPI_KEY,
+          SUPABASE_URL:       !!SUPABASE_URL,
+          SUPABASE_SERVICE_KEY: !!SUPABASE_SERVICE_KEY,
+          ADMIN_DEBUG_SECRET: !!adminSecret,
+        },
+        dropId: DROP_ID, collections: COLLECTIONS, collectionsTon: COLLECTIONS_TON,
+        build: 'verify-access v6 (supabase has_access cache)',
+      });
+    }
+    // Public callers get only a heartbeat — no env/config disclosure.
+    return res.status(200).json({ ok: true });
   }
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'GET, POST');
@@ -206,12 +218,10 @@ export default async function handler(req, res) {
       attempts.push({ path: 'initData', error: hmacReason });
     }
   }
-  // The id we use for Supabase lookup: prefer HMAC-trusted, else fall
-  // back to the client-claimed one. The cache lookup is read-only and
-  // only returns true if an admin or a previous trusted verify set
-  // has_access — so even with a claimed id the worst a spoofer can do
-  // is unlock for an account that's already a legitimate holder.
-  const lookupTgId = trustedTgId || (Number.isFinite(claimedTgId) ? claimedTgId : null);
+  // SECURITY: only an HMAC-trusted id may pull a cache hit. A client-claimed
+  // id must NEVER grant access — otherwise anyone who knows a whitelisted
+  // user's Telegram ID could pass it as claimedTgId and unlock the app.
+  const lookupTgId = trustedTgId;
 
   // ---- Path 1: Supabase has_access cache (instant) ----
   let cached = null;
