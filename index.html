@@ -4237,57 +4237,55 @@ html, body {
         </div>
       </div>
 
-      <!-- PROTOTYPE A: Dr. Mario (infection puzzle on the pill engine) -->
-      <div class="level-card" id="c2-ward-card-1" onclick="Game.startC2Level(1)">
+      <!-- LEVEL 1: Clock Tower — main Chapter 2 mechanic. Reach 5,000. -->
+      <div class="level-card" id="c2-ct-card-1" onclick="Game.startC2ClockTower(1)">
         <div class="patient-photo">
-          <img src="assets/story%202/remeber%20lab.jpg" alt="Dr. Mario" class="patient-photo-img">
+          <img src="assets/story%202/walking.jpg" alt="Clock Tower I" class="patient-photo-img">
         </div>
         <div class="patient-info">
-          <div class="id-card-label">PROTOTYPE A</div>
-          <div class="level-card-name">DR. MARIO</div>
-          <div class="patient-priority">Infection &middot; Match antidotes onto the virus</div>
+          <div class="id-card-label" data-i18n="c2_story_file">CASE FILE</div>
+          <div class="level-card-name" data-i18n="c2_ct1_name">CLOCK TOWER I</div>
+          <div class="patient-priority" data-i18n="c2_ct1_priority">Stalker &middot; Reach 5,000 to escape</div>
           <div class="patient-meta-row">DIFFICULTY <b>&bull;&bull;</b></div>
-          <div class="patient-meta-row">CLASS_ID <b>PROTO_VIRUS</b></div>
+          <div class="patient-meta-row">KLASS_ID <b>NIGHT_01</b></div>
         </div>
         <div class="patient-actions">
-          <button class="btn-proceed" onclick="event.stopPropagation();Game.startC2Level(1)">PLAY</button>
-          <div class="level-card-badge badge-play" id="c2-ward1-badge" data-i18n="play">PLAY</div>
+          <button class="btn-proceed" onclick="event.stopPropagation();Game.startC2ClockTower(1)" data-i18n="c2_ward_play">PLAY</button>
+          <div class="level-card-badge badge-play" id="c2-ct-badge-1" data-i18n="play">PLAY</div>
         </div>
       </div>
 
-      <!-- PROTOTYPE B: Clock Tower (stalker on the pill engine) -->
-      <div class="level-card" id="c2-ward-card-2" onclick="Game.startC2ClockTower()">
+      <!-- LEVEL 2: Clock Tower — harder, faster. Reach 12,000. Locked. -->
+      <div class="level-card locked" id="c2-ct-card-2" onclick="Game.startC2ClockTower(2)">
         <div class="patient-photo">
-          <img src="assets/story%202/walking.jpg" alt="Clock Tower" class="patient-photo-img">
+          <img src="assets/story%202/remeber%20lab.jpg" alt="Clock Tower II" class="patient-photo-img">
         </div>
         <div class="patient-info">
-          <div class="id-card-label">PROTOTYPE B</div>
-          <div class="level-card-name">CLOCK TOWER</div>
-          <div class="patient-priority">Stalker &middot; Clear combos to scare it back</div>
+          <div class="id-card-label" data-i18n="c2_story_file">CASE FILE</div>
+          <div class="level-card-name" data-i18n="c2_ct2_name">CLOCK TOWER II</div>
+          <div class="patient-locked-note" id="c2-ct-note-2" data-i18n="c2_ct2_locked">Clear Clock Tower I to unlock</div>
           <div class="patient-meta-row">DIFFICULTY <b>&bull;&bull;&bull;</b></div>
-          <div class="patient-meta-row">CLASS_ID <b>PROTO_STALKER</b></div>
+          <div class="patient-meta-row">KLASS_ID <b>NIGHT_02</b></div>
         </div>
         <div class="patient-actions">
-          <button class="btn-proceed" onclick="event.stopPropagation();Game.startC2ClockTower()">PLAY</button>
-          <div class="level-card-badge badge-play" id="c2-ward2-badge" data-i18n="play">PLAY</div>
+          <div class="level-card-badge badge-locked" id="c2-ct-badge-2" data-i18n="locked">&#128274; LOCKED</div>
         </div>
       </div>
 
-      <!-- Endless: The Long Night -->
-      <div class="level-card" id="c2-ward-card-3" onclick="Game.startC2Runner()">
+      <!-- ENDLESS: The Long Night — Clock Tower with no escape. Unlock 1000. -->
+      <div class="level-card locked" id="c2-ct-card-3" onclick="Game.startC2ClockTower(3)">
         <div class="patient-photo">
           <img src="assets/story%202/background.jpg" alt="The Long Night" class="patient-photo-img">
         </div>
         <div class="patient-info">
           <div class="id-card-label">ENDLESS</div>
           <div class="level-card-name" data-i18n="c2_ward3_name">THE LONG NIGHT</div>
-          <div class="patient-priority" data-i18n="c2_ward3_desc">Run &middot; Outlast the horde</div>
-          <div class="patient-meta-row">BEST <b id="c2-ward3-best">0</b></div>
-          <div class="patient-meta-row">CLASS_ID <b>NIGHTMARE_INF</b></div>
+          <div class="patient-locked-note" id="c2-ct-note-3" data-i18n="lvl3_locked_note">Unlock for 1000 &#129689;</div>
+          <div class="patient-meta-row">BEST <b id="c2-ct-best">0</b></div>
+          <div class="patient-meta-row">KLASS_ID <b>NIGHT_INF</b></div>
         </div>
         <div class="patient-actions">
-          <button class="btn-proceed" onclick="event.stopPropagation();Game.startC2Runner()" data-i18n="c2_ward_play">PLAY</button>
-          <div class="level-card-badge badge-play" data-i18n="c2_endless">ENDLESS</div>
+          <div class="level-card-badge badge-locked" id="c2-ct-badge-3" data-i18n="locked">&#128274; LOCKED</div>
         </div>
       </div>
     </div>
@@ -4984,6 +4982,13 @@ const I18N = {
     c2_endless: 'ENDLESS',
     c2_complete_lvl1_first: 'Contain M-1 first!',
     c2_complete_lvl2_first: 'Contain M-2 first!',
+    // Clock Tower level select (Chapter 2 main mechanic)
+    c2_ct1_name: 'CLOCK TOWER I',
+    c2_ct1_priority: 'Stalker · Reach 5,000 to escape',
+    c2_ct2_name: 'CLOCK TOWER II',
+    c2_ct2_priority: 'Stalker · Reach 12,000 to escape',
+    c2_ct2_locked: 'Clear Clock Tower I to unlock',
+    c2_ct3_priority: 'Run · Outlast the stalker — no escape',
     c2_mystery_label: 'PATIENT FILE — ???',
     c2_mystery_body: 'Found on the registry desk after the nightmare. Name field empty. Coming soon.',
     // Infection puzzle HUD
@@ -5170,6 +5175,13 @@ const I18N = {
     c2_endless: 'БЕСКОНЕЧНО',
     c2_complete_lvl1_first: 'Сначала сдержите М-1!',
     c2_complete_lvl2_first: 'Сначала сдержите М-2!',
+    // Выбор уровней «Часовая башня» (основная механика главы 2)
+    c2_ct1_name: 'ЧАСОВАЯ БАШНЯ I',
+    c2_ct1_priority: 'Преследователь · Наберите 5 000, чтобы сбежать',
+    c2_ct2_name: 'ЧАСОВАЯ БАШНЯ II',
+    c2_ct2_priority: 'Преследователь · Наберите 12 000, чтобы сбежать',
+    c2_ct2_locked: 'Пройдите «Часовую башню I», чтобы открыть',
+    c2_ct3_priority: 'Бег · Переживите преследователя — выхода нет',
     c2_mystery_label: 'КАРТА ПАЦИЕНТА — ???',
     c2_mystery_body: 'Найдена на стойке регистратуры после кошмара. Поле имени пустое. Скоро.',
     // HUD заражения
@@ -5311,6 +5323,11 @@ const Save = {
       c2_ward1complete: false,
       c2_ward2complete: false,
       c2_ward3best: 0,
+      // Clock Tower (Chapter 2 main mechanic): L1/L2 completion, endless unlock + best.
+      c2_ct1complete: false,
+      c2_ct2complete: false,
+      c2_ctEndlessUnlocked: false,
+      c2_ctBest: 0,
       lastLogin: null,
       lang: 'en',
       sound: true,
@@ -5933,18 +5950,43 @@ const Game = (() => {
 
   // Update Chapter 2 ward cards (badges + endless best).
   function updateC2LevelsUI() {
-    const b1 = document.getElementById('c2-ward1-badge');
+    // Level 1 — Clock Tower, always available.
+    const b1 = document.getElementById('c2-ct-badge-1');
     if (b1) {
-      b1.textContent = state.c2_ward1complete ? tr('complete') : tr('play');
-      b1.className = 'level-card-badge ' + (state.c2_ward1complete ? 'badge-complete' : 'badge-play');
+      b1.textContent = state.c2_ct1complete ? tr('complete') : tr('play');
+      b1.className = 'level-card-badge ' + (state.c2_ct1complete ? 'badge-complete' : 'badge-play');
     }
-    const b2 = document.getElementById('c2-ward2-badge');
-    if (b2) {
-      b2.textContent = state.c2_ward2complete ? tr('complete') : tr('play');
-      b2.className = 'level-card-badge ' + (state.c2_ward2complete ? 'badge-complete' : 'badge-play');
+    // Level 2 — unlocked once Level 1 is cleared.
+    const card2 = document.getElementById('c2-ct-card-2');
+    const b2 = document.getElementById('c2-ct-badge-2');
+    const n2 = document.getElementById('c2-ct-note-2');
+    if (state.c2_ct1complete) {
+      if (card2) card2.classList.remove('locked');
+      if (b2) {
+        b2.textContent = state.c2_ct2complete ? tr('complete') : tr('play');
+        b2.className = 'level-card-badge ' + (state.c2_ct2complete ? 'badge-complete' : 'badge-play');
+      }
+      if (n2) { n2.textContent = tr('c2_ct2_priority'); n2.className = 'patient-priority'; }
+    } else {
+      if (card2) card2.classList.add('locked');
+      if (b2) { b2.textContent = tr('locked'); b2.className = 'level-card-badge badge-locked'; }
+      if (n2) { n2.textContent = tr('c2_ct2_locked'); n2.className = 'patient-locked-note'; }
     }
-    const best = document.getElementById('c2-ward3-best');
-    if (best) best.textContent = state.c2_ward3best || 0;
+    // Endless — bought for 1,000 coins.
+    const card3 = document.getElementById('c2-ct-card-3');
+    const b3 = document.getElementById('c2-ct-badge-3');
+    const n3 = document.getElementById('c2-ct-note-3');
+    const best = document.getElementById('c2-ct-best');
+    if (best) best.textContent = (state.c2_ctBest || 0).toLocaleString();
+    if (state.c2_ctEndlessUnlocked) {
+      if (card3) card3.classList.remove('locked');
+      if (b3) { b3.textContent = tr('c2_endless'); b3.className = 'level-card-badge badge-play'; }
+      if (n3) { n3.textContent = tr('c2_ct3_priority'); n3.className = 'patient-priority'; }
+    } else {
+      if (card3) card3.classList.add('locked');
+      if (b3) { b3.textContent = tr('locked'); b3.className = 'level-card-badge badge-locked'; }
+      if (n3) { n3.textContent = tr('lvl3_locked_note'); n3.className = 'patient-locked-note'; }
+    }
   }
 
   // Placeholder for the not-yet-built wards (Don't Breathe, The Long Night).
@@ -6049,23 +6091,50 @@ const Game = (() => {
     try { C2.Infection.stop(); } catch (e) {}
   }
 
-  // ---- ALT PROTOTYPE: Clock Tower (stalker) ----
-  function startC2ClockTower() {
+  // ---- CHAPTER 2 MAIN MECHANIC: Clock Tower (stalker) ----
+  // Three levels mirroring Chapter 1: L1 reach 5,000, L2 reach 12,000,
+  // L3 endless (unlocked for 1,000 coins, survive as long as you can).
+  let c2ctCurrentLevel = 1;
+  function startC2ClockTower(levelId) {
     if (!isDevAccount()) return;
+    levelId = levelId || 1;
+    if (levelId === 2 && !state.c2_ct1complete) { showToast(tr('c2_complete_lvl1_first')); return; }
+    if (levelId === 3 && !state.c2_ctEndlessUnlocked) { tryUnlockC2Endless(); return; }
+    c2ctCurrentLevel = levelId;
     showScreen('c2-ct');
     requestAnimationFrame(() => {
       C2.ClockTower.startLevel(
-        () => { try { C2.Audio.music('stop'); } catch (e) {} },   // win
-        () => { try { C2.Audio.music('stop'); } catch (e) {} }    // lose
+        levelId,
+        () => {                                  // win
+          if (levelId === 1) state.c2_ct1complete = true;
+          if (levelId === 2) state.c2_ct2complete = true;
+          Save.save(state);
+          updateC2LevelsUI();
+        },
+        (finalScore) => {                        // lose — record endless best
+          if (levelId === 3 && (finalScore || 0) > (state.c2_ctBest || 0)) {
+            state.c2_ctBest = finalScore;
+            Save.save(state);
+            updateC2LevelsUI();
+          }
+        }
       );
     });
+  }
+  // Endless Clock Tower costs 1,000 coins to unlock (same price/flow as the
+  // Chapter 1 Endless Ward). Reuses the styled confirm modal.
+  function tryUnlockC2Endless() {
+    if (state.c2_ctEndlessUnlocked) { startC2ClockTower(3); return; }
+    if ((state.coins || 0) < 1000) { showToast(tr('not_enough_coins')); return; }
+    pendingEndlessUnlock = 'c2';
+    document.getElementById('overlay-endless-unlock').classList.add('active');
   }
   function c2ctRotateCW()  { try { C2.ClockTower.rotate(1); }  catch (e) {} }
   function c2ctRotateCCW() { try { C2.ClockTower.rotate(-1); } catch (e) {} }
   function c2ctRestart() {
     const o = document.getElementById('c2ct-end-overlay');
     if (o) o.classList.remove('show');
-    startC2ClockTower();
+    startC2ClockTower(c2ctCurrentLevel || 1);
   }
   function pauseC2ClockTower() {
     showScreen('c2-levels');
@@ -6099,7 +6168,11 @@ const Game = (() => {
   // Endless Ward costs 1,000 coins to unlock. Any player with the balance
   // can buy it; the unlock persists in state and syncs. On success we start
   // the level immediately so the spend feels rewarding.
+  // Which endless ward the confirm modal is currently buying: Chapter 1
+  // ('c1') or Chapter 2 Clock Tower ('c2'). Set before opening the modal.
+  let pendingEndlessUnlock = 'c1';
   function tryUnlockEndless() {
+    pendingEndlessUnlock = 'c1';
     if (state.level3unlocked) { startLevel(3); return; }
     if ((state.coins || 0) < 1000) {
       showToast(tr('not_enough_coins'));
@@ -6116,6 +6189,19 @@ const Game = (() => {
 
   function confirmEndlessUnlock() {
     closeEndlessUnlock();
+    if (pendingEndlessUnlock === 'c2') {
+      if (state.c2_ctEndlessUnlocked) { startC2ClockTower(3); return; }
+      if ((state.coins || 0) < 1000) { showToast(tr('not_enough_coins')); return; }
+      state.coins -= 1000;
+      state.c2_ctEndlessUnlocked = true;
+      Save.save(state);
+      updateMenuCoins();
+      pushProgress();
+      updateC2LevelsUI();
+      showToast(tr('endless_unlocked_toast'));
+      startC2ClockTower(3);
+      return;
+    }
     if (state.level3unlocked) { startLevel(3); return; }
     if ((state.coins || 0) < 1000) { showToast(tr('not_enough_coins')); return; }
     state.coins -= 1000;
@@ -8848,6 +8934,11 @@ const C2 = (() => {
       };
     }
     function setMusic(mode) {
+      // Background music is disabled for Chapter 2 — sound effects only.
+      // We still honor 'stop' so any lingering graph is torn down.
+      stopMusic();
+      return;
+      // eslint-disable-next-line no-unreachable
       if (mode === 'stop') { stopMusic(); return; }
       if (!enabled) { musicMode = mode; return; }
       if (musicMode === mode && music) return;
@@ -10619,10 +10710,14 @@ const C2 = (() => {
     const COLOR_HEX2 = { red: '#a8345e', cyan: '#3a8cb6', lime: '#5fa030', amber: '#a07c20' };
 
     const LEVELS = [
-      // descendMs: how often the stalker creeps down one row when idle.
+      // creep:       rows/sec the stalker descends at the START of the level.
+      // creepAccel:  how much that rate grows per second elapsed — the stalker
+      //              speeds up GRADUALLY the longer the nightmare drags on.
       // lurePerDrop: rows it gains each time you lock a pair (no clear).
       // repelPerCombo: rows it is shoved back per chain step on a clear.
-      { id: 1, name: 'CLOCK TOWER', target: 4000, lives: 3, speed: 760, descendMs: 1700, lurePerDrop: 0.55, repelPerCombo: 1.6, startDepth: 2.5 },
+      { id: 1, name: 'CLOCK TOWER I',  target: 5000,     lives: 3, speed: 780, creep: 0.16, creepAccel: 0.010, lurePerDrop: 0.45, repelPerCombo: 1.7, startDepth: 2.0, endless: false },
+      { id: 2, name: 'CLOCK TOWER II', target: 12000,    lives: 2, speed: 560, creep: 0.21, creepAccel: 0.015, lurePerDrop: 0.55, repelPerCombo: 1.6, startDepth: 2.0, endless: false },
+      { id: 3, name: 'THE LONG NIGHT', target: Infinity, lives: 1, speed: 680, creep: 0.24, creepAccel: 0.022, lurePerDrop: 0.65, repelPerCombo: 1.5, startDepth: 2.5, endless: true  },
     ];
 
     let canvas = null, ctx = null;
@@ -10631,7 +10726,8 @@ const C2 = (() => {
     let running = false, paused = false;
     let raf = null, lastT = 0;
     let fallTimer = 0, fallSpeed = 760;
-    let descendTimer = 0;
+    let elapsedSec = 0;     // seconds the level has been running (drives creep accel)
+    let shambleTimer = 0;   // ms accumulator for the ambient footstep SFX
     let score = 0, lives = 3, combo = 0;
     let currentLevel = null;
     let cellSize = 30;
@@ -10741,11 +10837,6 @@ const C2 = (() => {
         }
       }
     }
-    function descendStalker() {
-      depth = Math.min(ROWS, depth + 1);
-      try { Audio.spread(); } catch (e) {}
-      if (depth >= ROWS) grab();
-    }
     function grab() {
       // The stalker reached the floor — it gets you. Lose a life, knock the
       // top of the stack loose in the panic, and shove it back up a little.
@@ -10822,8 +10913,10 @@ const C2 = (() => {
       ctx.fillRect(x + 4, y + 4, 4, 2);
     }
     function drawStalker() {
-      // A creeping band of darkness with a thin pixel silhouette riding its
-      // lower edge. Sits at row=depth and descends. The closer it is, the
+      // A creeping band of darkness with the actual zombie sprite riding its
+      // lower edge — the SAME color-keyed sprite used in the typing fight, so
+      // the stalker matches the rest of the chapter instead of a placeholder
+      // silhouette. Sits at row=depth and descends. The closer it is, the
       // redder and taller the dread gradient over the board.
       const t = performance.now() * 0.004;
       const yBand = depth * cellSize;
@@ -10839,21 +10932,27 @@ const C2 = (() => {
       const pulse = 0.6 + 0.4 * Math.sin(t * 2);
       ctx.fillStyle = `rgba(180,10,40,${0.45 + 0.4 * pulse})`;
       ctx.fillRect(0, yBand - 2, W, 4);
-      // Pixel silhouette (tall, thin, clawed) hanging from the line.
-      const cx = W / 2 + Math.sin(t) * cellSize * 0.6;
-      const s = cellSize;
-      ctx.fillStyle = `rgba(8,0,6,${0.85})`;
-      // head
-      ctx.fillRect(cx - s * 0.22, yBand - s * 0.05, s * 0.44, s * 0.5);
-      // body
-      ctx.fillRect(cx - s * 0.14, yBand + s * 0.4, s * 0.28, s * 0.9);
-      // two long arms / shears
-      ctx.fillRect(cx - s * 0.7, yBand + s * 0.45, s * 0.55, s * 0.12);
-      ctx.fillRect(cx + s * 0.15, yBand + s * 0.45, s * 0.55, s * 0.12);
-      // glowing eyes
-      ctx.fillStyle = `rgba(255,${40 + 80 * pulse | 0},60,${0.7 + 0.3 * pulse})`;
-      ctx.fillRect(cx - s * 0.13, yBand + s * 0.12, s * 0.08, s * 0.08);
-      ctx.fillRect(cx + s * 0.05, yBand + s * 0.12, s * 0.08, s * 0.08);
+      // The zombie sprite, swaying slightly, hanging from the stalker line.
+      const cx = W / 2 + Math.sin(t) * cellSize * 0.55;
+      const spr = Assets.zombie();
+      if (spr && spr.width && spr.height) {
+        const sh = cellSize * 2.7;
+        const sw = sh * (spr.width / spr.height);
+        ctx.save();
+        ctx.imageSmoothingEnabled = false;
+        // Feet straddle the line, body looming above it as it descends.
+        ctx.drawImage(spr, cx - sw / 2, yBand - sh * 0.82, sw, sh);
+        ctx.restore();
+      } else {
+        // Fallback silhouette until the sprite finishes decoding.
+        const s = cellSize;
+        ctx.fillStyle = `rgba(8,0,6,${0.85})`;
+        ctx.fillRect(cx - s * 0.22, yBand - s * 0.05, s * 0.44, s * 0.5);
+        ctx.fillRect(cx - s * 0.14, yBand + s * 0.4, s * 0.28, s * 0.9);
+        ctx.fillStyle = `rgba(255,${40 + 80 * pulse | 0},60,${0.7 + 0.3 * pulse})`;
+        ctx.fillRect(cx - s * 0.13, yBand + s * 0.12, s * 0.08, s * 0.08);
+        ctx.fillRect(cx + s * 0.05, yBand + s * 0.12, s * 0.08, s * 0.08);
+      }
     }
     function render() {
       ctx.fillStyle = '#0a050d';
@@ -10886,10 +10985,18 @@ const C2 = (() => {
           fallTimer += dt;
           if (fallTimer >= fallSpeed) { fallTimer = 0; dropStep(); }
         }
-        descendTimer += dt;
-        if (currentLevel && descendTimer >= currentLevel.descendMs) {
-          descendTimer = 0;
-          descendStalker();
+        // Stalker creeps DOWN continuously and accelerates gradually — no
+        // more sudden full-row jumps. rate = base creep scaled by how long
+        // the nightmare has dragged on. Clears (repel) and locks (lure) still
+        // shove `depth` around on top of this steady creep.
+        if (currentLevel) {
+          elapsedSec += dt / 1000;
+          const rate = currentLevel.creep * (1 + currentLevel.creepAccel * elapsedSec);
+          depth = Math.min(ROWS, depth + rate * (dt / 1000));
+          if (depth >= ROWS) grab();
+          // Ambient shamble footstep so the silent creep still feels alive.
+          shambleTimer += dt;
+          if (shambleTimer >= 850) { shambleTimer = 0; try { Audio.shamble(); } catch (e) {} }
         }
         render();
         updateHUD();
@@ -10903,7 +11010,11 @@ const C2 = (() => {
       const prox = document.getElementById('c2ct-prox');
       const comboEl = document.getElementById('c2ct-combo');
       if (s) s.textContent = score.toLocaleString();
-      if (t && currentLevel) t.textContent = 'ESCAPE: ' + currentLevel.target.toLocaleString();
+      if (t && currentLevel) {
+        t.textContent = currentLevel.endless
+          ? (window.tr ? window.tr('c2_endless_hud') : 'SURVIVE')
+          : 'ESCAPE: ' + currentLevel.target.toLocaleString();
+      }
       if (liv && currentLevel) {
         liv.innerHTML = '';
         for (let i = 0; i < currentLevel.lives; i++) {
@@ -10942,25 +11053,26 @@ const C2 = (() => {
       cancelAnimationFrame(raf);
       raf = null;
       try { won ? Audio.success() : Audio.fail(); } catch (e) {}
-      if (won) { try { onWin && onWin(); } catch (e) {} }
-      else { try { onLose && onLose(); } catch (e) {} }
+      if (won) { try { onWin && onWin(score); } catch (e) {} }
+      else { try { onLose && onLose(score); } catch (e) {} }
       const overlay = document.getElementById('c2ct-end-overlay');
       const title = document.getElementById('c2ct-end-title');
       const sub = document.getElementById('c2ct-end-sub');
       if (overlay && title && sub) {
         title.textContent = won ? 'ESCAPED' : 'CAUGHT';
-        sub.textContent = 'Score: ' + score;
+        sub.textContent = 'Score: ' + score.toLocaleString();
         overlay.classList.add('show');
       }
     }
-    function startLevel(winCb, loseCb) {
+    function startLevel(levelId, winCb, loseCb) {
       onWin = winCb; onLose = loseCb;
-      currentLevel = LEVELS[0];
+      Assets.load();   // ensure the zombie sprite is decoding
+      currentLevel = LEVELS.find(l => l.id === levelId) || LEVELS[0];
       freshGrid();
       lives = currentLevel.lives;
       score = 0; combo = 0;
       fallSpeed = currentLevel.speed;
-      fallTimer = 0; descendTimer = 0;
+      fallTimer = 0; elapsedSec = 0; shambleTimer = 0;
       depth = currentLevel.startDepth;
       caughtFlash = 0;
       pair = spawnPair();
