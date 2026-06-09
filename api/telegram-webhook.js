@@ -50,16 +50,18 @@ export default async function handler(req, res) {
     console.error('[webhook] TELEGRAM_BOT_TOKEN missing');
     return res.status(500).json({ error: 'bot_token_missing' });
   }
-  // Fail closed: the webhook MUST be protected by a shared secret, otherwise
-  // anyone could POST forged Bot API updates and make the bot message
-  // arbitrary chats. Register it with setWebhook's secret_token set to the
-  // same value as TELEGRAM_WEBHOOK_SECRET.
-  if (!WEBHOOK_SECRET) {
-    console.error('[webhook] TELEGRAM_WEBHOOK_SECRET not set — refusing update (fail closed)');
-    return res.status(500).json({ error: 'webhook_secret_not_configured' });
-  }
-  if (req.headers['x-telegram-bot-api-secret-token'] !== WEBHOOK_SECRET) {
-    return res.status(401).json({ error: 'bad_secret' });
+  // Shared-secret check. When TELEGRAM_WEBHOOK_SECRET is set we ENFORCE it
+  // (reject any update without the matching X-Telegram-Bot-Api-Secret-Token) —
+  // this is what closes the forged-update hole. If it's not set we fall back
+  // to open mode and warn loudly, so the bot keeps working out of the box.
+  // To secure it: set TELEGRAM_WEBHOOK_SECRET in Vercel AND re-register with
+  //   setWebhook?...&secret_token=<same value>.
+  if (WEBHOOK_SECRET) {
+    if (req.headers['x-telegram-bot-api-secret-token'] !== WEBHOOK_SECRET) {
+      return res.status(401).json({ error: 'bad_secret' });
+    }
+  } else {
+    console.warn('[webhook] TELEGRAM_WEBHOOK_SECRET not set — running UNAUTHENTICATED. Set it to close the forged-update hole.');
   }
 
   const update = req.body || {};
