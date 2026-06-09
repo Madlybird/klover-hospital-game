@@ -10779,9 +10779,9 @@ const C2 = (() => {
       //              speeds up GRADUALLY the longer the nightmare drags on.
       // lurePerDrop: rows it gains each time you lock a pair (no clear).
       // repelPerCombo: rows it is shoved back per chain step on a clear.
-      { id: 1, name: 'CLOCK TOWER I',  target: 5000,     lives: 3, speed: 780, creep: 0.085, creepAccel: 0.005, lurePerDrop: 0.22, repelPerCombo: 1.9, startDepth: 1.0, endless: false },
-      { id: 2, name: 'CLOCK TOWER II', target: 12000,    lives: 2, speed: 560, creep: 0.12,  creepAccel: 0.008, lurePerDrop: 0.30, repelPerCombo: 1.7, startDepth: 1.2, endless: false },
-      { id: 3, name: 'THE LONG NIGHT', target: Infinity, lives: 1, speed: 680, creep: 0.15,  creepAccel: 0.013, lurePerDrop: 0.40, repelPerCombo: 1.6, startDepth: 1.6, endless: true  },
+      { id: 1, name: 'CLOCK TOWER I',  target: 5000,     lives: 3, speed: 780, creep: 0.100, creepAccel: 0.006, lurePerDrop: 0.22, repelPerCombo: 1.9, startDepth: 1.0, endless: false },
+      { id: 2, name: 'CLOCK TOWER II', target: 12000,    lives: 2, speed: 560, creep: 0.140, creepAccel: 0.009, lurePerDrop: 0.30, repelPerCombo: 1.7, startDepth: 1.2, endless: false },
+      { id: 3, name: 'THE LONG NIGHT', target: Infinity, lives: 1, speed: 680, creep: 0.170, creepAccel: 0.014, lurePerDrop: 0.40, repelPerCombo: 1.6, startDepth: 1.6, endless: true  },
     ];
 
     let canvas = null, ctx = null;
@@ -11090,9 +11090,7 @@ const C2 = (() => {
           const rate = currentLevel.creep * (1 + currentLevel.creepAccel * elapsedSec);
           depth = Math.min(ROWS, depth + rate * (dt / 1000));
           if (depth >= ROWS) grab();
-          // Ambient shamble footstep so the silent creep still feels alive.
-          shambleTimer += dt;
-          if (shambleTimer >= 850) { shambleTimer = 0; try { Audio.shamble(); } catch (e) {} }
+          // (Ambient shamble footstep intentionally muted on the levels.)
         }
         updatePickup(dt);
         render();

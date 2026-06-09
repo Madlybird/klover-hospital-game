@@ -6,6 +6,7 @@ export const config = { maxDuration: 60 };
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const PUBLIC_URL = process.env.PUBLIC_URL || '';
+const ADMIN_SECRET = process.env.ADMIN_DEBUG_SECRET || '';
 
 const PUSH_TEXT = '🩷 Psst. Something new opened at the clinic.';
 
@@ -39,6 +40,11 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 export default async function handler(req, res) {
   if (!BOT_TOKEN) {
     return res.status(200).json({ ok: false, reason: 'bot_token_missing' });
+  }
+  // Admin-gated: this fires a real broadcast, so require the shared secret.
+  // Without it, anyone hitting the URL could spam the recipient list.
+  if (!ADMIN_SECRET || (req.query?.secret || '') !== ADMIN_SECRET) {
+    return res.status(401).json({ error: 'unauthorized' });
   }
 
   // Dry-run probe: lets us confirm the new deploy is live WITHOUT
