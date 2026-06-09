@@ -3767,19 +3767,59 @@ html, body {
 }
 
 /* ---- C2 level select (#screen-c2-levels) ---- */
-/* Light checkered theme — identical to the main chapter-1 levels page. */
+/* Story-2 corridor backdrop (darkened) instead of the light checker, so the
+   nightmare select screen matches the chapter's tone. */
 #screen-c2-levels {
-  background-color: #d8eeff !important;
+  background-color: #060108 !important;
   background-image:
-    linear-gradient(rgba(180,210,240,0.45) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(180,210,240,0.45) 1px, transparent 1px) !important;
-  background-size: 14px 14px !important;
-  color: #1a2a4a !important;
+    linear-gradient(rgba(6,1,8,0.78), rgba(10,2,14,0.88)),
+    url("assets/story 2/background.jpg") !important;
+  background-size: cover, cover !important;
+  background-position: center, center !important;
+  background-repeat: no-repeat, no-repeat !important;
+  color: #f0e0e8 !important;
   padding: 20px;
   align-items: stretch;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
+#screen-c2-levels .screen-title { color: #ffd0e0 !important; }
+#screen-c2-levels .patient-subtitle { color: rgba(255,200,220,0.85) !important; }
+#screen-c2-levels .btn-back { color: #ffd0e0 !important; }
+/* ---- C2 Clock Tower game (#screen-c2-ct) — same corridor backdrop ---- */
+#screen-c2-ct {
+  background-color: #060108 !important;
+  background-image:
+    linear-gradient(rgba(6,1,8,0.62), rgba(10,2,14,0.82)),
+    url("assets/story 2/background.jpg") !important;
+  background-size: cover, cover !important;
+  background-position: center, center !important;
+  background-repeat: no-repeat, no-repeat !important;
+}
+/* Dark horror chrome for the Clock Tower HUD/sidebar (mirrors #screen-c2-game)
+   so it reads on the corridor backdrop instead of the light default theme. */
+#screen-c2-ct .game-hud {
+  background: linear-gradient(180deg, rgba(20,5,25,0.96), rgba(8,3,12,0.94)) !important;
+  border-bottom: 1px solid rgba(180,40,80,0.32) !important;
+}
+#screen-c2-ct .hud-label, #screen-c2-ct .next-label { color: rgba(255,180,200,0.7) !important; }
+#screen-c2-ct .hud-value { color: #e8609a !important; text-shadow: 0 0 10px rgba(232,96,154,0.4); }
+#screen-c2-ct .hud-level-name { color: #fff !important; letter-spacing: 3px; }
+#screen-c2-ct .hud-target { color: #ffaac0 !important; }
+#screen-c2-ct .combo-display { color: #ff8050 !important; }
+#screen-c2-ct #c2ct-canvas {
+  background: #08050d;
+  border: 1px solid rgba(180,40,80,0.30);
+  border-radius: 8px;
+}
+#screen-c2-ct #c2ct-next-canvas {
+  background: rgba(40,10,30,0.30);
+  border: 1px solid rgba(180,40,80,0.35);
+  border-radius: 6px;
+}
+#screen-c2-ct .rot-btn { background: #6e1142; border: 2px solid #421030; color: #fff; }
+#screen-c2-ct .rot-btn:hover { background: #8e1858; }
+#screen-c2-ct .btn-pause { background: rgba(40,10,30,0.6); border-color: rgba(180,40,80,0.4); color: #ffaac0; }
 .c2-levels-grid { gap: 14px; }
 .c2-card {
   background: linear-gradient(135deg, rgba(20,5,30,0.95), rgba(40,10,30,0.92)) !important;
@@ -4374,7 +4414,12 @@ html, body {
           <button class="rot-btn" onclick="Game.c2ctRotateCCW()" aria-label="Rotate left">&#8634;</button>
           <button class="rot-btn" onclick="Game.c2ctRotateCW()" aria-label="Rotate right">&#8635;</button>
         </div>
-        <div class="fact-card"><b>!! FACT</b><span>Clear 4+ to scare the stalker back. Big chains push it further.</span></div>
+        <button id="c2ct-bombButton" class="bomb-btn" aria-label="Hold to use bomb">
+          <span class="bomb-icon" aria-hidden="true"></span>
+          <span class="bomb-label" data-i18n="bomb">BOMB</span>
+          <span class="bomb-count" id="c2ct-bomb-count">x1</span>
+          <span class="bomb-progress" id="c2ct-bomb-progress"></span>
+        </button>
       </div>
     </div>
     <div class="c2g-end-overlay" id="c2ct-end-overlay">
@@ -5561,6 +5606,12 @@ const Game = (() => {
     setupTouchControls();
     setupMaiInteraction();
     setupBombButton();
+    // Expose the pill renderer + equipped-skin palette so Chapter 2 can draw
+    // identical capsules (and honor a purchased skin) without duplicating code.
+    window.SkinKit = {
+      blobs: () => (SKINS.find(s => s.id === state.equippedSkin) || SKINS[0]).blobs,
+      drawPill: drawBlob,
+    };
     checkDailyBonus();
     initTonConnect();
     // Detect referral immediately so it's captured even if the
@@ -10708,6 +10759,9 @@ const C2 = (() => {
     const COLORS = ['red', 'cyan', 'lime', 'amber'];
     const COLOR_HEX  = { red: '#e8609a', cyan: '#6fd4ff', lime: '#a8e060', amber: '#f0c050' };
     const COLOR_HEX2 = { red: '#a8345e', cyan: '#3a8cb6', lime: '#5fa030', amber: '#a07c20' };
+    // Maps each board color onto an index into the equipped skin's pill palette
+    // (SkinKit.blobs()), so the capsules recolor with whatever skin is bought.
+    const COLOR_IDX = { red: 0, cyan: 1, lime: 2, amber: 3 };
 
     const LEVELS = [
       // creep:       rows/sec the stalker descends at the START of the level.
@@ -10734,6 +10788,9 @@ const C2 = (() => {
     let depth = 0;          // stalker position, 0 (top) .. ROWS (floor = caught)
     let caughtFlash = 0;    // ms of red flash after a grab
     let onWin = null, onLose = null;
+    // Bomb power-up — same as Chapter 1: start with 1, earn one on a tier-4
+    // chain, hold the button to detonate and blast a clutch of random cells.
+    let bombs = 1, bombHoldTimer = null, bombHoldActive = false;
 
     function freshGrid() { grid = Array.from({ length: ROWS }, () => Array(COLS).fill(null)); }
     function spawnPair() {
@@ -10818,6 +10875,8 @@ const C2 = (() => {
       if (toClear.length) {
         toClear.forEach(([r, c]) => { grid[r][c] = null; });
         combo++;
+        // Reward a bomb on a tier-4 chain — same trigger as Chapter 1.
+        if (combo === 4) { bombs++; updateBombUI(); try { Audio.success(); } catch (e) {} }
         const pts = cleared * 10 * combo;
         score += pts;
         // The clear is loud and bright — it drives the stalker back. Bigger
@@ -10905,6 +10964,15 @@ const C2 = (() => {
     }
     function drawCell(r, c, v) {
       const x = c * cellSize, y = r * cellSize;
+      // Render the chapter-1 capsule (and honor the equipped pill skin) so the
+      // board matches the rest of the game. Falls back to a flat tile if the
+      // shared renderer isn't available yet.
+      const kit = window.SkinKit;
+      if (kit && kit.drawPill) {
+        const blobs = kit.blobs();
+        kit.drawPill(ctx, x, y, cellSize, cellSize, blobs[COLOR_IDX[v]] || blobs[0]);
+        return;
+      }
       ctx.fillStyle = COLOR_HEX2[v] || '#222';
       ctx.fillRect(x + 1, y + 1, cellSize - 2, cellSize - 2);
       ctx.fillStyle = COLOR_HEX[v] || '#888';
@@ -10936,7 +11004,7 @@ const C2 = (() => {
       const cx = W / 2 + Math.sin(t) * cellSize * 0.55;
       const spr = Assets.zombie();
       if (spr && spr.width && spr.height) {
-        const sh = cellSize * 2.7;
+        const sh = cellSize * 2.25;
         const sw = sh * (spr.width / spr.height);
         ctx.save();
         ctx.imageSmoothingEnabled = false;
@@ -10957,6 +11025,17 @@ const C2 = (() => {
     function render() {
       ctx.fillStyle = '#0a050d';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
+      // Corridor backdrop from the Chapter-2 story art, cover-fit and darkened
+      // so the capsules still pop. Falls back to the flat fill above.
+      const bg = Assets.img && Assets.img.bg;
+      if (bg && bg.complete && bg.naturalWidth) {
+        const s = Math.max(canvas.width / bg.naturalWidth, canvas.height / bg.naturalHeight);
+        const dw = bg.naturalWidth * s, dh = bg.naturalHeight * s;
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(bg, (canvas.width - dw) / 2, (canvas.height - dh) / 2, dw, dh);
+        ctx.fillStyle = 'rgba(6,1,10,0.64)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
       ctx.strokeStyle = 'rgba(180,30,60,0.08)';
       for (let r = 0; r <= ROWS; r++) {
         ctx.beginPath(); ctx.moveTo(0, r * cellSize); ctx.lineTo(canvas.width, r * cellSize); ctx.stroke();
@@ -11041,12 +11120,67 @@ const C2 = (() => {
       drawCellOn(cx, ox, cs, cs, nextPair.c2);
     }
     function drawCellOn(cx, x, y, sz, v) {
+      const kit = window.SkinKit;
+      if (kit && kit.drawPill) {
+        const blobs = kit.blobs();
+        kit.drawPill(cx, x, y, sz, sz, blobs[COLOR_IDX[v]] || blobs[0]);
+        return;
+      }
       cx.fillStyle = COLOR_HEX2[v] || '#222';
       cx.fillRect(x + 1, y + 1, sz - 2, sz - 2);
       cx.fillStyle = COLOR_HEX[v] || '#888';
       cx.fillRect(x + 3, y + 3, sz - 6, sz - 6);
       cx.fillStyle = 'rgba(255,255,255,0.20)';
       cx.fillRect(x + 4, y + 4, 4, 2);
+    }
+    // ---- BOMB power-up (mirrors Chapter 1) ----
+    function updateBombUI() {
+      const btn = document.getElementById('c2ct-bombButton');
+      const cnt = document.getElementById('c2ct-bomb-count');
+      if (!btn) return;
+      if (cnt) cnt.textContent = 'x' + bombs;
+      btn.classList.toggle('empty', bombs <= 0);
+    }
+    function cancelBombHold() {
+      bombHoldActive = false;
+      if (bombHoldTimer) { clearTimeout(bombHoldTimer); bombHoldTimer = null; }
+      const btn = document.getElementById('c2ct-bombButton');
+      if (btn) btn.classList.remove('holding');
+    }
+    function bindBomb() {
+      const btn = document.getElementById('c2ct-bombButton');
+      if (!btn || btn.__c2ctbomb) return;
+      btn.__c2ctbomb = true;
+      const start = (e) => {
+        e.preventDefault();
+        if (bombs <= 0 || !running || paused) return;
+        bombHoldActive = true;
+        btn.classList.add('holding');
+        bombHoldTimer = setTimeout(() => { if (bombHoldActive) activateBomb(); cancelBombHold(); }, 1000);
+      };
+      btn.addEventListener('touchstart', start, { passive: false });
+      btn.addEventListener('mousedown', start);
+      ['touchend', 'touchcancel', 'mouseup', 'mouseleave'].forEach(ev => btn.addEventListener(ev, cancelBombHold));
+    }
+    function activateBomb() {
+      if (bombs <= 0 || !running || paused) return;
+      const filled = [];
+      for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) { if (grid[r][c] !== null) filled.push({ r, c }); }
+      if (!filled.length) return;
+      bombs--; updateBombUI();
+      const count = Math.min(filled.length, 8 + Math.floor(Math.random() * 5));
+      for (let i = filled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [filled[i], filled[j]] = [filled[j], filled[i]];
+      }
+      filled.slice(0, count).forEach(({ r, c }) => { grid[r][c] = null; });
+      try { Audio.glass(); } catch (e) {}
+      // The blast also scares the stalker back a couple of rows.
+      depth = Math.max(0, depth - 2);
+      gravity();
+      combo = 0;
+      resolveMatches();
+      updateHUD();
     }
     function finish(won) {
       running = false;
@@ -11086,7 +11220,10 @@ const C2 = (() => {
       const nm = document.getElementById('c2ct-level-name');
       if (nm) nm.textContent = currentLevel.name;
       running = true; paused = false; lastT = 0;
+      bombs = 1; bombHoldActive = false;
       bindControls();
+      bindBomb();
+      updateBombUI();
       updateHUD();
       raf = requestAnimationFrame(loop);
     }
