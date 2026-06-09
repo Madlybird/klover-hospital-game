@@ -9030,6 +9030,10 @@ const C2 = (() => {
       // Start/stop the procedural background score for a phase.
       // mode: 'dream' | 'game' | 'glitch' | 'wake' | 'stop'.
       music: setMusic,
+      // Piece-action blips (mirror Chapter 1's move/rotate/land feedback).
+      move:   () => tone(440, 0.05, 0.06, 'square'),
+      rotate: () => tone(520, 0.05, 0.06, 'square'),
+      land:   () => tone(200, 0.08, 0.11, 'sawtooth'),
       // Single low heart thump.
       heart: () => {
         const c = getCtx(); if (!c) return;
@@ -10831,6 +10835,7 @@ const C2 = (() => {
         grid[cell.y][cell.x] = cell.c;
       }
       pair = null;
+      try { Audio.land(); } catch (e) {}
       gravity();
       // Locking a pair makes noise — the stalker is lured closer. A clear
       // immediately afterwards will push it back, so safe play means always
@@ -10940,17 +10945,17 @@ const C2 = (() => {
       if (!pair) return;
       const rot = ((pair.rotation + (dir > 0 ? 1 : 3)) % 4 + 4) % 4;
       const test = { ...pair, rotation: rot };
-      if (valid(test)) { pair = test; return; }
+      if (valid(test)) { pair = test; try { Audio.rotate(); } catch (e) {} return; }
       const kicks = [[-1, 0], [1, 0], [0, -1]];
       for (const [dx, dy] of kicks) {
         const k = { ...pair, rotation: rot, x: pair.x + dx, y: pair.y + dy };
-        if (valid(k)) { pair = k; return; }
+        if (valid(k)) { pair = k; try { Audio.rotate(); } catch (e) {} return; }
       }
     }
     function move(dir) {
       if (!pair) return;
       const test = { ...pair, x: pair.x + dir };
-      if (valid(test)) pair = test;
+      if (valid(test)) { pair = test; try { Audio.move(); } catch (e) {} }
     }
     function drop() {
       if (!pair) return;
