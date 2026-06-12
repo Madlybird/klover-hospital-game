@@ -3411,59 +3411,60 @@ html, body {
    the arc ships to all players.
    ============================================================ */
 .c2-entry {
-  display: none; /* toggled to flex by updateLevelsUI() when dev */
+  display: none; /* toggled to flex by updateLevelsUI() when unlocked */
   margin: 18px auto 8px;
   max-width: 360px;
   padding: 14px 18px;
-  background: linear-gradient(135deg, #160520 0%, #2b0a2b 100%);
-  border: 1px solid rgba(180,40,80,0.45);
+  background: linear-gradient(135deg, #ffffff 0%, #fff2f8 100%);
+  border: 2px solid #f3c2da;
   border-radius: 14px;
-  color: #fff;
+  color: #1a2a4a;
   cursor: pointer;
   position: relative;
   overflow: hidden;
   flex-direction: column;
   align-items: flex-start;
   gap: 2px;
-  transition: transform 0.15s, box-shadow 0.18s;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(255,255,255,0.04);
+  transition: transform 0.15s, box-shadow 0.18s, border-color 0.18s;
+  box-shadow: 0 4px 10px rgba(232,96,154,0.12);
 }
-.c2-entry:hover { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(180,40,80,0.35); }
-.c2-entry::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: repeating-linear-gradient(90deg, transparent 0, transparent 6px, rgba(180,40,80,0.05) 6px, rgba(180,40,80,0.05) 7px);
-  pointer-events: none;
+.c2-entry:hover {
+  transform: translateY(-1px);
+  border-color: #e8609a;
+  box-shadow: 0 6px 18px rgba(232,96,154,0.22);
 }
 .c2-entry::after {
   content: 'NEW';
   position: absolute;
-  top: 8px; right: 10px;
+  top: 10px; right: 12px;
   font-size: 9px;
   letter-spacing: 1.5px;
   font-weight: 800;
-  color: rgba(255,150,180,0.6);
-  background: rgba(180,40,80,0.18);
-  padding: 2px 6px;
-  border-radius: 3px;
-  border: 1px solid rgba(180,40,80,0.4);
+  color: #e8609a;
+  background: rgba(232,96,154,0.12);
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid rgba(232,96,154,0.4);
 }
 .c2-entry-label {
   font-size: 10px;
   letter-spacing: 3px;
-  color: rgba(220,90,130,0.95);
-  font-weight: 800;
+  color: #e8609a;
+  font-weight: 900;
+  font-family: 'Nunito', sans-serif;
 }
 .c2-entry-title {
   font-size: 22px;
-  font-weight: 800;
+  font-weight: 900;
   letter-spacing: 1px;
   margin-top: 2px;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+  color: #3a8fd4;
+  font-family: 'Nunito', sans-serif;
 }
 .c2-entry-sub {
   font-size: 11px;
-  color: rgba(255,255,255,0.55);
+  color: #6a8bab;
+  font-weight: 700;
   font-style: italic;
 }
 /* Subtle down-chevron drawn from two borders — muted to match the card's
@@ -3473,8 +3474,8 @@ html, body {
   width: 12px;
   height: 12px;
   margin: 14px auto 0;
-  border-right: 2px solid rgba(220,90,130,0.7);
-  border-bottom: 2px solid rgba(220,90,130,0.7);
+  border-right: 2px solid rgba(232,96,154,0.75);
+  border-bottom: 2px solid rgba(232,96,154,0.75);
   transform: rotate(45deg);
   animation: c2-hint-bounce 1.5s ease-in-out infinite;
 }
