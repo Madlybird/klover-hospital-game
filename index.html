@@ -949,6 +949,69 @@ html, body {
   padding: 20px 0;
 }
 
+/* HOSPITAL TV */
+.htv-header {
+  position: relative;
+  z-index: 2;
+}
+.htv-stage {
+  position: absolute;
+  inset: 0;
+  background: #05070d url('assets/Untitled-20260610-161205-5021.png') center center / cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.htv-stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(5,7,13,0.35) 0%, rgba(5,7,13,0.82) 100%);
+}
+.htv-overlay {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 0 28px;
+}
+.htv-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: 3px;
+  color: #ff5a7a;
+  margin-bottom: 18px;
+}
+.htv-live-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ff3b5f;
+  box-shadow: 0 0 10px #ff3b5f;
+  animation: htv-blink 1.2s ease-in-out infinite;
+}
+@keyframes htv-blink { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
+.htv-soon {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: 38px;
+  line-height: 1.05;
+  letter-spacing: 2px;
+  color: #fff;
+  text-shadow: 0 4px 24px rgba(0,0,0,0.6);
+}
+.htv-sub {
+  margin-top: 14px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: rgba(255,255,255,0.78);
+  text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+}
+
 /* ===== VICTORY / LEVEL COMPLETE OVERLAY ===== */
 .fireworks {
   position: absolute;
@@ -4031,6 +4094,7 @@ html, body {
       <button class="btn-primary" onclick="Game.requireWalletGate('levels')" data-i18n="menu_play">Ready for your treatment?</button>
       <button class="btn-secondary" onclick="Game.requireWalletGate('referral')" data-i18n="menu_referral">Patient records</button>
       <button class="btn-secondary" onclick="Game.requireWalletGate('shop')" data-i18n="menu_shop">Medicine cabinet</button>
+      <button class="btn-secondary" onclick="Game.showScreen('hospital-tv')" data-i18n="menu_hospital_tv">Hospital TV</button>
       <button class="btn-secondary" onclick="Game.showScreen('settings')" data-i18n="menu_settings">Settings</button>
     </div>
 
@@ -4547,6 +4611,21 @@ html, body {
     <div class="settings-version">KLAS SYSTEM v2.0 &nbsp;|&nbsp; KLOVER HOSPITAL</div>
   </div>
 
+  <!-- HOSPITAL TV -->
+  <div id="screen-hospital-tv" class="screen">
+    <div class="howto-header htv-header">
+      <button class="btn-back" onclick="Game.showScreen('menu')">&#8592;</button>
+      <div class="screen-title" data-i18n="menu_hospital_tv">Hospital TV</div>
+    </div>
+    <div class="htv-stage">
+      <div class="htv-overlay">
+        <div class="htv-live"><span class="htv-live-dot"></span>LIVE</div>
+        <div class="htv-soon" data-i18n="htv_soon">STREAMING SOON</div>
+        <div class="htv-sub" data-i18n="htv_sub">Hospital TV is tuning in. Stay on this channel.</div>
+      </div>
+    </div>
+  </div>
+
   <!-- SHOP -->
   <div id="screen-shop" class="screen">
     <div class="howto-header">
@@ -4858,6 +4937,9 @@ const I18N = {
     menu_play: 'Ready for your treatment?',
     menu_referral: 'Patient records',
     menu_shop: 'Medicine cabinet',
+    menu_hospital_tv: 'Hospital TV',
+    htv_soon: 'STREAMING SOON',
+    htv_sub: 'Hospital TV is tuning in. Stay on this channel.',
     menu_settings: 'Settings',
     connect: '◉ CONNECT',
     connect_wallet: 'CONNECT WALLET',
@@ -5051,6 +5133,9 @@ const I18N = {
     menu_play: 'Готовы к лечению?',
     menu_referral: 'Карта пациента',
     menu_shop: 'Аптечка',
+    menu_hospital_tv: 'Больничное ТВ',
+    htv_soon: 'СКОРО В ЭФИРЕ',
+    htv_sub: 'Больничное ТВ настраивается. Оставайтесь на этом канале.',
     menu_settings: 'Настройки',
     connect: '◉ ПОДКЛЮЧИТЬ',
     connect_wallet: 'ПОДКЛЮЧИТЬ КОШЕЛЁК',
