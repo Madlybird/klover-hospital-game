@@ -3412,40 +3412,21 @@ html, body {
    ============================================================ */
 .c2-entry {
   display: none; /* toggled to flex by updateLevelsUI() when unlocked */
-  margin: 18px auto 8px;
+  margin: 18px auto 4px;
   max-width: 360px;
-  padding: 14px 18px;
-  background: linear-gradient(135deg, #ffffff 0%, #fff2f8 100%);
-  border: 2px solid #f3c2da;
-  border-radius: 14px;
+  padding: 6px 4px;
+  background: none;
+  border: none;
   color: #1a2a4a;
   cursor: pointer;
   position: relative;
-  overflow: hidden;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  text-align: center;
   gap: 2px;
-  transition: transform 0.15s, box-shadow 0.18s, border-color 0.18s;
-  box-shadow: 0 4px 10px rgba(232,96,154,0.12);
+  transition: transform 0.15s, opacity 0.18s;
 }
-.c2-entry:hover {
-  transform: translateY(-1px);
-  border-color: #e8609a;
-  box-shadow: 0 6px 18px rgba(232,96,154,0.22);
-}
-.c2-entry::after {
-  content: 'NEW';
-  position: absolute;
-  top: 10px; right: 12px;
-  font-size: 9px;
-  letter-spacing: 1.5px;
-  font-weight: 800;
-  color: #e8609a;
-  background: rgba(232,96,154,0.12);
-  padding: 2px 7px;
-  border-radius: 4px;
-  border: 1px solid rgba(232,96,154,0.4);
-}
+.c2-entry:hover { transform: translateY(-1px); opacity: 0.85; }
 .c2-entry-label {
   font-size: 10px;
   letter-spacing: 3px;
