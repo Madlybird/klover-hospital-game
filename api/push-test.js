@@ -19,7 +19,7 @@ function safeEqual(a, b) {
 
 const PUSH_TEXT =
   '🌙 The Night Shift is open.\n\n' +
-  "Chapter II just unlocked at Klover Hospital — a nightmare you can't wake from. Clock in?";
+  "Chapter II just unlocked at Klover Hospital. A nightmare you can't wake from. Clock in?";
 
 const BUTTON_TEXT = '🏥 Start the Night Shift';
 
