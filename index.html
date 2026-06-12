@@ -3436,7 +3436,7 @@ html, body {
   pointer-events: none;
 }
 .c2-entry::after {
-  content: 'DEV';
+  content: 'NEW';
   position: absolute;
   top: 8px; right: 10px;
   font-size: 9px;
@@ -3465,6 +3465,23 @@ html, body {
   font-size: 11px;
   color: rgba(255,255,255,0.55);
   font-style: italic;
+}
+.c2-entry-hint {
+  display: none; /* toggled to block by updateLevelsUI() with the card */
+  text-align: center;
+  margin: 22px auto 0;
+  max-width: 360px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  color: rgba(220,90,130,0.95);
+  text-transform: uppercase;
+  animation: c2-hint-bounce 1.4s ease-in-out infinite;
+}
+@keyframes c2-hint-bounce {
+  0%, 100% { transform: translateY(0); opacity: 0.85; }
+  50%      { transform: translateY(4px); opacity: 1; }
 }
 
 /* Chapter 2 screens (intro / action / levels / game) share a darker
@@ -4214,9 +4231,9 @@ html, body {
       </div>
     </div>
 
-    <!-- Chapter 2 entry. Toggled visible by updateLevelsUI() only when
-         Telegram.WebApp user id matches DEV_USER_ID. Non-dev players
-         never see this card. -->
+    <!-- Chapter 2 entry — now public (C2_PUBLIC). Toggled visible by
+         updateLevelsUI(). -->
+    <div class="c2-entry-hint" id="c2-entry-hint" data-i18n="c2_hint">New chapter unlocked &#8595;</div>
     <div class="c2-entry" id="c2-entry" onclick="Game.openC2()">
       <div class="c2-entry-label" data-i18n="c2_label">CHAPTER II</div>
       <div class="c2-entry-title" data-i18n="c2_title">Night Shift</div>
@@ -5088,6 +5105,7 @@ const I18N = {
     c2_label: 'CHAPTER II',
     c2_title: 'Night Shift',
     c2_sub: "A nightmare you can't wake from",
+    c2_hint: 'New chapter unlocked ↓',
     c2_levels_title: 'Night Shift',
     c2_levels_subtitle: 'Relive the nightmare:',
     c2_story_file: 'CASE FILE',
@@ -5288,6 +5306,7 @@ const I18N = {
     c2_label: 'ГЛАВА II',
     c2_title: 'Ночная смена',
     c2_sub: 'Кошмар, от которого не проснуться',
+    c2_hint: 'Открыта новая глава ↓',
     c2_levels_title: 'Ночная смена',
     c2_levels_subtitle: 'Переживите кошмар заново:',
     c2_story_file: 'ДЕЛО',
@@ -5880,10 +5899,12 @@ const Game = (() => {
       }
     }
 
-    // Chapter 2 entry — visible to the dev account only. When the arc
-    // is ready to ship publicly, flip isDevAccount() to a feature flag.
+    // Chapter 2 entry — now public (C2_PUBLIC). Set the flag to false to
+    // return it to dev-only visibility.
     const c2entry = document.getElementById('c2-entry');
-    if (c2entry) c2entry.style.display = isDevAccount() ? 'flex' : 'none';
+    if (c2entry) c2entry.style.display = c2Unlocked() ? 'flex' : 'none';
+    const c2hint = document.getElementById('c2-entry-hint');
+    if (c2hint) c2hint.style.display = c2Unlocked() ? 'block' : 'none';
   }
 
   // ---- SLIDE TUTORIAL ----
@@ -6039,10 +6060,15 @@ const Game = (() => {
     } catch { return false; }
   }
 
+  // Chapter 2 ("Night Shift") is now public — open to every player.
+  // Set C2_PUBLIC back to false to return it to dev-only.
+  const C2_PUBLIC = true;
+  function c2Unlocked() { return C2_PUBLIC || isDevAccount(); }
+
   // Open Chapter 2. Routes through the intro on first visit, then sends
   // the player straight to the c2 level select on subsequent visits.
   function openC2() {
-    if (!isDevAccount()) return;
+    if (!c2Unlocked()) return;
     if (!state.c2_introSeen) {
       playC2IntroPart1();
     } else {
@@ -6120,7 +6146,7 @@ const Game = (() => {
   // Replay nightmare intro from the c2 level select. Plays full sequence
   // again (panels 1-6 → action → 7-8).
   function replayC2Intro() {
-    if (!isDevAccount()) return;
+    if (!c2Unlocked()) return;
     playC2IntroPart1();
   }
 
@@ -6174,7 +6200,7 @@ const Game = (() => {
 
   // Placeholder for the not-yet-built wards (Don't Breathe, The Long Night).
   function c2WardSoon() {
-    if (!isDevAccount()) return;
+    if (!c2Unlocked()) return;
     showToast(tr('c2_soon_toast'));
   }
 
@@ -6227,7 +6253,7 @@ const Game = (() => {
 
   // ---- WARD 1: Code Blue (rhythm reanimation) ----
   function startC2CodeBlue() {
-    if (!isDevAccount()) return;
+    if (!c2Unlocked()) return;
     showScreen('c2-cb');
     requestAnimationFrame(() => {
       C2.CodeBlue.start(
@@ -6249,7 +6275,7 @@ const Game = (() => {
 
   // ---- WARD 2: Don't Breathe (silence survival) ----
   function startC2DontBreathe() {
-    if (!isDevAccount()) return;
+    if (!c2Unlocked()) return;
     showScreen('c2-db');
     requestAnimationFrame(() => {
       C2.DontBreathe.start(
@@ -6271,7 +6297,7 @@ const Game = (() => {
 
   // ---- ENDLESS: The Long Night (swipe runner) ----
   function startC2Runner() {
-    if (!isDevAccount()) return;
+    if (!c2Unlocked()) return;
     showScreen('c2-run');
     requestAnimationFrame(() => {
       C2.Runner.start(
@@ -6295,7 +6321,7 @@ const Game = (() => {
 
   // Start a Chapter 2 level. Enforces unlock chain.
   function startC2Level(levelId) {
-    if (!isDevAccount()) return;
+    if (!c2Unlocked()) return;
     if (levelId === 2 && !state.c2_level1complete) { showToast(tr('c2_complete_lvl1_first')); return; }
     if (levelId === 3 && !(state.c2_level1complete && state.c2_level2complete)) { showToast(tr('c2_complete_lvl2_first')); return; }
     showScreen('c2-game');
@@ -6326,7 +6352,7 @@ const Game = (() => {
   // L3 endless (unlocked for 1,000 coins, survive as long as you can).
   let c2ctCurrentLevel = 1;
   function startC2ClockTower(levelId) {
-    if (!isDevAccount()) return;
+    if (!c2Unlocked()) return;
     levelId = levelId || 1;
     if (levelId === 2 && !state.c2_ct1complete) { showToast(tr('c2_complete_lvl1_first')); return; }
     if (levelId === 3 && !state.c2_ctEndlessUnlocked) { tryUnlockC2Endless(); return; }
@@ -7843,6 +7869,11 @@ const Game = (() => {
   }
 
   function requireWalletGate(target) {
+    // Access is now open to everyone — the RIKANII sticker-holder gate is
+    // disabled. Route straight to the requested screen. (Re-enable the gate
+    // by restoring the verification flow below.)
+    runGateAction(target);
+    return;
     // Admins always pass.
     if (isAdminBypass()) { runGateAction(target); return; }
     // In-memory session result: already verified
