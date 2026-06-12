@@ -17,7 +17,11 @@ function safeEqual(a, b) {
   return crypto.timingSafeEqual(x, y);
 }
 
-const PUSH_TEXT = '🩷 Psst. Something new opened at the clinic.';
+const PUSH_TEXT =
+  '🌙 The Night Shift is open.\n\n' +
+  "Chapter II just unlocked at Klover Hospital — a nightmare you can't wake from. Clock in?";
+
+const BUTTON_TEXT = '🏥 Start the Night Shift';
 
 // Recipient list comes from env (comma-separated Telegram IDs). Never
 // hardcode real user IDs in source — that leaks PII into the repo.
@@ -25,6 +29,11 @@ const RECIPIENTS = (process.env.PUSH_RECIPIENTS || '')
   .split(',')
   .map((s) => Number(s.trim()))
   .filter(Number.isFinite);
+
+// Single test account (the dev's own Telegram id — already present in the
+// client as DEV_USER_ID). Hitting the endpoint with ?test=1 sends ONLY here,
+// so a test push can't reach real users regardless of PUSH_RECIPIENTS.
+const TEST_RECIPIENT = Number(process.env.PUSH_TEST_ID || 881282443);
 
 async function tg(method, payload) {
   const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/${method}`, {
@@ -58,19 +67,28 @@ export default async function handler(req, res) {
   // sending anything, so polling doesn't trigger the broadcast.
   const isDry = /(?:[?&])dry=1\b/.test(req.url || '') || req.query?.dry === '1';
   if (isDry) {
-    return res.status(200).json({ ok: true, dry: true, ready: true, build: 'broadcast-v2' });
+    return res.status(200).json({ ok: true, dry: true, ready: true, build: 'night-shift-v1' });
   }
+
+  // Test mode (?test=1): send ONLY to the single test account, ignoring the
+  // broadcast list entirely. This is the safe way to preview a push.
+  const isTest = /(?:[?&])test=1\b/.test(req.url || '') || req.query?.test === '1';
 
   const host = baseUrl(req);
   const keyboard = {
     inline_keyboard: [[
-      { text: '🏥 Open the clinic', web_app: { url: host + '/' } },
+      { text: BUTTON_TEXT, web_app: { url: host + '/' } },
     ]],
   };
 
-  const ids = [...new Set(RECIPIENTS)];
+  const ids = isTest
+    ? [TEST_RECIPIENT].filter(Number.isFinite)
+    : [...new Set(RECIPIENTS)];
   if (!ids.length) {
-    return res.status(200).json({ ok: true, total: 0, sent: 0, failed: 0, note: 'no recipients configured (set PUSH_RECIPIENTS)' });
+    const note = isTest
+      ? 'no test recipient (set PUSH_TEST_ID)'
+      : 'no recipients configured (set PUSH_RECIPIENTS)';
+    return res.status(200).json({ ok: true, total: 0, sent: 0, failed: 0, note });
   }
   const results = [];
   let sent = 0;
@@ -95,6 +113,7 @@ export default async function handler(req, res) {
 
   return res.status(200).json({
     ok: true,
+    test: isTest,
     total: ids.length,
     sent,
     failed,
