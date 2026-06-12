@@ -3466,22 +3466,21 @@ html, body {
   color: rgba(255,255,255,0.55);
   font-style: italic;
 }
+/* Subtle down-chevron drawn from two borders — muted to match the card's
+   pink, gently pulsing to draw the eye without a loud banner. */
 .c2-entry-hint {
   display: none; /* toggled to block by updateLevelsUI() with the card */
-  text-align: center;
-  margin: 22px auto 0;
-  max-width: 360px;
-  font-family: 'Nunito', sans-serif;
-  font-weight: 900;
-  font-size: 13px;
-  letter-spacing: 1.5px;
-  color: rgba(220,90,130,0.95);
-  text-transform: uppercase;
-  animation: c2-hint-bounce 1.4s ease-in-out infinite;
+  width: 12px;
+  height: 12px;
+  margin: 14px auto 0;
+  border-right: 2px solid rgba(220,90,130,0.7);
+  border-bottom: 2px solid rgba(220,90,130,0.7);
+  transform: rotate(45deg);
+  animation: c2-hint-bounce 1.5s ease-in-out infinite;
 }
 @keyframes c2-hint-bounce {
-  0%, 100% { transform: translateY(0); opacity: 0.85; }
-  50%      { transform: translateY(4px); opacity: 1; }
+  0%, 100% { transform: rotate(45deg) translate(0, 0);     opacity: 0.5; }
+  50%      { transform: rotate(45deg) translate(3px, 3px); opacity: 1;   }
 }
 
 /* Chapter 2 screens (intro / action / levels / game) share a darker
@@ -4233,7 +4232,7 @@ html, body {
 
     <!-- Chapter 2 entry — now public (C2_PUBLIC). Toggled visible by
          updateLevelsUI(). -->
-    <div class="c2-entry-hint" id="c2-entry-hint" data-i18n="c2_hint">New chapter unlocked &#8595;</div>
+    <div class="c2-entry-hint" id="c2-entry-hint" aria-hidden="true"></div>
     <div class="c2-entry" id="c2-entry" onclick="Game.openC2()">
       <div class="c2-entry-label" data-i18n="c2_label">CHAPTER II</div>
       <div class="c2-entry-title" data-i18n="c2_title">Night Shift</div>
@@ -5105,7 +5104,6 @@ const I18N = {
     c2_label: 'CHAPTER II',
     c2_title: 'Night Shift',
     c2_sub: "A nightmare you can't wake from",
-    c2_hint: 'New chapter unlocked ↓',
     c2_levels_title: 'Night Shift',
     c2_levels_subtitle: 'Relive the nightmare:',
     c2_story_file: 'CASE FILE',
@@ -5306,7 +5304,6 @@ const I18N = {
     c2_label: 'ГЛАВА II',
     c2_title: 'Ночная смена',
     c2_sub: 'Кошмар, от которого не проснуться',
-    c2_hint: 'Открыта новая глава ↓',
     c2_levels_title: 'Ночная смена',
     c2_levels_subtitle: 'Переживите кошмар заново:',
     c2_story_file: 'ДЕЛО',
