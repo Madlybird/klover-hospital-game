@@ -10989,13 +10989,14 @@ const C2 = (() => {
     let depth = 0;          // stalker position, 0 (top) .. ROWS (floor = caught)
     let caughtFlash = 0;    // ms of red flash after a grab
     let onWin = null, onLose = null;
-    // Bomb power-up — same as Chapter 1: start with 1, earn one on a tier-4
-    // chain, hold the button to detonate and blast a clutch of random cells.
-    let bombs = 1, bombHoldTimer = null, bombHoldActive = false;
-    // Bonus pickup (Chapter 2 only): every 30s a collectible drifts across the
-    // board — tap it to catch it. It's a bomb normally, or a heart when a life
-    // has been lost (catching it refills the life bar).
-    let pickup = null, pickupTimer = 0;
+    // Bomb power-up (Chapter 2): the player starts with NO bomb and is granted
+    // exactly one — a single bomb collectible drops 30s into the level, once.
+    // No tier-4 reward, no repeat drops, no accumulation. Hold the button to
+    // detonate and blast a clutch of random cells.
+    let bombs = 0, bombHoldTimer = null, bombHoldActive = false;
+    // Bonus pickup (Chapter 2 only): a single bomb drifts across the board 30s
+    // in — tap it to catch it. It spawns once per level and never again.
+    let pickup = null, pickupTimer = 0, pickupSpawned = false;
     const PICKUP_INTERVAL = 30000;
 
     function freshGrid() { grid = Array.from({ length: ROWS }, () => Array(COLS).fill(null)); }
@@ -11394,11 +11395,8 @@ const C2 = (() => {
     // ---- BONUS PICKUP (Chapter 2 only) ----
     function spawnPickup() {
       if (!canvas) return;
-      // Only ever drop a heart, and only when a life has actually been lost so
-      // it can refill the bar. No bomb pickups — the bomb is a single fixed
-      // power-up (starts at x1), so it must not rain down or accumulate.
-      const missingLife = currentLevel && lives < currentLevel.lives;
-      if (!missingLife) return;
+      // The one and only bomb of the level. Dropped a single time (see
+      // updatePickup), so catching it leaves the player with exactly one bomb.
       const r = Math.max(15, cellSize * 0.85);
       pickup = {
         x: r + Math.random() * Math.max(1, canvas.width - 2 * r),
@@ -11406,14 +11404,16 @@ const C2 = (() => {
         vx: (Math.random() < 0.5 ? -1 : 1) * (0.025 + Math.random() * 0.02),
         vy: 0.045,
         r,
-        type: 'life',
+        type: 'bomb',
         life: 9000,   // ms on screen before it escapes
       };
       try { Audio.tapHit(); } catch (e) {}
     }
     function updatePickup(dt) {
       pickupTimer += dt;
-      if (!pickup && pickupTimer >= PICKUP_INTERVAL) { pickupTimer = 0; spawnPickup(); }
+      // Drop the bomb exactly once, at the 30s mark. pickupSpawned latches so it
+      // never spawns again for the rest of the level.
+      if (!pickupSpawned && pickupTimer >= PICKUP_INTERVAL) { pickupSpawned = true; spawnPickup(); }
       if (!pickup) return;
       pickup.x += pickup.vx * dt;
       pickup.y += pickup.vy * dt;
@@ -11479,7 +11479,7 @@ const C2 = (() => {
       score = 0; combo = 0;
       fallSpeed = currentLevel.speed;
       fallTimer = 0; elapsedSec = 0; shambleTimer = 0;
-      pickup = null; pickupTimer = 0;
+      pickup = null; pickupTimer = 0; pickupSpawned = false;
       depth = currentLevel.startDepth;
       caughtFlash = 0;
       pair = spawnPair();
@@ -11493,7 +11493,7 @@ const C2 = (() => {
       const nm = document.getElementById('c2ct-level-name');
       if (nm) nm.textContent = currentLevel.name;
       running = true; paused = false; lastT = 0;
-      bombs = 1; bombHoldActive = false;
+      bombs = 0; bombHoldActive = false;   // earned via the single 30s drop, not at start
       bindControls();
       bindBomb();
       updateBombUI();
