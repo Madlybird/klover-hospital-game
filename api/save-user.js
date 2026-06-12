@@ -45,6 +45,36 @@ async function notifyChannel(user, referredBy, supabaseStatus) {
   }
 }
 
+// Admin diagnostic: ask Telegram whether the bot can actually post to the
+// configured report channel. Surfaces the three real failure modes — env not
+// set, chat id stale/migrated, or bot not a member/admin of the channel.
+async function probeChannel() {
+  if (!BOT_TOKEN) return { ok: false, reason: 'bot_token_missing' };
+  if (!REPORT_CHAT_ID) return { ok: false, reason: 'report_chat_id_unset' };
+  const call = async (method, qs) => {
+    try {
+      const r = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/${method}${qs || ''}`);
+      return await r.json();
+    } catch (e) { return { ok: false, description: e.message }; }
+  };
+  const me = await call('getMe');
+  const botId = me?.result?.id;
+  const chat = await call('getChat', `?chat_id=${encodeURIComponent(REPORT_CHAT_ID)}`);
+  const member = botId
+    ? await call('getChatMember', `?chat_id=${encodeURIComponent(REPORT_CHAT_ID)}&user_id=${botId}`)
+    : { ok: false, description: 'no_bot_id' };
+  return {
+    report_chat_id: REPORT_CHAT_ID,
+    bot: me?.result?.username ? `@${me.result.username}` : (me?.description || 'unknown'),
+    chat_reachable: !!chat?.ok,
+    chat_title: chat?.result?.title || null,
+    chat_error: chat?.ok ? null : chat?.description || null,
+    bot_status: member?.result?.status || null,
+    member_error: member?.ok ? null : member?.description || null,
+    can_post: !!chat?.ok && ['administrator', 'creator', 'member'].includes(member?.result?.status),
+  };
+}
+
 const supabase = SUPABASE_URL && SUPABASE_SERVICE_KEY
   ? createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, { auth: { persistSession: false } })
   : null;
@@ -85,6 +115,7 @@ export default async function handler(req, res) {
     if (!ADMIN_SECRET || !safeEqual(provided, ADMIN_SECRET)) {
       return res.status(200).json({ ok: true });
     }
+    const channel = await probeChannel();
     return res.status(200).json({
       ok: true,
       env: {
@@ -95,7 +126,8 @@ export default async function handler(req, res) {
       },
       supabase_client: !!supabase,
       channel_notify: !!REPORT_CHAT_ID,
-      build: 'save-user v4 (channel notify)',
+      channel,
+      build: 'save-user v5 (channel probe)',
     });
   }
 
