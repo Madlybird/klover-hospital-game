@@ -11082,8 +11082,10 @@ const C2 = (() => {
       if (toClear.length) {
         toClear.forEach(([r, c]) => { grid[r][c] = null; });
         combo++;
-        // Reward a bomb on a tier-4 chain — same trigger as Chapter 1.
-        if (combo === 4) { bombs++; updateBombUI(); try { Audio.success(); } catch (e) {} }
+        // A tier-4 chain is still a satisfying beat, but it no longer grants a
+        // bomb — the Chapter 2 bomb is a single fixed power-up with no
+        // accumulation, so a big chain just plays the success sting.
+        if (combo === 4) { try { Audio.success(); } catch (e) {} }
         const pts = cleared * 10 * combo;
         score += pts;
         // The clear is loud and bright — it drives the stalker back. Bigger
@@ -11392,9 +11394,11 @@ const C2 = (() => {
     // ---- BONUS PICKUP (Chapter 2 only) ----
     function spawnPickup() {
       if (!canvas) return;
-      // Heart if a life has been lost (so it can refill the bar); otherwise a
-      // bonus bomb. Endless (1 life) therefore only ever drops bombs.
+      // Only ever drop a heart, and only when a life has actually been lost so
+      // it can refill the bar. No bomb pickups — the bomb is a single fixed
+      // power-up (starts at x1), so it must not rain down or accumulate.
       const missingLife = currentLevel && lives < currentLevel.lives;
+      if (!missingLife) return;
       const r = Math.max(15, cellSize * 0.85);
       pickup = {
         x: r + Math.random() * Math.max(1, canvas.width - 2 * r),
@@ -11402,7 +11406,7 @@ const C2 = (() => {
         vx: (Math.random() < 0.5 ? -1 : 1) * (0.025 + Math.random() * 0.02),
         vy: 0.045,
         r,
-        type: missingLife ? 'life' : 'bomb',
+        type: 'life',
         life: 9000,   // ms on screen before it escapes
       };
       try { Audio.tapHit(); } catch (e) {}
