@@ -3510,6 +3510,235 @@ html, body {
 }
 .c2-placeholder-btn:hover { background: linear-gradient(135deg, #561240, #851852); }
 
+/* ============================================================
+   CHAPTER 3 — "STATIC" (Vi's arc — dev-gated)
+   Cyan/digital-void palette.
+   ============================================================ */
+#screen-c3-intro, #screen-c3-levels, #screen-c3-game {
+  background: #020a10;
+  color: #b0f0ff;
+}
+.c3-entry {
+  display: none;
+  margin: 18px auto 4px;
+  max-width: 360px;
+  padding: 6px 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 2px;
+  transition: transform 0.15s, opacity 0.18s;
+}
+.c3-entry:hover { transform: translateY(-1px); opacity: 0.85; }
+.c3-entry-label {
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: #00d4ff;
+  font-weight: 900;
+  font-family: 'Nunito', sans-serif;
+}
+.c3-entry-title {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  margin-top: 2px;
+  color: #00d4ff;
+  font-family: 'Nunito', sans-serif;
+}
+.c3-entry-sub {
+  font-size: 11px;
+  color: #7ab8c8;
+  font-weight: 700;
+  font-style: italic;
+}
+.c3-entry-hint {
+  display: none;
+  width: 12px;
+  height: 12px;
+  margin: 14px auto 0;
+  border-right: 2px solid rgba(0,212,255,0.75);
+  border-bottom: 2px solid rgba(0,212,255,0.75);
+  transform: rotate(45deg);
+  animation: c2hint-bob 1.4s ease-in-out infinite;
+}
+/* ---- C3 story panels (#screen-c3-intro) ---- */
+.c3p-stage {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  background: #020a10;
+}
+.c3p-scene {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+}
+.c3p-scene canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.c3p-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 14px 16px;
+  pointer-events: none;
+  z-index: 10;
+}
+.c3p-clock {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: rgba(0,212,255,0.7);
+  letter-spacing: 2px;
+}
+.c3p-skip {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: rgba(0,212,255,0.6);
+  letter-spacing: 1px;
+  cursor: pointer;
+  pointer-events: all;
+}
+.c3p-textbox {
+  padding: 14px 20px 20px;
+  background: rgba(2,10,16,0.92);
+  border-top: 1px solid rgba(0,212,255,0.25);
+  min-height: 80px;
+}
+.c3p-text {
+  font-family: 'Courier New', monospace;
+  font-size: 15px;
+  color: #b0f0ff;
+  line-height: 1.5;
+  min-height: 24px;
+}
+.c3p-text.show { animation: c3p-fadein 0.6s ease; }
+@keyframes c3p-fadein {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.c3p-tap-hint {
+  font-size: 11px;
+  color: rgba(0,212,255,0.5);
+  margin-top: 6px;
+  letter-spacing: 1px;
+}
+/* ---- C3 level select (#screen-c3-levels) ---- */
+#screen-c3-levels {
+  background-color: #020a10 !important;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+#screen-c3-levels .screen-title  { color: #7af0ff !important; }
+#screen-c3-levels .patient-subtitle { color: rgba(120,220,255,0.85) !important; }
+#screen-c3-levels .btn-back      { color: #7af0ff !important; }
+#screen-c3-levels .level-card    { border-color: rgba(0,180,220,0.3); background: rgba(0,20,40,0.6); }
+#screen-c3-levels .level-card:not(.locked):hover { border-color: rgba(0,212,255,0.7); }
+.c3-badge {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  border: none;
+}
+.c3-badge.badge-play     { background: linear-gradient(135deg, #004466, #006699); color: #fff; }
+.c3-badge.badge-complete { background: linear-gradient(135deg, #1a5a30, #2c8050); color: #fff; }
+.c3-badge.badge-locked   { background: rgba(0,30,50,0.6); color: rgba(120,200,220,0.4); }
+/* ---- C3 Touhou game (#screen-c3-game) ---- */
+.c3g-stage {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+}
+.c3g-hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 14px;
+  background: rgba(0,10,20,0.9);
+  border-bottom: 1px solid rgba(0,212,255,0.2);
+  flex-shrink: 0;
+}
+.c3g-hud-col { display: flex; flex-direction: column; gap: 2px; }
+.c3g-hud-label {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: rgba(0,212,255,0.6);
+  font-family: 'Courier New', monospace;
+}
+.c3g-hud-value {
+  font-size: 18px;
+  font-weight: 900;
+  color: #00d4ff;
+  font-family: 'Courier New', monospace;
+}
+.c3g-level-name {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #7af0ff;
+  font-family: 'Courier New', monospace;
+  text-align: center;
+}
+.c3g-lives { display: flex; gap: 4px; justify-content: flex-end; }
+.c3g-heart {
+  width: 14px; height: 14px;
+  background: #00d4ff;
+  clip-path: polygon(50% 15%, 100% 0%, 100% 60%, 50% 100%, 0% 60%, 0% 0%);
+}
+.c3g-heart.lost { background: rgba(0,80,100,0.3); }
+#c3g-canvas { flex: 1; width: 100%; display: block; }
+.c3g-end-overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.88);
+  z-index: 50;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+.c3g-end-overlay.show { display: flex; }
+.c3g-end-title {
+  font-family: 'Courier New', monospace;
+  font-size: 26px;
+  font-weight: 900;
+  color: #00d4ff;
+  letter-spacing: 4px;
+  text-shadow: 0 0 20px rgba(0,212,255,0.8);
+}
+.c3g-end-sub {
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  color: #7af0ff;
+}
+.c3g-end-buttons { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.c3-btn {
+  padding: 10px 22px;
+  background: linear-gradient(135deg, #003344, #005566);
+  border: 1px solid rgba(0,212,255,0.5);
+  color: #7af0ff;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.c3-btn:hover { background: linear-gradient(135deg, #004455, #007788); }
+
 /* ---- C2 storyline panels (#screen-c2-intro) ---- */
 .c2p-stage {
   display: flex;
@@ -4220,6 +4449,12 @@ html, body {
       <div class="c2-entry-title" data-i18n="c2_title">Night Shift</div>
       <div class="c2-entry-sub" data-i18n="c2_sub">A nightmare you can't wake from</div>
     </div>
+    <div class="c3-entry-hint" id="c3-entry-hint" aria-hidden="true"></div>
+    <div class="c3-entry" id="c3-entry" onclick="Game.openC3()">
+      <div class="c3-entry-label" data-i18n="c3_label">CHAPTER III</div>
+      <div class="c3-entry-title" data-i18n="c3_title">Static</div>
+      <div class="c3-entry-sub" data-i18n="c3_sub">Vi's side · Don't look at the data</div>
+    </div>
   </div>
 
   <!-- ===== CHAPTER 2 SCREENS (dev-gated stubs, filled in later sprints) ===== -->
@@ -4528,6 +4763,124 @@ html, body {
         <div class="c2g-end-buttons">
           <button class="c2-placeholder-btn" onclick="Game.c2ctRestart()" data-i18n="try_again">TRY AGAIN</button>
           <button class="c2-placeholder-btn" onclick="Game.showScreen('c2-levels')" data-i18n="c2_back_btn">&lsaquo; BACK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CHAPTER 3 SCREENS (Vi's arc — dev-gated) ===== -->
+
+  <!-- C3: canvas-drawn story panels -->
+  <div id="screen-c3-intro" class="screen">
+    <div class="c3p-stage">
+      <div class="c3p-scene" id="c3p-scene">
+        <canvas id="c3p-canvas"></canvas>
+        <div class="c3p-overlay">
+          <div class="c3p-clock" id="c3p-clock">03:47</div>
+          <div class="c3p-skip" onclick="Game.skipC3Intro()">SKIP &rsaquo;</div>
+        </div>
+      </div>
+      <div class="c3p-textbox">
+        <div class="c3p-text" id="c3p-text"></div>
+        <div class="c3p-tap-hint" data-i18n="c2_tap_continue">&#9678; tap to continue</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- C3: level select -->
+  <div id="screen-c3-levels" class="screen">
+    <div class="howto-header">
+      <button class="btn-back" onclick="Game.showScreen('levels')">&#8592;</button>
+      <div class="screen-title" data-i18n="c3_levels_title">STATIC</div>
+    </div>
+    <div class="patient-subtitle" data-i18n="c3_levels_subtitle">Select a memory to enter:</div>
+    <div class="levels-grid">
+      <div class="level-card" onclick="Game.replayC3Intro()">
+        <div class="patient-photo" style="background:#020a10;display:flex;align-items:center;justify-content:center;">
+          <span style="font-size:36px;color:#00d4ff;font-family:monospace;text-shadow:0 0 16px #00d4ff">VI</span>
+        </div>
+        <div class="patient-info">
+          <div class="id-card-label" data-i18n="c3_story_file">CASE FILE</div>
+          <div class="level-card-name" data-i18n="c3_story_name">STATIC</div>
+          <div class="patient-priority" data-i18n="c3_story_desc">Server Room &middot; The file he shouldn't open</div>
+          <div class="patient-meta-row">CHAPTER <b>III</b></div>
+          <div class="patient-meta-row">KLASS_ID <b>STATIC_00</b></div>
+        </div>
+        <div class="patient-actions">
+          <button class="btn-proceed" onclick="event.stopPropagation();Game.replayC3Intro()" data-i18n="c3_story_play">PLAY STORY</button>
+        </div>
+      </div>
+      <div class="level-card" id="c3-card-1" onclick="Game.startC3Level(1)">
+        <div class="patient-photo" style="background:#020a10;display:flex;align-items:center;justify-content:center;">
+          <span style="font-size:28px;color:#00d4ff;opacity:0.8;font-family:monospace;text-shadow:0 0 10px #00d4ff">I</span>
+        </div>
+        <div class="patient-info">
+          <div class="id-card-label">MEMORY SHARD</div>
+          <div class="level-card-name" data-i18n="c3_lvl1_name">DATA FRACTURE</div>
+          <div class="patient-priority" id="c3-note-1" data-i18n="c3_lvl1_priority">Corrupted fragments &middot; Survive the first wave</div>
+          <div class="patient-meta-row">DIFFICULTY <b>&bull;</b></div>
+          <div class="patient-meta-row">KLASS_ID <b>SHARD_01</b></div>
+        </div>
+        <div class="patient-actions">
+          <button class="c3-badge badge-play" id="c3-badge-1">ENTER</button>
+        </div>
+      </div>
+      <div class="level-card locked" id="c3-card-2" onclick="Game.startC3Level(2)">
+        <div class="patient-photo" style="background:#020a10;display:flex;align-items:center;justify-content:center;">
+          <span style="font-size:28px;color:#00d4ff;opacity:0.4;font-family:monospace">II</span>
+        </div>
+        <div class="patient-info">
+          <div class="id-card-label">MEMORY SHARD</div>
+          <div class="level-card-name" data-i18n="c3_lvl2_name">MEMORY LEAK</div>
+          <div class="patient-locked-note" id="c3-note-2" data-i18n="c3_lvl2_locked">Clear Shard 01 first</div>
+          <div class="patient-meta-row">DIFFICULTY <b>&bull;&bull;</b></div>
+          <div class="patient-meta-row">KLASS_ID <b>SHARD_02</b></div>
+        </div>
+        <div class="patient-actions">
+          <button class="c3-badge badge-locked" id="c3-badge-2" data-i18n="locked">LOCKED</button>
+        </div>
+      </div>
+      <div class="level-card locked" id="c3-card-3" onclick="Game.startC3Level(3)">
+        <div class="patient-photo" style="background:#020a10;display:flex;align-items:center;justify-content:center;">
+          <span style="font-size:28px;color:#00d4ff;opacity:0.3;font-family:monospace">&#8734;</span>
+        </div>
+        <div class="patient-info">
+          <div class="id-card-label">MEMORY SHARD</div>
+          <div class="level-card-name" data-i18n="c3_lvl3_name">STATIC LOOP</div>
+          <div class="patient-locked-note" id="c3-note-3" data-i18n="c3_lvl3_locked">Clear Shard 02 first</div>
+          <div class="patient-meta-row">DIFFICULTY <b>&bull;&bull;&bull;</b></div>
+          <div class="patient-meta-row">KLASS_ID <b>ENDLESS</b></div>
+        </div>
+        <div class="patient-actions">
+          <button class="c3-badge badge-locked" id="c3-badge-3" data-i18n="endless">ENDLESS</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- C3: Touhou bullet-hell game -->
+  <div id="screen-c3-game" class="screen">
+    <div class="c3g-stage" id="c3g-stage">
+      <div class="c3g-hud">
+        <div class="c3g-hud-col">
+          <div class="c3g-hud-label">SCORE</div>
+          <div class="c3g-hud-value" id="c3g-score">0</div>
+        </div>
+        <div>
+          <div class="c3g-level-name" id="c3g-level-name">DATA FRACTURE</div>
+        </div>
+        <div class="c3g-hud-col" style="align-items:flex-end">
+          <div class="c3g-hud-label">LIVES</div>
+          <div class="c3g-lives" id="c3g-lives"></div>
+        </div>
+      </div>
+      <canvas id="c3g-canvas"></canvas>
+      <div class="c3g-end-overlay" id="c3g-end-overlay">
+        <div class="c3g-end-title" id="c3g-end-title">CLEARED</div>
+        <div class="c3g-end-sub" id="c3g-end-sub">Score: 0</div>
+        <div class="c3g-end-buttons">
+          <button class="c3-btn" onclick="Game.restartC3Game()" data-i18n="try_again">TRY AGAIN</button>
+          <button class="c3-btn" onclick="Game.showScreen('c3-levels')" data-i18n="c2_back_btn">&lsaquo; BACK</button>
         </div>
       </div>
     </div>
@@ -5167,6 +5520,35 @@ const I18N = {
     c2_fact_text: 'Match 4+ antidotes touching infection to neutralize it.',
     c2_level_clear: 'CONTAINED',
     c2_level_fail: 'OVERRUN',
+    // ---- Chapter 3 "Static" (Vi's arc — dev-gated) ----
+    c3_label: 'CHAPTER III',
+    c3_title: 'Static',
+    c3_sub: "Vi's side · Don't look at the data",
+    c3_levels_title: 'STATIC',
+    c3_levels_subtitle: 'Select a memory to enter:',
+    c3_story_file: 'CASE FILE',
+    c3_story_name: 'STATIC',
+    c3_story_desc: "Server Room · The file he shouldn't open",
+    c3_story_play: 'PLAY STORY',
+    c3_lvl1_name: 'DATA FRACTURE',
+    c3_lvl1_priority: 'Corrupted fragments · Survive the first wave',
+    c3_lvl2_name: 'MEMORY LEAK',
+    c3_lvl2_locked: 'Clear Shard 01 first',
+    c3_lvl2_priority: 'Deep archive · Patterns intensify',
+    c3_lvl3_name: 'STATIC LOOP',
+    c3_lvl3_locked: 'Clear Shard 02 first',
+    c3_lvl3_priority: 'No endpoint · Run until the signal dies',
+    c3_p1: "I shouldn't be running this. But I have to know.",
+    c3_p2: 'PATIENT #0 — FILE CORRUPTED. Last access: 3 years ago.',
+    c3_p3: 'Five minutes. Just one look at the archive.',
+    c3_p4: 'Where are the memories? The data is fragmenting—',
+    c3_p5: '...Vi?',
+    c3_p6: "That's impossible. You're gone.",
+    c3_p7: 'Thank you for not forgetting.',
+    c3_p8: '',
+    c3_enter: 'ENTER',
+    c3_cleared: 'CLEARED',
+    c3_failed: 'SIGNAL LOST',
   },
   ru: {
     tagline: 'ИГРА-ГОЛОВОЛОМКА С ТАБЛЕТКАМИ',
@@ -5367,6 +5749,35 @@ const I18N = {
     c2_fact_text: 'Соберите 4+ антидота рядом с заражением, чтобы нейтрализовать.',
     c2_level_clear: 'СДЕРЖАНО',
     c2_level_fail: 'ЗАХВАЧЕНО',
+    // ---- Глава 3 «Статика» (арка Ви — dev) ----
+    c3_label: 'ГЛАВА III',
+    c3_title: 'Статика',
+    c3_sub: 'Сторона Ви · Не открывай этот файл',
+    c3_levels_title: 'СТАТИКА',
+    c3_levels_subtitle: 'Выберите воспоминание:',
+    c3_story_file: 'ДЕЛО',
+    c3_story_name: 'СТАТИКА',
+    c3_story_desc: 'Серверная · Файл, который не стоило открывать',
+    c3_story_play: 'СМОТРЕТЬ ИСТОРИЮ',
+    c3_lvl1_name: 'РАЗРЫВ ДАННЫХ',
+    c3_lvl1_priority: 'Повреждённые фрагменты · Выживи в первой волне',
+    c3_lvl2_name: 'УТЕЧКА ПАМЯТИ',
+    c3_lvl2_locked: 'Сначала пройди Shard 01',
+    c3_lvl2_priority: 'Глубокий архив · Паттерны усиливаются',
+    c3_lvl3_name: 'ПЕТЛЯ СТАТИКИ',
+    c3_lvl3_locked: 'Сначала пройди Shard 02',
+    c3_lvl3_priority: 'Без выхода · Держись, пока сигнал не умрёт',
+    c3_p1: 'Я не должен этого делать. Но мне нужно знать.',
+    c3_p2: 'ПАЦИЕНТ #0 — ФАЙЛ ПОВРЕЖДЁН. Последний доступ: 3 года назад.',
+    c3_p3: 'Пять минут. Один взгляд на архив.',
+    c3_p4: 'Где воспоминания? Данные распадаются—',
+    c3_p5: '...Вай?',
+    c3_p6: 'Это невозможно. Тебя нет.',
+    c3_p7: 'Спасибо, что не забыл.',
+    c3_p8: '',
+    c3_enter: 'ВОЙТИ',
+    c3_cleared: 'ОЧИЩЕНО',
+    c3_failed: 'СИГНАЛ ПОТЕРЯН',
   },
 };
 
@@ -5502,6 +5913,11 @@ const Save = {
       c2_ct2complete: false,
       c2_ctEndlessUnlocked: false,
       c2_ctBest: 0,
+      // Chapter 3 ("Static") — Vi's arc.
+      c3_introSeen: false,
+      c3_lvl1complete: false,
+      c3_lvl2complete: false,
+      c3_lvl3best: 0,
       lastLogin: null,
       lang: 'en',
       sound: true,
@@ -5796,11 +6212,13 @@ const Game = (() => {
     if (name === 'hospital-tv') updateHospitalTvUI();
     if (name === 'levels') updateLevelsUI();
     if (name === 'c2-levels') updateC2LevelsUI();
+    if (name === 'c3-levels') updateC3LevelsUI();
     if (name !== 'game' && gameRunning) stopGame();
     if (name !== 'c2-cb') { try { C2.CodeBlue.stop(); } catch (e) {} }
     if (name !== 'c2-db') { try { C2.DontBreathe.stop(); } catch (e) {} }
     if (name !== 'c2-run') { try { C2.Runner.stop(); } catch (e) {} }
     if (name !== 'c2-ct')  { try { C2.ClockTower.stop(); } catch (e) {} }
+    if (name !== 'c3-game') { try { C3.Game.stop(); } catch (e) {} }
 
     // Telegram vertical-swipe collapses the mini app — disable it on
     // any chapter 2 screen (intro/action/game/levels) so the swipe-down
@@ -5884,6 +6302,12 @@ const Game = (() => {
     if (c2entry) c2entry.style.display = c2Unlocked() ? 'flex' : 'none';
     const c2hint = document.getElementById('c2-entry-hint');
     if (c2hint) c2hint.style.display = c2Unlocked() ? 'block' : 'none';
+
+    // Chapter 3 entry — dev-only.
+    const c3entry = document.getElementById('c3-entry');
+    if (c3entry) c3entry.style.display = c3Unlocked() ? 'flex' : 'none';
+    const c3hint = document.getElementById('c3-entry-hint');
+    if (c3hint) c3hint.style.display = c3Unlocked() ? 'block' : 'none';
   }
 
   // ---- SLIDE TUTORIAL ----
@@ -6044,6 +6468,91 @@ const Game = (() => {
   const C2_PUBLIC = true;
   function c2Unlocked() { return C2_PUBLIC || isDevAccount(); }
 
+  // Chapter 3 ("Static") — Vi's arc. Dev accounts only for now.
+  // Flip to `return true` when the arc ships publicly.
+  function c3Unlocked() { return isDevAccount(); }
+
+  function openC3() {
+    if (!c3Unlocked()) return;
+    if (!state.c3_introSeen) {
+      playC3Intro();
+    } else {
+      updateC3LevelsUI();
+      showScreen('c3-levels');
+    }
+  }
+
+  function playC3Intro() {
+    showScreen('c3-intro');
+    requestAnimationFrame(() => {
+      C3.Intro.play(0, 7, () => {
+        state.c3_introSeen = true;
+        Save.save(state);
+        updateC3LevelsUI();
+        showScreen('c3-levels');
+      });
+      C3.Intro.bindTap();
+    });
+  }
+
+  function skipC3Intro() {
+    try { C3.Intro.skipToEnd(); } catch (e) {}
+  }
+
+  function replayC3Intro() {
+    if (!c3Unlocked()) return;
+    playC3Intro();
+  }
+
+  function startC3Level(n) {
+    if (!c3Unlocked()) return;
+    if (n === 2 && !state.c3_lvl1complete) { showToast(tr('c3_lvl2_locked')); return; }
+    if (n === 3 && !state.c3_lvl2complete) { showToast(tr('c3_lvl3_locked')); return; }
+    showScreen('c3-game');
+    requestAnimationFrame(() => C3.Game.start(n));
+  }
+
+  function restartC3Game() {
+    const ol = document.getElementById('c3g-end-overlay');
+    if (ol) ol.classList.remove('show');
+    C3.Game.restart();
+  }
+
+  function updateC3LevelsUI() {
+    const b1 = document.getElementById('c3-badge-1');
+    if (b1) {
+      b1.textContent = state.c3_lvl1complete ? tr('complete') : tr('c3_enter');
+      b1.className = 'c3-badge ' + (state.c3_lvl1complete ? 'badge-complete' : 'badge-play');
+    }
+    const card2 = document.getElementById('c3-card-2');
+    const b2 = document.getElementById('c3-badge-2');
+    const n2 = document.getElementById('c3-note-2');
+    if (state.c3_lvl1complete) {
+      if (card2) card2.classList.remove('locked');
+      if (b2) {
+        b2.textContent = state.c3_lvl2complete ? tr('complete') : tr('c3_enter');
+        b2.className = 'c3-badge ' + (state.c3_lvl2complete ? 'badge-complete' : 'badge-play');
+      }
+      if (n2) { n2.textContent = tr('c3_lvl2_priority'); n2.className = 'patient-priority'; }
+    } else {
+      if (card2) card2.classList.add('locked');
+      if (b2) { b2.textContent = tr('locked'); b2.className = 'c3-badge badge-locked'; }
+      if (n2) { n2.textContent = tr('c3_lvl2_locked'); n2.className = 'patient-locked-note'; }
+    }
+    const card3 = document.getElementById('c3-card-3');
+    const b3 = document.getElementById('c3-badge-3');
+    const n3 = document.getElementById('c3-note-3');
+    if (state.c3_lvl2complete) {
+      if (card3) card3.classList.remove('locked');
+      if (b3) { b3.textContent = tr('endless'); b3.className = 'c3-badge badge-play'; }
+      if (n3) { n3.textContent = tr('c3_lvl3_priority'); n3.className = 'patient-priority'; }
+    } else {
+      if (card3) card3.classList.add('locked');
+      if (b3) { b3.textContent = tr('locked'); b3.className = 'c3-badge badge-locked'; }
+      if (n3) { n3.textContent = tr('c3_lvl3_locked'); n3.className = 'patient-locked-note'; }
+    }
+  }
+
   // Open Chapter 2. Routes through the intro on first visit, then sends
   // the player straight to the c2 level select on subsequent visits.
   function openC2() {
@@ -6135,6 +6644,14 @@ const Game = (() => {
     Save.save(state);
     updateC2LevelsUI();
   };
+
+  // Bridge for C3 module.
+  window.__c3_state_set = function(key, val) {
+    state[key] = val;
+    Save.save(state);
+    updateC3LevelsUI();
+  };
+  window.__c3_get_best = function() { return state.c3_lvl3best || 0; };
 
   // Update Chapter 2 ward cards (badges + endless best).
   function updateC2LevelsUI() {
@@ -8173,6 +8690,12 @@ const Game = (() => {
     c2ctRestart,
     pauseC2ClockTower,
     isDevAccount,
+    // Chapter 3 ("Static") — Vi's arc.
+    openC3,
+    skipC3Intro,
+    replayC3Intro,
+    startC3Level,
+    restartC3Game,
   };
 })();
 
@@ -11987,6 +12510,574 @@ window.tr = tr;
 // ============================================================
 // TELEGRAM WEB APP INIT
 // ============================================================
+// ============================================================
+// C3 MODULE — "STATIC" (Vi's arc)
+// Intro: 8 procedurally-drawn canvas panels
+// Game:  Touhou-style bullet-hell shooter
+// ============================================================
+const C3 = (() => {
+
+  // ---- INTRO ----
+  const Intro = (() => {
+    let canvas, ctx, panelIdx, endIdx, onDone, animRaf, panelStartT;
+
+    const PANELS = [
+      { draw: drawServerRoom,  clock: '03:47', key: 'c3_p1' },
+      { draw: drawCorruptFile, clock: '03:47', key: 'c3_p2' },
+      { draw: drawHeadset,     clock: '03:47', key: 'c3_p3' },
+      { draw: drawVoid,        clock: '03:48', key: 'c3_p4' },
+      { draw: drawHand,        clock: '03:48', key: 'c3_p5' },
+      { draw: drawShock,       clock: '03:48', key: 'c3_p6' },
+      { draw: drawDissolve,    clock: '03:49', key: 'c3_p7' },
+      { draw: drawCorridor,    clock: '03:49', key: 'c3_p8' },
+    ];
+
+    function W() { return canvas ? canvas.getBoundingClientRect().width  : 1; }
+    function H() { return canvas ? canvas.getBoundingClientRect().height : 1; }
+
+    function size() {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width  = W() * dpr;
+      canvas.height = H() * dpr;
+      ctx.setTransform(1,0,0,1,0,0);
+      ctx.scale(dpr, dpr);
+    }
+
+    function scanlines() {
+      ctx.save();
+      ctx.fillStyle = 'rgba(0,0,0,0.15)';
+      const h = H();
+      for (let y = 0; y < h; y += 4) ctx.fillRect(0, y, W(), 2);
+      ctx.restore();
+    }
+    function glitch(n) {
+      ctx.save();
+      for (let i = 0; i < n; i++) {
+        ctx.fillStyle = `rgba(0,212,255,${0.03 + Math.random()*0.07})`;
+        ctx.fillRect(0, Math.random()*H(), W(), 1 + Math.random()*3);
+      }
+      ctx.restore();
+    }
+
+    function drawServerRoom(t) {
+      const w = W(), h = H();
+      ctx.fillStyle = '#010810'; ctx.fillRect(0,0,w,h);
+      [[w*.12,h*.3],[w*.4,h*.28],[w*.68,h*.3]].forEach(([mx,my],i) => {
+        const mw = w*.22, mh = h*.18;
+        const g = ctx.createRadialGradient(mx+mw/2,my+mh/2,0,mx+mw/2,my+mh/2,mw);
+        g.addColorStop(0,'rgba(0,180,255,0.22)'); g.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.fillStyle=g; ctx.fillRect(mx-mw*.5,my-mh*.5,mw*2,mh*2);
+        ctx.fillStyle='#001a26'; ctx.strokeStyle='rgba(0,212,255,0.45)'; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.rect(mx,my,mw,mh); ctx.fill(); ctx.stroke();
+        ctx.fillStyle='rgba(0,212,255,0.65)'; ctx.font=`${mh*.11}px Courier New`;
+        for (let r=0;r<5;r++) {
+          const row_y = my+r*mh/5+6;
+          const txt = (i===1&&r===2)?'PATIENT #0...':'>'+Math.random().toString(36).substr(2,8);
+          ctx.fillText(txt.substr(0,11),mx+4,row_y+5);
+        }
+      });
+      ctx.fillStyle='#050810'; ctx.fillRect(0,h*.52,w,h*.48);
+      ctx.fillStyle='#08101a';
+      ctx.beginPath(); ctx.ellipse(w*.38,h*.34,w*.06,h*.08,0,0,Math.PI*2); ctx.fill();
+      ctx.fillRect(w*.3,h*.42,w*.16,h*.14);
+      glitch(6); scanlines();
+    }
+
+    function drawCorruptFile(t) {
+      const w = W(), h = H();
+      ctx.fillStyle='#000d14'; ctx.fillRect(0,0,w,h);
+      const pw=w*.85,ph=h*.65,px=(w-pw)/2,py=(h-ph)/2;
+      ctx.fillStyle='#001520'; ctx.strokeStyle='rgba(0,212,255,0.35)'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.rect(px,py,pw,ph); ctx.fill(); ctx.stroke();
+      ctx.fillStyle='rgba(0,212,255,0.12)'; ctx.fillRect(px,py,pw,24);
+      ctx.fillStyle='rgba(0,212,255,0.75)'; ctx.font='11px Courier New';
+      ctx.fillText('KLAS_ARCHIVE / patient_0',px+10,py+16);
+      const lines=['ID: PATIENT_0','NAME: [CORRUPTED]','DOB: [CORRUPTED]','DIAGNOSIS: [REDACTED]',
+                   'TREATMENT: FAILED','-------------------','LAST ACCESS: 3Y AGO','STATUS: ████████'];
+      const gr = Math.floor(t/220)%lines.length;
+      lines.forEach((line,i)=>{
+        const fy=py+36+i*20;
+        ctx.fillStyle = i===gr?'rgba(255,60,60,0.9)':i>=5?'rgba(255,120,0,0.65)':'rgba(0,212,255,0.72)';
+        ctx.font='12px Courier New';
+        const txt = i===gr?line.replace(/\S/g,()=>Math.random()>.5?line[~~(Math.random()*line.length)]:'_'):line;
+        ctx.fillText(txt,px+12,fy);
+      });
+      if (Math.sin(t/180)>.8){ctx.fillStyle='rgba(255,40,40,0.06)';ctx.fillRect(0,0,w,h);}
+      glitch(12); scanlines();
+    }
+
+    function drawHeadset(t) {
+      const w = W(), h = H();
+      ctx.fillStyle='#050412'; ctx.fillRect(0,0,w,h);
+      const g=ctx.createRadialGradient(w/2,h*.4,0,w/2,h*.4,w*.4);
+      g.addColorStop(0,'rgba(0,100,180,0.28)'); g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+      ctx.fillStyle='#0a0820';
+      ctx.beginPath(); ctx.ellipse(w/2,h*.35,w*.1,h*.13,0,0,Math.PI*2); ctx.fill();
+      ctx.fillRect(w/2-w*.12,h*.48,w*.24,h*.2);
+      ctx.strokeStyle='rgba(0,212,255,0.9)'; ctx.lineWidth=3;
+      ctx.beginPath(); ctx.arc(w/2,h*.35,w*.115,Math.PI,0); ctx.stroke();
+      ctx.fillStyle='rgba(0,212,255,0.8)';
+      ctx.beginPath(); ctx.ellipse(w/2-w*.115,h*.35,w*.02,h*.025,0,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(w/2+w*.115,h*.35,w*.02,h*.025,0,0,Math.PI*2); ctx.fill();
+      const p=(Math.sin(t/300)+1)/2;
+      ctx.strokeStyle=`rgba(0,212,255,${.4-p*.3})`; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.arc(w/2,h*.35,w*.14+p*w*.05,0,Math.PI*2); ctx.stroke();
+      glitch(4); scanlines();
+    }
+
+    function drawVoid(t) {
+      const w = W(), h = H();
+      ctx.fillStyle='#000'; ctx.fillRect(0,0,w,h);
+      ctx.font='10px Courier New';
+      for (let i=0;i<16;i++) {
+        const x=(w/16)*i+w/32, sp=.5+(i%3)*.4, off=(i*137)%h;
+        for (let r=0;r<20;r++) {
+          const y=((t*sp+off+r*22)%(h+220))-20;
+          const a=Math.max(0,1-r/20);
+          ctx.fillStyle=`rgba(0,212,255,${.55*a})`;
+          ctx.fillText(String.fromCharCode(0x30A0+~~((t/100+i+r)%96)),x,y);
+        }
+      }
+      const vy=(h*.1+(t%8000)/8000*h*.8)%h;
+      ctx.save(); ctx.globalAlpha=.8; ctx.fillStyle='#001520';
+      ctx.beginPath(); ctx.ellipse(w/2,vy,w*.06,h*.07,0,0,Math.PI*2); ctx.fill();
+      ctx.fillRect(w/2-w*.07,vy+h*.07,w*.14,h*.1); ctx.restore();
+      scanlines();
+    }
+
+    function drawHand(t) {
+      const w = W(), h = H();
+      ctx.fillStyle='#000'; ctx.fillRect(0,0,w,h);
+      const id=ctx.createImageData(~~w,~~h); const d=id.data;
+      for(let i=0;i<d.length;i+=4){const v=Math.random()*28;d[i]=v*.15;d[i+1]=v;d[i+2]=v*1.3;d[i+3]=255;}
+      ctx.putImageData(id,0,0);
+      ctx.fillStyle='rgba(180,230,255,0.82)';
+      ctx.beginPath(); ctx.ellipse(w/2,h*.3,w*.1,h*.12,Math.PI/8,0,Math.PI*2); ctx.fill();
+      [[-0.09,-0.16],[-0.04,-0.2],[0.03,-0.19],[0.09,-0.14]].forEach(([dx,dy])=>{
+        ctx.beginPath(); ctx.ellipse(w/2+dx*w,h*.3+dy*h,w*.025,h*.07,dx*.4,0,Math.PI*2); ctx.fill();
+      });
+      const hg=ctx.createRadialGradient(w/2,h*.3,0,w/2,h*.3,w*.25);
+      hg.addColorStop(0,'rgba(100,220,255,0.35)'); hg.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=hg; ctx.fillRect(0,0,w,h);
+      const p=(Math.sin(t/250)+1)/2;
+      ctx.strokeStyle=`rgba(0,212,255,${.3+p*.5})`; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.arc(w/2,h*.3,w*.16+p*w*.04,0,Math.PI*2); ctx.stroke();
+    }
+
+    function drawShock(t) {
+      const w = W(), h = H();
+      ctx.fillStyle='#030008'; ctx.fillRect(0,0,w,h);
+      if (Math.sin(t/80)>.6) {
+        for(let i=0;i<7;i++){
+          const sy=Math.random()*h;
+          ctx.drawImage(canvas,0,~~sy,~~w,3,(Math.random()-.5)*28,~~sy,~~w,3);
+        }
+      }
+      ctx.fillStyle='#0a0418';
+      ctx.beginPath(); ctx.ellipse(w*.45,h*.4,w*.08,h*.1,Math.PI/20,0,Math.PI*2); ctx.fill();
+      ctx.fillRect(w*.35,h*.5,w*.2,h*.18);
+      ctx.fillStyle='rgba(255,255,255,0.9)';
+      ctx.beginPath(); ctx.ellipse(w*.42,h*.39,w*.015,h*.012,0,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(w*.48,h*.39,w*.015,h*.012,0,0,Math.PI*2); ctx.fill();
+      if (Math.sin(t/120)>.7){ctx.fillStyle='rgba(255,0,0,0.07)';ctx.fillRect(0,0,w,h);}
+      glitch(18); scanlines();
+    }
+
+    function drawDissolve(t) {
+      const w = W(), h = H();
+      ctx.fillStyle='#000'; ctx.fillRect(0,0,w,h);
+      const prog=Math.min(t/4000,1);
+      for (let i=0;i<200;i++) {
+        const s=i*1.618;
+        const px=w*.4+Math.cos(s*3)*w*.1*(1+prog*2);
+        const py=h*.35+Math.sin(s*2)*h*.15*(1+prog*1.5);
+        const a=Math.max(0,(1-prog)*(.4+Math.sin(t/200+i)*.3));
+        ctx.fillStyle=`rgba(180,240,255,${a})`;
+        const sz=2+(1-prog)*3;
+        ctx.fillRect(px,py,sz,sz);
+      }
+      const tg=ctx.createRadialGradient(w*.4,h*.4,0,w*.4,h*.4,w*.3);
+      tg.addColorStop(0,`rgba(0,212,255,${.35*(1-prog)})`); tg.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=tg; ctx.fillRect(0,0,w,h);
+      scanlines();
+    }
+
+    function drawCorridor(t) {
+      const w = W(), h = H();
+      ctx.fillStyle='#08060e'; ctx.fillRect(0,0,w,h);
+      ctx.strokeStyle='rgba(0,212,255,0.12)'; ctx.lineWidth=1;
+      const vx=w/2, vy=h*.5;
+      for (let i=0;i<7;i++) {
+        const x=w*.08+i*w*.14;
+        ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(vx,vy); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x,h); ctx.lineTo(vx,vy); ctx.stroke();
+      }
+      ctx.fillStyle='rgba(0,180,220,0.14)';
+      ctx.beginPath(); ctx.ellipse(w*.35,h*.42,w*.05,h*.065,0,0,Math.PI*2); ctx.fill();
+      ctx.fillRect(w*.305,h*.485,w*.09,h*.14);
+      ctx.beginPath(); ctx.ellipse(w*.65,h*.42,w*.05,h*.065,0,0,Math.PI*2); ctx.fill();
+      ctx.fillRect(w*.605,h*.485,w*.09,h*.14);
+      const lg=ctx.createRadialGradient(vx,vy,0,vx,vy,w*.3);
+      lg.addColorStop(0,'rgba(180,255,220,0.08)'); lg.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=lg; ctx.fillRect(0,0,w,h);
+      glitch(3); scanlines();
+    }
+
+    function renderPanel(t) { const p=PANELS[panelIdx]; if(p) p.draw(t); }
+
+    function loop(now) {
+      if (!animRaf) return;
+      if (panelStartT===0) panelStartT=now;
+      renderPanel(now-panelStartT);
+      animRaf=requestAnimationFrame(loop);
+    }
+
+    function showText() {
+      const p=PANELS[panelIdx];
+      const el=document.getElementById('c3p-text');
+      const cl=document.getElementById('c3p-clock');
+      if (!p||!el) return;
+      el.classList.remove('show'); void el.offsetWidth;
+      el.textContent=window.tr?window.tr(p.key):'';
+      el.classList.add('show');
+      if (cl) cl.textContent=p.clock;
+    }
+
+    function next() {
+      panelIdx++;
+      if (panelIdx>endIdx) {
+        cancelAnimationFrame(animRaf); animRaf=null;
+        const cb=onDone; onDone=null; if(cb) cb(); return;
+      }
+      panelStartT=0; showText();
+    }
+
+    function play(startIdx,endIdxIn,onDoneIn) {
+      canvas=document.getElementById('c3p-canvas');
+      ctx=canvas.getContext('2d');
+      panelIdx=startIdx; endIdx=endIdxIn; onDone=onDoneIn; panelStartT=0;
+      size(); window.addEventListener('resize',size);
+      showText();
+      animRaf=1; animRaf=requestAnimationFrame(loop);
+    }
+
+    function bindTap() {
+      const scene=document.getElementById('c3p-scene');
+      if (!scene||scene.__c3bound) return;
+      scene.__c3bound=true;
+      scene.addEventListener('click',()=>{ if(animRaf) next(); });
+    }
+
+    function skipToEnd() {
+      cancelAnimationFrame(animRaf); animRaf=null;
+      const cb=onDone; onDone=null; if(cb) cb();
+    }
+
+    return { play, bindTap, skipToEnd };
+  })();
+
+  // ---- GAME (Touhou bullet-hell) ----
+  const Game = (() => {
+    let canvas, ctx, raf, running;
+    let lives, score, level, waveIndex, waveTimer, bossActive;
+    let px, py;                         // player position
+    let touchTargetX = null;
+    let fireTimer = 0;
+    let invincible = 0;
+    let bullets = [], shots = [], enemies = [], particles = [];
+    let w = 1, h = 1;
+    let lastT = 0, lastLevel = 1;
+
+    const FIRE_INTERVAL = 0.12;   // seconds between player shots
+    const PLAYER_SPEED  = 200;    // px/s
+    const INVINCIBLE_S  = 1.5;    // seconds of invincibility after hit
+    const PLAYER_W = 14, PLAYER_H = 20;
+
+    const WAVE_PAUSE = 2.2;       // seconds between waves
+
+    function resize() {
+      if (!canvas) return;
+      const r=canvas.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
+      w=r.width; h=r.height;
+      canvas.width=~~(w*dpr); canvas.height=~~(h*dpr);
+      ctx.setTransform(1,0,0,1,0,0); ctx.scale(dpr,dpr);
+    }
+
+    function start(lvl) {
+      lastLevel=lvl;
+      canvas=document.getElementById('c3g-canvas');
+      ctx=canvas.getContext('2d');
+      resize(); window.addEventListener('resize',resize);
+      lives=3; score=0; level=lvl; waveIndex=0; waveTimer=0; bossActive=false;
+      px=w/2; py=h*.82;
+      bullets=[]; shots=[]; enemies=[]; particles=[];
+      fireTimer=0; invincible=0; touchTargetX=null; running=true;
+      bindInput();
+      document.getElementById('c3g-level-name').textContent=
+        lvl===3?'STATIC LOOP':lvl===2?'MEMORY LEAK':'DATA FRACTURE';
+      document.getElementById('c3g-end-overlay').classList.remove('show');
+      renderHUD();
+      lastT=performance.now();
+      raf=requestAnimationFrame(tick);
+    }
+
+    function restart() { if(raf){cancelAnimationFrame(raf);raf=null;} start(lastLevel); }
+    function stop() { running=false; if(raf){cancelAnimationFrame(raf);raf=null;} }
+
+    function bindInput() {
+      const stage=document.getElementById('c3g-stage');
+      if (stage.__c3gi) return; stage.__c3gi=true;
+      const rect=()=>canvas.getBoundingClientRect();
+      stage.addEventListener('touchstart',e=>{touchTargetX=e.touches[0].clientX-rect().left;},{passive:true});
+      stage.addEventListener('touchmove',e=>{e.preventDefault();touchTargetX=e.touches[0].clientX-rect().left;},{passive:false});
+      stage.addEventListener('touchend',()=>{touchTargetX=null;});
+      stage.addEventListener('mousemove',e=>{if(e.buttons)touchTargetX=e.clientX-rect().left;});
+    }
+
+    function tick(now) {
+      if (!running) return;
+      const dt=Math.min((now-lastT)/1000,.05); lastT=now;
+      update(dt); draw();
+      raf=requestAnimationFrame(tick);
+    }
+
+    function update(dt) {
+      // Player move
+      if (touchTargetX!==null) {
+        const dx=touchTargetX-px, mv=PLAYER_SPEED*dt;
+        px=Math.max(PLAYER_W, Math.min(w-PLAYER_W, px+(Math.abs(dx)<mv?dx:Math.sign(dx)*mv)));
+      }
+
+      // Player fire
+      fireTimer+=dt;
+      if (fireTimer>=FIRE_INTERVAL) {
+        fireTimer=0;
+        shots.push({x:px,y:py-PLAYER_H,vx:0,vy:-480});
+        if (level>=2){
+          shots.push({x:px-10,y:py-PLAYER_H,vx:-30,vy:-460});
+          shots.push({x:px+10,y:py-PLAYER_H,vx: 30,vy:-460});
+        }
+        if (level>=3 && waveIndex>4){
+          shots.push({x:px-20,y:py-PLAYER_H,vx:-60,vy:-440});
+          shots.push({x:px+20,y:py-PLAYER_H,vx: 60,vy:-440});
+        }
+      }
+
+      // Move shots
+      shots=shots.filter(s=>{s.x+=s.vx*dt;s.y+=s.vy*dt;return s.y>-10&&s.x>-10&&s.x<w+10;});
+
+      // Move enemy bullets
+      bullets=bullets.filter(b=>{
+        b.x+=Math.sin(b.a)*b.sp*dt; b.y+=Math.cos(b.a)*b.sp*dt;
+        return b.y<h+12&&b.x>-12&&b.x<w+12&&b.y>-12;
+      });
+
+      // Move enemies
+      enemies.forEach(e=>{
+        e.t=(e.t||0)+dt;
+        if (e.y<e.ty) e.y+=e.drop*dt;
+        e.x+=(e.vx||0)*dt;
+        if (e.wx) e.x+=Math.sin(e.t*e.wx)*55*dt;
+        if (e.x<e.r){e.x=e.r;if(e.vx)e.vx=Math.abs(e.vx);}
+        if (e.x>w-e.r){e.x=w-e.r;if(e.vx)e.vx=-Math.abs(e.vx);}
+        e.ft=(e.ft||0)+dt;
+        if (e.ft>=e.fr){e.ft=0;shoot(e);}
+      });
+
+      // Wave logic
+      if (enemies.length===0&&!bossActive) {
+        waveTimer+=dt;
+        if (waveTimer>=WAVE_PAUSE) { waveTimer=0; spawnWave(); }
+      }
+
+      // Particles
+      particles=particles.filter(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;return p.life>0;});
+
+      // Hits: shots vs enemies
+      for (let ei=enemies.length-1;ei>=0;ei--) {
+        const e=enemies[ei];
+        for (let si=shots.length-1;si>=0;si--) {
+          const s=shots[si];
+          if (Math.abs(s.x-e.x)<e.r&&Math.abs(s.y-e.y)<e.r) {
+            shots.splice(si,1); e.hp--;
+            burst(e.x,e.y,4,'#00d4ff');
+            if (e.hp<=0){
+              score+=e.sc; burst(e.x,e.y,14,'#00d4ff');
+              enemies.splice(ei,1);
+              if (e.isBoss){bossActive=false;}
+              renderHUD(); checkWin(); break;
+            }
+          }
+        }
+      }
+
+      // Hits: bullets vs player
+      if (invincible>0){invincible-=dt;}else{
+        for (const b of bullets){
+          if (Math.abs(b.x-px)<7&&Math.abs(b.y-py)<9){takeHit();break;}
+        }
+      }
+    }
+
+    function shoot(e) {
+      const toP=Math.atan2(px-e.x,py-e.y);
+      const sp=e.bs, n=e.bn||1;
+      if (e.bp==='aimed'){
+        bullets.push({x:e.x,y:e.y,a:toP,sp});
+      } else if (e.bp==='radial'){
+        for(let i=0;i<n;i++) bullets.push({x:e.x,y:e.y,a:Math.PI*2/n*i,sp});
+      } else if (e.bp==='spread'){
+        for(let i=0;i<n;i++) bullets.push({x:e.x,y:e.y,a:toP+(i-(n-1)/2)*0.28,sp});
+      } else if (e.bp==='spiral'){
+        e.sa=(e.sa||0)+0.38;
+        for(let i=0;i<3;i++) bullets.push({x:e.x,y:e.y,a:e.sa+Math.PI*2/3*i,sp});
+      } else if (e.bp==='shotgun'){
+        for(let i=0;i<n;i++) bullets.push({x:e.x,y:e.y,a:toP+(i-(n-1)/2)*0.18,sp:sp+Math.random()*30});
+      }
+    }
+
+    function spawnWave() {
+      const lv=level, wi=waveIndex;
+      const maxWaves=lv===3?9999:lv===2?5:3;
+      if (wi>=maxWaves&&lv!==3) return; // all waves done; checkWin handles it
+
+      // Boss on final wave (L1 wave 3, L2 wave 5)
+      const isBoss=(lv<3)&&(wi===maxWaves-1)&&!bossActive;
+      if (isBoss) {
+        bossActive=true;
+        enemies.push({x:w/2,y:-50,ty:h*.17,drop:80,r:34,isBoss:true,
+          hp:lv===1?22:42,sc:600,bp:'spiral',fr:.48,bs:110+lv*12,vx:65,wx:0,t:0,ft:0});
+      } else {
+        const cnt=Math.min(4+wi+lv*2,12);
+        const patterns=['aimed','spread','radial','shotgun'];
+        const bp=patterns[wi%patterns.length];
+        const bn=bp==='radial'?6+wi:bp==='spread'?4+~~(wi/2):bp==='shotgun'?5:1;
+        for (let i=0;i<cnt;i++){
+          enemies.push({
+            x:(w/(cnt+1))*(i+1), y:-38-~~(i/5)*45, ty:h*(.1+~~(i/5)*.11),
+            drop:55, r:15, hp:1+lv, sc:50+lv*25,
+            bp, bn, fr:Math.max(.5,1.8-wi*.12-(lv-1)*.2), bs:100+wi*7+(lv-1)*18,
+            vx:(i%2?1:-1)*(35+wi*8), wx:i%3===0?2.4:0, t:0, ft:0,
+          });
+        }
+      }
+      waveIndex++;
+    }
+
+    function takeHit() {
+      lives--; invincible=INVINCIBLE_S; burst(px,py,22,'#ff4488'); renderHUD();
+      if (lives<=0){running=false;setTimeout(()=>endScreen(false),450);}
+    }
+
+    function burst(x,y,n,col){
+      for(let i=0;i<n;i++){
+        const a=Math.random()*Math.PI*2, sp=40+Math.random()*120;
+        particles.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:.5+Math.random()*.4,col,sz:2+Math.random()*3});
+      }
+    }
+
+    function checkWin() {
+      if (level===3) return;
+      const done=(level===1&&waveIndex>=3)||(level===2&&waveIndex>=5);
+      if (done&&enemies.length===0&&bossActive===false){
+        running=false; setTimeout(()=>endScreen(true),600);
+      }
+    }
+
+    function endScreen(win) {
+      const ol=document.getElementById('c3g-end-overlay');
+      const ti=document.getElementById('c3g-end-title');
+      const su=document.getElementById('c3g-end-sub');
+      if (!ol) return;
+      if (win){
+        ti.textContent=window.tr?window.tr('c3_cleared'):'CLEARED';
+        ti.style.color='#00d4ff';
+        if (level===1) window.__c3_state_set?.('c3_lvl1complete',true);
+        if (level===2) window.__c3_state_set?.('c3_lvl2complete',true);
+        if (level===3) window.__c3_state_set?.('c3_lvl3best',Math.max(score,window.__c3_get_best?.()||0));
+      } else {
+        ti.textContent=window.tr?window.tr('c3_failed'):'SIGNAL LOST';
+        ti.style.color='#ff4060';
+      }
+      su.textContent='Score: '+score.toLocaleString();
+      ol.classList.add('show');
+    }
+
+    function renderHUD() {
+      const sc=document.getElementById('c3g-score');
+      if(sc) sc.textContent=score.toLocaleString();
+      const lv=document.getElementById('c3g-lives');
+      if(lv){lv.innerHTML='';for(let i=0;i<3;i++){const d=document.createElement('div');d.className='c3g-heart'+(i<lives?' ':' lost');lv.appendChild(d);}}
+    }
+
+    function draw() {
+      ctx.clearRect(0,0,w,h);
+      ctx.fillStyle='#000510'; ctx.fillRect(0,0,w,h);
+      // Grid
+      ctx.strokeStyle='rgba(0,90,140,0.07)'; ctx.lineWidth=.5;
+      for(let x=0;x<w;x+=28){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();}
+      for(let y=0;y<h;y+=28){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();}
+
+      // Particles
+      particles.forEach(p=>{
+        ctx.globalAlpha=Math.max(0,p.life/.9);
+        ctx.fillStyle=p.col; ctx.fillRect(p.x-p.sz/2,p.y-p.sz/2,p.sz,p.sz);
+      });
+      ctx.globalAlpha=1;
+
+      // Enemies
+      ctx.shadowBlur=10;
+      enemies.forEach(e=>{
+        if (e.isBoss){
+          ctx.fillStyle='#ff2050'; ctx.shadowColor='#ff2050';
+          ctx.beginPath();
+          ctx.moveTo(e.x,e.y-e.r);ctx.lineTo(e.x+e.r,e.y);ctx.lineTo(e.x,e.y+e.r);ctx.lineTo(e.x-e.r,e.y);
+          ctx.closePath(); ctx.fill();
+          // HP bar
+          const maxHp=level===1?22:42;
+          ctx.shadowBlur=0;
+          ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(e.x-32,e.y-e.r-12,64,5);
+          ctx.fillStyle='#ff2050'; ctx.fillRect(e.x-32,e.y-e.r-12,64*(e.hp/maxHp),5);
+          ctx.shadowBlur=10;
+        } else {
+          ctx.fillStyle='#b01840'; ctx.strokeStyle='#ff3060'; ctx.lineWidth=1; ctx.shadowColor='#ff1840';
+          ctx.beginPath();
+          for(let i=0;i<6;i++){const a=Math.PI*2/6*i-Math.PI/2;const[ex,ey]=[e.x+Math.cos(a)*e.r,e.y+Math.sin(a)*e.r];i?ctx.lineTo(ex,ey):ctx.moveTo(ex,ey);}
+          ctx.closePath(); ctx.fill(); ctx.stroke();
+        }
+      });
+      ctx.shadowBlur=0;
+
+      // Enemy bullets
+      ctx.fillStyle='#ff3050'; ctx.shadowBlur=5; ctx.shadowColor='#ff3050';
+      bullets.forEach(b=>{ctx.beginPath();ctx.arc(b.x,b.y,4,0,Math.PI*2);ctx.fill();});
+      ctx.shadowBlur=0;
+
+      // Player shots
+      ctx.fillStyle='#00d4ff'; ctx.shadowBlur=7; ctx.shadowColor='#00d4ff';
+      shots.forEach(s=>{ctx.fillRect(s.x-2,s.y,4,10);});
+      ctx.shadowBlur=0;
+
+      // Player — Vi (triangle ship)
+      const blink=invincible>0&&Math.floor(invincible*8)%2===0;
+      if (!blink){
+        ctx.fillStyle='#a0eeff'; ctx.shadowBlur=14; ctx.shadowColor='#00d4ff';
+        ctx.beginPath();
+        ctx.moveTo(px,py-PLAYER_H); ctx.lineTo(px-PLAYER_W,py+PLAYER_H/2); ctx.lineTo(px+PLAYER_W,py+PLAYER_H/2);
+        ctx.closePath(); ctx.fill();
+        ctx.fillStyle='#00d4ff'; ctx.shadowBlur=4;
+        ctx.beginPath(); ctx.arc(px,py-2,2.5,0,Math.PI*2); ctx.fill();
+        ctx.shadowBlur=0;
+      }
+    }
+
+    return { start, stop, restart };
+  })();
+
+  return { Intro, Game };
+})();
+
 (function() {
   if (window.Telegram?.WebApp) {
     Telegram.WebApp.ready();
