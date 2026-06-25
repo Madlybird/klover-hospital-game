@@ -12570,9 +12570,10 @@ window.tr = tr;
 const C3 = (() => {
   // Preload story artwork + game background
   const _imgs = {};
+  const _imgVer = { '7': '?v=2' };
   [['p1','1'],['p3','3'],['p4','4'],['p5','5'],['p6','6'],['p7','7'],['gbg','game-bg']].forEach(([key,n]) => {
     const img = new Image();
-    img.src = `/assets/story3/${n}.png`;
+    img.src = `/assets/story3/${n}.png${_imgVer[n]||''}`;
     _imgs[key] = img;
   });
 

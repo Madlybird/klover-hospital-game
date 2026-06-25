@@ -97,17 +97,46 @@ export default async function handler(req, res) {
   const { count: total } = await sb
     .from('users')
     .select('telegram_id', { count: 'exact', head: true });
+
   const { data: latest } = await sb
     .from('users')
     .select('telegram_id, username, created_at')
     .order('created_at', { ascending: false })
     .limit(5);
 
+  // Coin aggregates
+  const { data: coinRow } = await sb
+    .from('users')
+    .select('coins')
+    .not('coins', 'is', null)
+    .gt('coins', 0);
+  const coinValues = (coinRow || []).map(r => r.coins || 0);
+  const coinsTotal = coinValues.reduce((s, v) => s + v, 0);
+  const coinsAvg = coinValues.length ? Math.round(coinsTotal / coinValues.length) : 0;
+  const coinsMax = coinValues.length ? Math.max(...coinValues) : 0;
+  const coinsTop10 = [...coinValues].sort((a,b)=>b-a).slice(0,10);
+
+  // Top players by coins
+  const { data: topPlayers } = await sb
+    .from('users')
+    .select('telegram_id, username, coins, high_score')
+    .not('coins', 'is', null)
+    .order('coins', { ascending: false })
+    .limit(10);
+
   return res.status(200).json({
     ok: true,
     total: total || 0,
     windows: totals,
     latest,
+    coins: {
+      total: coinsTotal,
+      avg: coinsAvg,
+      max: coinsMax,
+      usersWithCoins: coinValues.length,
+      top10values: coinsTop10,
+    },
+    topPlayers: topPlayers || [],
     serverTime: new Date().toISOString(),
   });
 }
