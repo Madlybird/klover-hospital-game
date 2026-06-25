@@ -6522,7 +6522,7 @@ const Game = (() => {
     showScreen('c3-intro');
     requestAnimationFrame(() => {
       try { C3.Audio.prime(); C3.Audio.music('story'); } catch (e) {}
-      C3.Intro.play(0, 7, () => {
+      C3.Intro.play(0, 6, () => {
         try { C3.Audio.music('stop'); } catch (e) {}
         state.c3_introSeen = true;
         Save.save(state);
@@ -12588,7 +12588,6 @@ const C3 = (() => {
       { draw: drawHand,        clock: '03:48', key: 'c3_p5' },
       { draw: drawShock,       clock: '03:48', key: 'c3_p6' },
       { draw: drawDissolve,    clock: '03:49', key: 'c3_p7' },
-      { draw: drawCorridor,    clock: '03:49', key: 'c3_p8' },
     ];
 
     function W() { return canvas ? canvas.getBoundingClientRect().width  : 1; }
@@ -12669,7 +12668,6 @@ const C3 = (() => {
 
     function drawDissolve(t) { drawImgFull('p7', t, 0); }
 
-    function drawCorridor(t) { drawImgFull('p7', t, 0); }
 
     function renderPanel(t) { const p=PANELS[panelIdx]; if(p) p.draw(t); }
 
@@ -12734,7 +12732,7 @@ const C3 = (() => {
     let invincible = 0;
     let bullets = [], shots = [], enemies = [], particles = [];
     let w = 1, h = 1;
-    let lastT = 0, lastLevel = 1;
+    let lastT = 0, lastLevel = 1, weaponTier = 1;
 
     const FIRE_INTERVAL = 0.12;   // seconds between player shots
     const PLAYER_SPEED  = 200;    // px/s
@@ -12759,7 +12757,7 @@ const C3 = (() => {
       canvas=document.getElementById('c3g-canvas');
       ctx=canvas.getContext('2d');
       resize(); window.addEventListener('resize',resize);
-      lives=3; score=0; level=lvl; waveIndex=0; waveTimer=0; bossActive=false;
+      lives=3; score=0; level=lvl; waveIndex=0; waveTimer=0; bossActive=false; weaponTier=1;
       px=w/2; py=h*.82;
       bullets=[]; shots=[]; enemies=[]; particles=[];
       fireTimer=0; invincible=0; touchTargetX=null; running=true;
@@ -12799,17 +12797,30 @@ const C3 = (() => {
         px=Math.max(PLAYER_W, Math.min(w-PLAYER_W, px+(Math.abs(dx)<mv?dx:Math.sign(dx)*mv)));
       }
 
-      // Player fire
+      // Player fire — level 3 has gradual weapon tier based on wave
+      const _tier = level===3
+        ? (waveIndex>=12?4:waveIndex>=7?3:waveIndex>=3?2:1)
+        : (level>=2?2:1);
+      if (level===3 && _tier!==weaponTier) {
+        weaponTier=_tier;
+        const names=['','T-I: SINGLE','T-II: SPREAD','T-III: WIDE','T-IV: RAPID'];
+        const el=document.getElementById('c3g-level-name');
+        if(el) el.textContent='STATIC LOOP  '+names[_tier];
+        try{window.showToast?.('WEAPON: '+names[_tier]);}catch(e){}
+      }
+      const _fi = level===3&&_tier>=4 ? 0.085 : FIRE_INTERVAL;
       fireTimer+=dt;
-      if (fireTimer>=FIRE_INTERVAL) {
+      if (fireTimer>=_fi) {
         fireTimer=0;
         try { C3.Audio.shoot(); } catch(ex){}
         shots.push({x:px,y:py-PLAYER_H,vx:0,vy:-480});
-        if (level>=2){
+        // Tier 2+: 3-shot spread (also always on level 2)
+        if (level===2||(level===3&&_tier>=2)){
           shots.push({x:px-10,y:py-PLAYER_H,vx:-30,vy:-460});
           shots.push({x:px+10,y:py-PLAYER_H,vx: 30,vy:-460});
         }
-        if (level>=3 && waveIndex>4){
+        // Tier 3+: 5-shot wide
+        if (level===3&&_tier>=3){
           shots.push({x:px-20,y:py-PLAYER_H,vx:-60,vy:-440});
           shots.push({x:px+20,y:py-PLAYER_H,vx: 60,vy:-440});
         }
@@ -12892,26 +12903,41 @@ const C3 = (() => {
     function spawnWave() {
       const lv=level, wi=waveIndex;
       const maxWaves=lv===3?9999:lv===2?5:3;
-      if (wi>=maxWaves&&lv!==3) return; // all waves done; checkWin handles it
+      if (wi>=maxWaves&&lv!==3) return;
 
-      // Boss on final wave (L1 wave 3, L2 wave 5)
-      const isBoss=(lv<3)&&(wi===maxWaves-1)&&!bossActive;
+      // Boss: L1/L2 on last wave; L3 endless every 5th wave (4,9,14…)
+      const isBoss = lv===3
+        ? (wi>0 && wi%5===4 && !bossActive)
+        : ((wi===maxWaves-1) && !bossActive);
+
       if (isBoss) {
         bossActive=true;
         try { C3.Audio.bossAlarm(); } catch(ex){}
+        // Endless boss scales with wave count
+        const bossHp = lv===3 ? 18+Math.floor(wi/5)*12 : (lv===1?22:42);
+        const bossSpd= lv===3 ? 90+Math.floor(wi/5)*10  : 110+lv*12;
         enemies.push({x:w/2,y:-50,ty:h*.17,drop:80,r:34,isBoss:true,
-          hp:lv===1?22:42,sc:600,bp:'spiral',fr:.48,bs:110+lv*12,vx:65,wx:0,t:0,ft:0});
+          hp:bossHp,sc:400+wi*40,bp:'spiral',fr:.45,bs:bossSpd,vx:50+wi*3,wx:0,t:0,ft:0});
       } else {
-        const cnt=Math.min(4+wi+lv*2,12);
+        // Endless: starts easy, ramps gradually
+        const cnt = lv===3
+          ? Math.min(2+Math.floor(wi/2), 10)
+          : Math.min(4+wi+lv*2, 12);
+        const hp  = lv===3 ? Math.min(1+Math.floor(wi/4), 6) : 1+lv;
+        const fr  = lv===3
+          ? Math.max(0.45, 2.2-wi*0.07)
+          : Math.max(0.5,  1.8-wi*0.12-(lv-1)*0.2);
+        const bs  = lv===3 ? 80+wi*5 : 100+wi*7+(lv-1)*18;
+        const vx  = lv===3 ? (20+wi*4) : (35+wi*8);
         const patterns=['aimed','spread','radial','shotgun'];
         const bp=patterns[wi%patterns.length];
-        const bn=bp==='radial'?6+wi:bp==='spread'?4+~~(wi/2):bp==='shotgun'?5:1;
+        const bn=bp==='radial'?Math.min(4+Math.floor(wi/2),10):bp==='spread'?3+~~(wi/3):bp==='shotgun'?4:1;
+        const sc = lv===3 ? 30+wi*8 : 50+lv*25;
         for (let i=0;i<cnt;i++){
           enemies.push({
             x:(w/(cnt+1))*(i+1), y:-38-~~(i/5)*45, ty:h*(.1+~~(i/5)*.11),
-            drop:55, r:15, hp:1+lv, sc:50+lv*25,
-            bp, bn, fr:Math.max(.5,1.8-wi*.12-(lv-1)*.2), bs:100+wi*7+(lv-1)*18,
-            vx:(i%2?1:-1)*(35+wi*8), wx:i%3===0?2.4:0, t:0, ft:0,
+            drop:55, r:15, hp, sc, bp, bn, fr, bs,
+            vx:(i%2?1:-1)*vx, wx:i%3===0?2.2:0, t:0, ft:0,
           });
         }
       }
