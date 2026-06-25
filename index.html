@@ -3582,15 +3582,14 @@ html, body {
 }
 /* ---- C3 story panels (#screen-c3-intro) ---- */
 .c3p-stage {
-  display: flex;
-  flex-direction: column;
+  position: relative;
   height: 100vh;
   width: 100%;
   background: #020a10;
 }
 .c3p-scene {
-  position: relative;
-  flex: 1;
+  position: absolute;
+  inset: 0;
   overflow: hidden;
 }
 .c3p-scene canvas {
@@ -3624,14 +3623,14 @@ html, body {
   pointer-events: all;
 }
 .c3p-textbox {
-  flex: 0 0 auto;
-  min-height: 130px;
-  background: linear-gradient(180deg, rgba(1,8,20,0.97) 0%, #010810 100%);
-  border-top: 1px solid rgba(0,212,255,0.3);
-  padding: 16px 22px 20px;
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  z-index: 20;
+  background: linear-gradient(to top, rgba(1,8,20,0.97) 0%, rgba(1,8,20,0.88) 55%, transparent 100%);
+  padding: 48px 22px 26px;
   font-family: 'Courier New', monospace;
   color: #b0f0ff;
-  position: relative;
+  pointer-events: none;
 }
 .c3p-text {
   font-size: 18px;
@@ -4815,10 +4814,10 @@ html, body {
           <div class="c3p-clock" id="c3p-clock">03:47</div>
           <div class="c3p-skip" onclick="Game.skipC3Intro()">SKIP &rsaquo;</div>
         </div>
-      </div>
-      <div class="c3p-textbox">
-        <div class="c3p-text" id="c3p-text"></div>
-        <div class="c3p-tap-hint" data-i18n="c2_tap_continue">&#9678; tap to continue</div>
+        <div class="c3p-textbox">
+          <div class="c3p-text" id="c3p-text"></div>
+          <div class="c3p-tap-hint" data-i18n="c2_tap_continue">&#9678; tap to continue</div>
+        </div>
       </div>
     </div>
   </div>
@@ -12569,9 +12568,9 @@ window.tr = tr;
 // Game:  Touhou-style bullet-hell shooter
 // ============================================================
 const C3 = (() => {
-  // Preload story artwork
+  // Preload story artwork + game background
   const _imgs = {};
-  [['p1','1'],['p3','3'],['p4','4'],['p5','5']].forEach(([key,n]) => {
+  [['p1','1'],['p3','3'],['p4','4'],['p5','5'],['p6','6'],['p7','7'],['gbg','game-bg']].forEach(([key,n]) => {
     const img = new Image();
     img.src = `/assets/story3/${n}.png`;
     _imgs[key] = img;
@@ -12666,64 +12665,11 @@ const C3 = (() => {
 
     function drawHand(t) { drawImgFull('p5', t, 0); }
 
-    function drawShock(t) {
-      const w = W(), h = H();
-      ctx.fillStyle='#030008'; ctx.fillRect(0,0,w,h);
-      if (Math.sin(t/80)>.6) {
-        for(let i=0;i<7;i++){
-          const sy=Math.random()*h;
-          ctx.drawImage(canvas,0,~~sy,~~w,3,(Math.random()-.5)*28,~~sy,~~w,3);
-        }
-      }
-      ctx.fillStyle='#0a0418';
-      ctx.beginPath(); ctx.ellipse(w*.45,h*.4,w*.08,h*.1,Math.PI/20,0,Math.PI*2); ctx.fill();
-      ctx.fillRect(w*.35,h*.5,w*.2,h*.18);
-      ctx.fillStyle='rgba(255,255,255,0.9)';
-      ctx.beginPath(); ctx.ellipse(w*.42,h*.39,w*.015,h*.012,0,0,Math.PI*2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse(w*.48,h*.39,w*.015,h*.012,0,0,Math.PI*2); ctx.fill();
-      if (Math.sin(t/120)>.7){ctx.fillStyle='rgba(255,0,0,0.07)';ctx.fillRect(0,0,w,h);}
-      glitch(18); scanlines();
-    }
+    function drawShock(t) { drawImgFull('p6', t, 8); }
 
-    function drawDissolve(t) {
-      const w = W(), h = H();
-      ctx.fillStyle='#000'; ctx.fillRect(0,0,w,h);
-      const prog=Math.min(t/4000,1);
-      for (let i=0;i<200;i++) {
-        const s=i*1.618;
-        const px=w*.4+Math.cos(s*3)*w*.1*(1+prog*2);
-        const py=h*.35+Math.sin(s*2)*h*.15*(1+prog*1.5);
-        const a=Math.max(0,(1-prog)*(.4+Math.sin(t/200+i)*.3));
-        ctx.fillStyle=`rgba(180,240,255,${a})`;
-        const sz=2+(1-prog)*3;
-        ctx.fillRect(px,py,sz,sz);
-      }
-      const tg=ctx.createRadialGradient(w*.4,h*.4,0,w*.4,h*.4,w*.3);
-      tg.addColorStop(0,`rgba(0,212,255,${.35*(1-prog)})`); tg.addColorStop(1,'rgba(0,0,0,0)');
-      ctx.fillStyle=tg; ctx.fillRect(0,0,w,h);
-      scanlines();
-    }
+    function drawDissolve(t) { drawImgFull('p7', t, 0); }
 
-    function drawCorridor(t) {
-      const w = W(), h = H();
-      ctx.fillStyle='#08060e'; ctx.fillRect(0,0,w,h);
-      ctx.strokeStyle='rgba(0,212,255,0.12)'; ctx.lineWidth=1;
-      const vx=w/2, vy=h*.5;
-      for (let i=0;i<7;i++) {
-        const x=w*.08+i*w*.14;
-        ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(vx,vy); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x,h); ctx.lineTo(vx,vy); ctx.stroke();
-      }
-      ctx.fillStyle='rgba(0,180,220,0.14)';
-      ctx.beginPath(); ctx.ellipse(w*.35,h*.42,w*.05,h*.065,0,0,Math.PI*2); ctx.fill();
-      ctx.fillRect(w*.305,h*.485,w*.09,h*.14);
-      ctx.beginPath(); ctx.ellipse(w*.65,h*.42,w*.05,h*.065,0,0,Math.PI*2); ctx.fill();
-      ctx.fillRect(w*.605,h*.485,w*.09,h*.14);
-      const lg=ctx.createRadialGradient(vx,vy,0,vx,vy,w*.3);
-      lg.addColorStop(0,'rgba(180,255,220,0.08)'); lg.addColorStop(1,'rgba(0,0,0,0)');
-      ctx.fillStyle=lg; ctx.fillRect(0,0,w,h);
-      glitch(3); scanlines();
-    }
+    function drawCorridor(t) { drawImgFull('p7', t, 0); }
 
     function renderPanel(t) { const p=PANELS[panelIdx]; if(p) p.draw(t); }
 
@@ -13028,9 +12974,15 @@ const C3 = (() => {
 
     function draw() {
       ctx.clearRect(0,0,w,h);
-      ctx.fillStyle='#000510'; ctx.fillRect(0,0,w,h);
-      // Grid
-      ctx.strokeStyle='rgba(0,90,140,0.07)'; ctx.lineWidth=.5;
+      // Background art
+      const _bg = _imgs['gbg'];
+      if (_bg && _bg.complete && _bg.naturalWidth) {
+        ctx.globalAlpha = 0.22; ctx.drawImage(_bg,0,0,w,h); ctx.globalAlpha = 1;
+      } else {
+        ctx.fillStyle='#000510'; ctx.fillRect(0,0,w,h);
+      }
+      // Grid overlay
+      ctx.strokeStyle='rgba(0,90,140,0.09)'; ctx.lineWidth=.5;
       for(let x=0;x<w;x+=28){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();}
       for(let y=0;y<h;y+=28){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();}
 
