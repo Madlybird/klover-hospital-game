@@ -3514,8 +3514,11 @@ html, body {
    CHAPTER 3 — "STATIC" (Vi's arc — dev-gated)
    Cyan/digital-void palette.
    ============================================================ */
-#screen-c3-intro, #screen-c3-levels, #screen-c3-game {
+#screen-c3-intro, #screen-c3-game {
   background: #020a10;
+  color: #b0f0ff;
+}
+#screen-c3-levels {
   color: #b0f0ff;
 }
 .c3-entry {
@@ -3662,9 +3665,11 @@ html, body {
 }
 /* ---- C3 level select (#screen-c3-levels) ---- */
 #screen-c3-levels {
-  background:
-    linear-gradient(rgba(0,4,12,0.72), rgba(0,4,12,0.72)),
-    url('/assets/story3/game-bg.png') center / cover no-repeat !important;
+  background-color: #020a10;
+  background-image: linear-gradient(rgba(0,4,12,0.70), rgba(0,4,12,0.70)), url('/assets/story3/game-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
@@ -4827,8 +4832,8 @@ html, body {
     <div class="patient-subtitle" data-i18n="c3_levels_subtitle">Select a memory to enter:</div>
     <div class="levels-grid">
       <div class="level-card" onclick="Game.replayC3Intro()">
-        <div class="patient-photo" style="background:#020a10;display:flex;align-items:center;justify-content:center;">
-          <span style="font-size:36px;color:#00d4ff;font-family:monospace;text-shadow:0 0 16px #00d4ff">VI</span>
+        <div class="patient-photo">
+          <img src="/assets/story3/1.png" alt="Vi" class="patient-photo-img">
         </div>
         <div class="patient-info">
           <div class="id-card-label" data-i18n="c3_story_file">CASE FILE</div>
@@ -4842,8 +4847,8 @@ html, body {
         </div>
       </div>
       <div class="level-card" id="c3-card-1" onclick="Game.startC3Level(1)">
-        <div class="patient-photo" style="background:#020a10;display:flex;align-items:center;justify-content:center;">
-          <span style="font-size:28px;color:#00d4ff;opacity:0.8;font-family:monospace;text-shadow:0 0 10px #00d4ff">I</span>
+        <div class="patient-photo">
+          <img src="/assets/story3/3.png" alt="Shard 01" class="patient-photo-img">
         </div>
         <div class="patient-info">
           <div class="id-card-label">MEMORY SHARD</div>
@@ -4857,8 +4862,8 @@ html, body {
         </div>
       </div>
       <div class="level-card locked" id="c3-card-2" onclick="Game.startC3Level(2)">
-        <div class="patient-photo" style="background:#020a10;display:flex;align-items:center;justify-content:center;">
-          <span style="font-size:28px;color:#00d4ff;opacity:0.4;font-family:monospace">II</span>
+        <div class="patient-photo">
+          <img src="/assets/story3/4.png" alt="Shard 02" class="patient-photo-img">
         </div>
         <div class="patient-info">
           <div class="id-card-label">MEMORY SHARD</div>
@@ -4872,8 +4877,8 @@ html, body {
         </div>
       </div>
       <div class="level-card locked" id="c3-card-3" onclick="Game.startC3Level(3)">
-        <div class="patient-photo" style="background:#020a10;display:flex;align-items:center;justify-content:center;">
-          <span style="font-size:28px;color:#00d4ff;opacity:0.3;font-family:monospace">&#8734;</span>
+        <div class="patient-photo">
+          <img src="/assets/story3/5.png" alt="Endless" class="patient-photo-img">
         </div>
         <div class="patient-info">
           <div class="id-card-label">MEMORY SHARD</div>
@@ -6684,6 +6689,16 @@ const Game = (() => {
   };
 
   // Bridge for C3 module.
+  window.__c3_add_coins = function(n) {
+    state.coins = (state.coins || 0) + n;
+    Save.save(state);
+    updateMenuCoins();
+  };
+  window.__c3_lvl_done = function(n) {
+    if (n === 1) return !!state.c3_lvl1complete;
+    if (n === 2) return !!state.c3_lvl2complete;
+    return false;
+  };
   window.__c3_state_set = function(key, val) {
     state[key] = val;
     Save.save(state);
@@ -12792,6 +12807,9 @@ const C3 = (() => {
 
     function start(lvl) {
       lastLevel=lvl;
+      // snapshot before run — used in endScreen to detect first clear
+      window.__c3_lvl1_was_done = window.__c3_lvl_done?.(1) ?? true;
+      window.__c3_lvl2_was_done = window.__c3_lvl_done?.(2) ?? true;
       canvas=document.getElementById('c3g-canvas');
       ctx=canvas.getContext('2d');
       resize(); window.addEventListener('resize',resize);
@@ -12981,19 +12999,23 @@ const C3 = (() => {
       const ti=document.getElementById('c3g-end-title');
       const su=document.getElementById('c3g-end-sub');
       if (!ol) return;
+      let coinsEarned = 0;
       if (win){
         ti.textContent=window.tr?window.tr('c3_cleared'):'CLEARED';
         ti.style.color='#00d4ff';
         try { C3.Audio.cleared(); } catch(ex){}
-        if (level===1) window.__c3_state_set?.('c3_lvl1complete',true);
-        if (level===2) window.__c3_state_set?.('c3_lvl2complete',true);
-        if (level===3) window.__c3_state_set?.('c3_lvl3best',Math.max(score,window.__c3_get_best?.()||0));
+        if (level===1 && !window.__c3_lvl1_was_done) { coinsEarned=80; window.__c3_state_set?.('c3_lvl1complete',true); }
+        if (level===2 && !window.__c3_lvl2_was_done) { coinsEarned=160; window.__c3_state_set?.('c3_lvl2complete',true); }
+        if (level===3) { coinsEarned=Math.max(10,Math.floor(score/100)); window.__c3_state_set?.('c3_lvl3best',Math.max(score,window.__c3_get_best?.()||0)); }
       } else {
         ti.textContent=window.tr?window.tr('c3_failed'):'SIGNAL LOST';
         ti.style.color='#ff4060';
         try { C3.Audio.gameOver(); } catch(ex){}
+        // partial coin reward for endless progress
+        if (level===3 && score>0) coinsEarned=Math.max(5,Math.floor(score/200));
       }
-      su.textContent='Score: '+score.toLocaleString();
+      if (coinsEarned>0) window.__c3_add_coins?.(coinsEarned);
+      su.textContent='Score: '+score.toLocaleString()+(coinsEarned>0?' · +'+coinsEarned+' 🪙':'');
       ol.classList.add('show');
     }
 
