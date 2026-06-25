@@ -6218,6 +6218,7 @@ const Game = (() => {
     if (name !== 'c2-db') { try { C2.DontBreathe.stop(); } catch (e) {} }
     if (name !== 'c2-run') { try { C2.Runner.stop(); } catch (e) {} }
     if (name !== 'c2-ct')  { try { C2.ClockTower.stop(); } catch (e) {} }
+    if (name !== 'c3-game' && name !== 'c3-intro') { try { C3.Audio.music('stop'); } catch (e) {} }
     if (name !== 'c3-game') { try { C3.Game.stop(); } catch (e) {} }
 
     // Telegram vertical-swipe collapses the mini app — disable it on
@@ -6485,7 +6486,9 @@ const Game = (() => {
   function playC3Intro() {
     showScreen('c3-intro');
     requestAnimationFrame(() => {
+      try { C3.Audio.prime(); C3.Audio.music('story'); } catch (e) {}
       C3.Intro.play(0, 7, () => {
+        try { C3.Audio.music('stop'); } catch (e) {}
         state.c3_introSeen = true;
         Save.save(state);
         updateC3LevelsUI();
@@ -6496,6 +6499,7 @@ const Game = (() => {
   }
 
   function skipC3Intro() {
+    try { C3.Audio.music('stop'); } catch (e) {}
     try { C3.Intro.skipToEnd(); } catch (e) {}
   }
 
@@ -6509,7 +6513,10 @@ const Game = (() => {
     if (n === 2 && !state.c3_lvl1complete) { showToast(tr('c3_lvl2_locked')); return; }
     if (n === 3 && !state.c3_lvl2complete) { showToast(tr('c3_lvl3_locked')); return; }
     showScreen('c3-game');
-    requestAnimationFrame(() => C3.Game.start(n));
+    requestAnimationFrame(() => {
+      try { C3.Audio.prime(); C3.Audio.music('game'); } catch (e) {}
+      C3.Game.start(n);
+    });
   }
 
   function restartC3Game() {
@@ -12766,7 +12773,7 @@ const C3 = (() => {
       const scene=document.getElementById('c3p-scene');
       if (!scene||scene.__c3bound) return;
       scene.__c3bound=true;
-      scene.addEventListener('click',()=>{ if(animRaf) next(); });
+      scene.addEventListener('click',()=>{ if(animRaf){ try{C3.Audio.panelTap();}catch(ex){} next(); } });
     }
 
     function skipToEnd() {
@@ -12853,6 +12860,7 @@ const C3 = (() => {
       fireTimer+=dt;
       if (fireTimer>=FIRE_INTERVAL) {
         fireTimer=0;
+        try { C3.Audio.shoot(); } catch(ex){}
         shots.push({x:px,y:py-PLAYER_H,vx:0,vy:-480});
         if (level>=2){
           shots.push({x:px-10,y:py-PLAYER_H,vx:-30,vy:-460});
@@ -12902,6 +12910,7 @@ const C3 = (() => {
           if (Math.abs(s.x-e.x)<e.r&&Math.abs(s.y-e.y)<e.r) {
             shots.splice(si,1); e.hp--;
             burst(e.x,e.y,4,'#00d4ff');
+            try { e.isBoss ? C3.Audio.bossHit() : C3.Audio.enemyDie(); } catch(ex){}
             if (e.hp<=0){
               score+=e.sc; burst(e.x,e.y,14,'#00d4ff');
               enemies.splice(ei,1);
@@ -12946,6 +12955,7 @@ const C3 = (() => {
       const isBoss=(lv<3)&&(wi===maxWaves-1)&&!bossActive;
       if (isBoss) {
         bossActive=true;
+        try { C3.Audio.bossAlarm(); } catch(ex){}
         enemies.push({x:w/2,y:-50,ty:h*.17,drop:80,r:34,isBoss:true,
           hp:lv===1?22:42,sc:600,bp:'spiral',fr:.48,bs:110+lv*12,vx:65,wx:0,t:0,ft:0});
       } else {
@@ -12967,6 +12977,7 @@ const C3 = (() => {
 
     function takeHit() {
       lives--; invincible=INVINCIBLE_S; burst(px,py,22,'#ff4488'); renderHUD();
+      try { C3.Audio.playerHit(); } catch(ex){}
       if (lives<=0){running=false;setTimeout(()=>endScreen(false),450);}
     }
 
@@ -12986,6 +12997,7 @@ const C3 = (() => {
     }
 
     function endScreen(win) {
+      try { C3.Audio.music('stop'); } catch(ex){}
       const ol=document.getElementById('c3g-end-overlay');
       const ti=document.getElementById('c3g-end-title');
       const su=document.getElementById('c3g-end-sub');
@@ -12993,12 +13005,14 @@ const C3 = (() => {
       if (win){
         ti.textContent=window.tr?window.tr('c3_cleared'):'CLEARED';
         ti.style.color='#00d4ff';
+        try { C3.Audio.cleared(); } catch(ex){}
         if (level===1) window.__c3_state_set?.('c3_lvl1complete',true);
         if (level===2) window.__c3_state_set?.('c3_lvl2complete',true);
         if (level===3) window.__c3_state_set?.('c3_lvl3best',Math.max(score,window.__c3_get_best?.()||0));
       } else {
         ti.textContent=window.tr?window.tr('c3_failed'):'SIGNAL LOST';
         ti.style.color='#ff4060';
+        try { C3.Audio.gameOver(); } catch(ex){}
       }
       su.textContent='Score: '+score.toLocaleString();
       ol.classList.add('show');
@@ -13075,7 +13089,270 @@ const C3 = (() => {
     return { start, stop, restart };
   })();
 
-  return { Intro, Game };
+  // ---- AUDIO ----
+  const Audio = (() => {
+    let ctx = null;
+    let masterGain = null;
+    let musicNodes = [];
+    let seqTimer = null;
+    let musicMode = null;
+    let _enabled = true;
+
+    function ac() {
+      if (!ctx) {
+        try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; }
+      }
+      if (ctx.state === 'suspended') ctx.resume();
+      return ctx;
+    }
+
+    function beep(freq, dur, vol, type, t0) {
+      if (!_enabled) return;
+      const c = ac(); if (!c) return;
+      const t = t0 != null ? t0 : c.currentTime;
+      const osc = c.createOscillator(), g = c.createGain();
+      osc.type = type || 'sine';
+      osc.frequency.setValueAtTime(freq, t);
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(vol, t + 0.008);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      osc.connect(g); g.connect(c.destination);
+      osc.start(t); osc.stop(t + dur + 0.02);
+    }
+
+    function stopMusic() {
+      if (seqTimer) { clearInterval(seqTimer); seqTimer = null; }
+      if (masterGain && ctx) {
+        try {
+          const t = ctx.currentTime;
+          masterGain.gain.cancelScheduledValues(t);
+          masterGain.gain.setTargetAtTime(0, t, 0.3);
+        } catch (e) {}
+      }
+      const toStop = musicNodes.slice();
+      musicNodes = [];
+      setTimeout(() => toStop.forEach(n => { try { n.stop ? n.stop() : n.disconnect(); } catch (e) {} }), 600);
+      masterGain = null;
+      musicMode = null;
+    }
+
+    // Story panels: cold digital void — static noise + sparse minor pad + glitch LFO
+    function startStory() {
+      const c = ac(); if (!c) return;
+      stopMusic();
+      const t = c.currentTime;
+      masterGain = c.createGain();
+      masterGain.gain.setValueAtTime(0, t);
+      masterGain.gain.linearRampToValueAtTime(_enabled ? 0.28 : 0, t + 2.2);
+      masterGain.connect(c.destination);
+      musicMode = 'story';
+
+      // Filtered static noise bed
+      const buf = c.createBuffer(1, c.sampleRate * 3, c.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      const noise = c.createBufferSource(); noise.buffer = buf; noise.loop = true;
+      const hp = c.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 1400; hp.Q.value = 0.8;
+      const ng = c.createGain(); ng.gain.value = 0.18;
+      noise.connect(hp); hp.connect(ng); ng.connect(masterGain);
+      noise.start(t);
+      musicNodes.push(noise);
+
+      // Low sub drone — A1 (55 Hz)
+      const sub = c.createOscillator(); sub.type = 'sine'; sub.frequency.value = 55;
+      const subG = c.createGain(); subG.gain.value = 0.55;
+      sub.connect(subG); subG.connect(masterGain);
+      sub.start(t);
+      musicNodes.push(sub);
+
+      // Detuned minor pad: Am (A3/C4/E4) — cold, thin triangles
+      [220, 261.6, 329.6, 440].forEach((f, i) => {
+        const o = c.createOscillator(); o.type = 'triangle';
+        o.frequency.value = f; o.detune.value = (i % 2 === 0 ? -8 : 8);
+        const g = c.createGain(); g.gain.value = 0.12;
+        // Slow tremolo LFO per voice
+        const lfo = c.createOscillator(); lfo.frequency.value = 0.04 + i * 0.01;
+        const lfoG = c.createGain(); lfoG.gain.value = 0.06;
+        lfo.connect(lfoG); lfoG.connect(g.gain);
+        o.connect(g); g.connect(masterGain);
+        o.start(t); lfo.start(t);
+        musicNodes.push(o, lfo);
+      });
+
+      // High glitch accent — random narrow-band noise clicks via setInterval
+      seqTimer = setInterval(() => {
+        if (!_enabled || musicMode !== 'story') return;
+        const cc = ac(); if (!cc) return;
+        if (Math.random() > 0.38) return; // sparse
+        const tt = cc.currentTime;
+        const nb = cc.createBuffer(1, Math.ceil(cc.sampleRate * 0.06), cc.sampleRate);
+        const nd = nb.getChannelData(0);
+        for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
+        const ns = cc.createBufferSource(); ns.buffer = nb;
+        const bp2 = cc.createBiquadFilter(); bp2.type = 'bandpass';
+        bp2.frequency.value = 1800 + Math.random() * 3000; bp2.Q.value = 4;
+        const gg = cc.createGain(); gg.gain.setValueAtTime(0.12, tt); gg.gain.exponentialRampToValueAtTime(0.001, tt + 0.06);
+        ns.connect(bp2); bp2.connect(gg); gg.connect(cc.destination);
+        ns.start(tt); ns.stop(tt + 0.08);
+      }, 320);
+    }
+
+    // Game music: Touhou-style driving D-minor arpeggio + beat
+    function startGame() {
+      const c = ac(); if (!c) return;
+      stopMusic();
+      const t = c.currentTime;
+      masterGain = c.createGain();
+      masterGain.gain.setValueAtTime(0, t);
+      masterGain.gain.linearRampToValueAtTime(_enabled ? 0.22 : 0, t + 0.6);
+      masterGain.connect(c.destination);
+      musicMode = 'game';
+
+      // Bass pad: D2 sawtooth through lowpass
+      const bassLp = c.createBiquadFilter(); bassLp.type = 'lowpass'; bassLp.frequency.value = 320; bassLp.Q.value = 3;
+      bassLp.connect(masterGain);
+      const bass = c.createOscillator(); bass.type = 'sawtooth'; bass.frequency.value = 73.4; // D2
+      const bassG = c.createGain(); bassG.gain.value = 0.55;
+      bass.connect(bassG); bassG.connect(bassLp); bass.start(t);
+      musicNodes.push(bass);
+
+      // Melody arpeggio — D minor pentatonic, 16th notes at ~155 BPM
+      // D4 F4 A4 C5 D5 C5 A4 F4 (cycle)
+      const ARP = [293.66, 349.23, 440, 523.25, 587.33, 523.25, 440, 349.23];
+      const ARP2 = [369.99, 440, 554.37, 659.25, 739.99, 659.25, 554.37, 440]; // counter-melody F# minor
+      const STEP = 0.097; // ~155 BPM 16th note
+      let step = 0;
+
+      seqTimer = setInterval(() => {
+        if (!_enabled || musicMode !== 'game') return;
+        const cc = ac(); if (!cc) return;
+        const tt = cc.currentTime + 0.02;
+
+        // Main melody note
+        const freq = ARP[step % ARP.length];
+        const o = cc.createOscillator(); o.type = 'square';
+        o.frequency.setValueAtTime(freq, tt);
+        o.frequency.setValueAtTime(freq * 0.995, tt + STEP * 0.7);
+        const g = cc.createGain();
+        g.gain.setValueAtTime(0, tt);
+        g.gain.linearRampToValueAtTime(0.09, tt + 0.006);
+        g.gain.exponentialRampToValueAtTime(0.001, tt + STEP * 0.85);
+        o.connect(g); g.connect(cc.destination);
+        o.start(tt); o.stop(tt + STEP + 0.04);
+
+        // Counter-melody every 2 steps
+        if (step % 2 === 1) {
+          const f2 = ARP2[~~(step / 2) % ARP2.length];
+          const o2 = cc.createOscillator(); o2.type = 'triangle';
+          o2.frequency.value = f2 * 0.5; // octave down
+          const g2 = cc.createGain();
+          g2.gain.setValueAtTime(0, tt); g2.gain.linearRampToValueAtTime(0.055, tt + 0.012);
+          g2.gain.exponentialRampToValueAtTime(0.001, tt + STEP * 1.8);
+          o2.connect(g2); g2.connect(cc.destination); o2.start(tt); o2.stop(tt + STEP * 2 + 0.04);
+        }
+
+        // Kick on beat (every 4 steps)
+        if (step % 4 === 0) {
+          const k = cc.createOscillator(); k.type = 'sine';
+          k.frequency.setValueAtTime(120, tt); k.frequency.exponentialRampToValueAtTime(38, tt + 0.14);
+          const kg = cc.createGain();
+          kg.gain.setValueAtTime(0, tt); kg.gain.linearRampToValueAtTime(0.38, tt + 0.005);
+          kg.gain.exponentialRampToValueAtTime(0.001, tt + 0.18);
+          k.connect(kg); kg.connect(cc.destination); k.start(tt); k.stop(tt + 0.22);
+        }
+
+        // Snare on beat 2 and 4 (steps 8 and 24 in a 32-step pattern, or simpler: every 8th step offset by 8)
+        if (step % 8 === 4) {
+          const sb = cc.createBuffer(1, Math.ceil(cc.sampleRate * 0.12), cc.sampleRate);
+          const sd = sb.getChannelData(0);
+          for (let i = 0; i < sd.length; i++) sd[i] = (Math.random() * 2 - 1) * Math.max(0, 1 - i / sd.length * 3);
+          const ss = cc.createBufferSource(); ss.buffer = sb;
+          const sf = cc.createBiquadFilter(); sf.type = 'bandpass'; sf.frequency.value = 2400; sf.Q.value = 1.2;
+          const sg = cc.createGain(); sg.gain.setValueAtTime(0.22, tt); sg.gain.exponentialRampToValueAtTime(0.001, tt + 0.12);
+          ss.connect(sf); sf.connect(sg); sg.connect(cc.destination); ss.start(tt); ss.stop(tt + 0.15);
+        }
+
+        // Hi-hat every step (quieter)
+        const hb = cc.createBuffer(1, Math.ceil(cc.sampleRate * 0.04), cc.sampleRate);
+        const hd = hb.getChannelData(0);
+        for (let i = 0; i < hd.length; i++) hd[i] = (Math.random() * 2 - 1) * Math.max(0, 1 - i / hd.length * 5);
+        const hs = cc.createBufferSource(); hs.buffer = hb;
+        const hf = cc.createBiquadFilter(); hf.type = 'highpass'; hf.frequency.value = 7000;
+        const hg = cc.createGain(); hg.gain.setValueAtTime(step % 2 === 0 ? 0.10 : 0.05, tt); hg.gain.exponentialRampToValueAtTime(0.001, tt + 0.04);
+        hs.connect(hf); hf.connect(hg); hg.connect(cc.destination); hs.start(tt); hs.stop(tt + 0.06);
+
+        step++;
+      }, STEP * 1000);
+    }
+
+    function music(mode) {
+      if (!_enabled && mode !== 'stop') return;
+      if (mode === 'stop') { stopMusic(); return; }
+      if (musicMode === mode) return;
+      if (mode === 'story') startStory();
+      else if (mode === 'game') startGame();
+    }
+
+    // SFX
+    function shoot() {
+      if (!_enabled) return;
+      const c = ac(); if (!c) return;
+      beep(1800, 0.04, 0.07, 'square');
+    }
+    function enemyDie() {
+      if (!_enabled) return;
+      beep(400, 0.06, 0.10, 'sawtooth');
+      beep(280, 0.08, 0.08, 'sawtooth');
+    }
+    function bossHit() {
+      if (!_enabled) return;
+      beep(600, 0.04, 0.08, 'square');
+    }
+    function playerHit() {
+      if (!_enabled) return;
+      const c = ac(); if (!c) return;
+      const t = c.currentTime;
+      beep(220, 0.18, 0.20, 'sawtooth', t);
+      beep(165, 0.20, 0.15, 'sawtooth', t + 0.04);
+      // Noise burst
+      const buf = c.createBuffer(1, Math.ceil(c.sampleRate * 0.15), c.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      const ns = c.createBufferSource(); ns.buffer = buf;
+      const g = c.createGain(); g.gain.setValueAtTime(0.18, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+      ns.connect(g); g.connect(c.destination); ns.start(t); ns.stop(t + 0.18);
+    }
+    function bossAlarm() {
+      if (!_enabled) return;
+      const c = ac(); if (!c) return;
+      const t = c.currentTime;
+      [0, 0.18, 0.36].forEach((dt, i) => {
+        beep(440 + i * 110, 0.14, 0.12, 'square', t + dt);
+      });
+    }
+    function cleared() {
+      if (!_enabled) return;
+      const c = ac(); if (!c) return;
+      const t = c.currentTime;
+      [293.66, 349.23, 440, 587.33].forEach((f, i) => beep(f, 0.3, 0.12, 'triangle', t + i * 0.12));
+    }
+    function gameOver() {
+      if (!_enabled) return;
+      const c = ac(); if (!c) return;
+      const t = c.currentTime;
+      [440, 349.23, 293.66, 220].forEach((f, i) => beep(f, 0.25, 0.12, 'sawtooth', t + i * 0.14));
+    }
+    function panelTap() {
+      if (!_enabled) return;
+      beep(1200, 0.05, 0.06, 'sine');
+    }
+    function prime() { try { ac(); } catch (e) {} }
+    function enable(v) { _enabled = v; if (!v) stopMusic(); }
+
+    return { music, shoot, enemyDie, bossHit, playerHit, bossAlarm, cleared, gameOver, panelTap, prime, enable };
+  })();
+
+  return { Intro, Game, Audio };
 })();
 
 (function() {
