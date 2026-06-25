@@ -3522,17 +3522,46 @@ html, body {
   display: none;
   margin: 18px auto 4px;
   max-width: 360px;
-  padding: 6px 4px;
-  background: none;
-  border: none;
+  width: 100%;
   cursor: pointer;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   text-align: center;
-  gap: 2px;
   transition: transform 0.15s, opacity 0.18s;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(0,212,255,0.25);
+  box-shadow: 0 4px 24px rgba(0,180,255,0.12);
 }
-.c3-entry:hover { transform: translateY(-1px); opacity: 0.85; }
+.c3-entry:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,212,255,0.22); }
+.c3-entry-img-wrap {
+  position: relative;
+  height: 220px;
+  overflow: hidden;
+  background: #010810;
+}
+.c3-entry-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+.c3-entry-img-wrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 40%, rgba(1,8,20,0.85) 100%);
+}
+.c3-entry-info {
+  background: rgba(1,8,20,0.96);
+  border-top: 1px solid rgba(0,212,255,0.2);
+  padding: 10px 16px 14px;
+  gap: 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 .c3-entry-label {
   font-size: 10px;
   letter-spacing: 3px;
@@ -3608,39 +3637,44 @@ html, body {
   pointer-events: all;
 }
 .c3p-textbox {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 20;
-  background: rgba(0,0,0,0.90);
-  border-top: 3px solid #fff;
-  padding: 14px 20px 20px;
-  pointer-events: none;
-  /* manga angular notch — top-right corner cut */
-  clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%);
+  flex: 0 0 auto;
+  min-height: 130px;
+  background: linear-gradient(180deg, rgba(1,8,20,0.97) 0%, #010810 100%);
+  border-top: 1px solid rgba(0,212,255,0.3);
+  padding: 16px 22px 20px;
+  font-family: 'Courier New', monospace;
+  color: #b0f0ff;
+  position: relative;
 }
 .c3p-text {
-  font-family: 'Courier New', monospace;
-  font-size: 16px;
-  font-weight: 700;
-  color: #ffffff;
-  line-height: 1.55;
-  letter-spacing: 0.3px;
-  text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+  font-size: 18px;
+  line-height: 1.5;
+  font-style: italic;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.8);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
   min-height: 24px;
 }
-.c3p-text.show { animation: c3p-fadein 0.45s ease; }
+.c3p-text.show { opacity: 1; transform: translateY(0); }
+.c3p-tap-hint {
+  position: absolute;
+  bottom: 6px;
+  left: 0; right: 0;
+  text-align: center;
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: rgba(0,212,255,0.55);
+  animation: c3p-pulse 1.4s ease-in-out infinite;
+}
+@keyframes c3p-pulse {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 1;   }
+}
 @keyframes c3p-fadein {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
-}
-.c3p-tap-hint {
-  font-size: 11px;
-  color: rgba(255,255,255,0.45);
-  margin-top: 7px;
-  letter-spacing: 1.5px;
-  font-family: 'Courier New', monospace;
 }
 /* ---- C3 level select (#screen-c3-levels) ---- */
 #screen-c3-levels {
@@ -4464,9 +4498,14 @@ html, body {
     </div>
     <div class="c3-entry-hint" id="c3-entry-hint" aria-hidden="true"></div>
     <div class="c3-entry" id="c3-entry" onclick="Game.openC3()">
-      <div class="c3-entry-label" data-i18n="c3_label">CHAPTER III</div>
-      <div class="c3-entry-title" data-i18n="c3_title">Static</div>
-      <div class="c3-entry-sub" data-i18n="c3_sub">Vi's side · Don't look at the data</div>
+      <div class="c3-entry-img-wrap">
+        <img src="/assets/story3/5.png" alt="Vi · Chapter III" draggable="false">
+      </div>
+      <div class="c3-entry-info">
+        <div class="c3-entry-label" data-i18n="c3_label">CHAPTER III</div>
+        <div class="c3-entry-title" data-i18n="c3_title">Static</div>
+        <div class="c3-entry-sub" data-i18n="c3_sub">Vi's side · Don't look at the data</div>
+      </div>
     </div>
   </div>
 
@@ -4792,10 +4831,10 @@ html, body {
           <div class="c3p-clock" id="c3p-clock">03:47</div>
           <div class="c3p-skip" onclick="Game.skipC3Intro()">SKIP &rsaquo;</div>
         </div>
-        <div class="c3p-textbox">
-          <div class="c3p-text" id="c3p-text"></div>
-          <div class="c3p-tap-hint" data-i18n="c2_tap_continue">&#9678; tap to continue</div>
-        </div>
+      </div>
+      <div class="c3p-textbox">
+        <div class="c3p-text" id="c3p-text"></div>
+        <div class="c3p-tap-hint" data-i18n="c2_tap_continue">&#9678; tap to continue</div>
       </div>
     </div>
   </div>
