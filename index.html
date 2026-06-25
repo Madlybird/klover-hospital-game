@@ -13202,84 +13202,132 @@ const C3 = (() => {
       const c = ac(); if (!c) return;
       stopMusic();
       const t = c.currentTime;
+
+      // Two buses: melody (through masterGain) and drums (separate, always audible when enabled)
       masterGain = c.createGain();
       masterGain.gain.setValueAtTime(0, t);
-      masterGain.gain.linearRampToValueAtTime(_enabled ? 0.22 : 0, t + 0.6);
+      masterGain.gain.linearRampToValueAtTime(_enabled ? 0.30 : 0, t + 0.6);
       masterGain.connect(c.destination);
+
+      const drumGain = c.createGain();
+      drumGain.gain.value = _enabled ? 0.9 : 0;
+      drumGain.connect(c.destination);
+      musicNodes.push({ stop: () => { try { drumGain.disconnect(); } catch(e){} } });
+
       musicMode = 'game';
 
-      // Bass pad: D2 sawtooth through lowpass
-      const bassLp = c.createBiquadFilter(); bassLp.type = 'lowpass'; bassLp.frequency.value = 320; bassLp.Q.value = 3;
-      bassLp.connect(masterGain);
-      const bass = c.createOscillator(); bass.type = 'sawtooth'; bass.frequency.value = 73.4; // D2
-      const bassG = c.createGain(); bassG.gain.value = 0.55;
-      bass.connect(bassG); bassG.connect(bassLp); bass.start(t);
-      musicNodes.push(bass);
-
-      // Melody arpeggio — D minor pentatonic, 16th notes at ~155 BPM
-      // D4 F4 A4 C5 D5 C5 A4 F4 (cycle)
-      const ARP = [293.66, 349.23, 440, 523.25, 587.33, 523.25, 440, 349.23];
-      const ARP2 = [369.99, 440, 554.37, 659.25, 739.99, 659.25, 554.37, 440]; // counter-melody F# minor
-      const STEP = 0.097; // ~155 BPM 16th note
+      // D minor pentatonic melody — 16th notes ~155 BPM
+      const ARP  = [293.66, 349.23, 440, 523.25, 587.33, 523.25, 440, 349.23];
+      const ARP2 = [369.99, 440, 554.37, 659.25, 739.99, 659.25, 554.37, 440];
+      // Bass line: 8th notes (every 2 steps), D minor root pattern
+      const BASS = [73.4, 73.4, 87.3, 73.4, 65.4, 65.4, 55.0, 65.4]; // D2 D2 F2 D2 C2 C2 A1 C2
+      const STEP = 0.097; // 16th note duration
       let step = 0;
 
       seqTimer = setInterval(() => {
         if (!_enabled || musicMode !== 'game') return;
         const cc = ac(); if (!cc) return;
-        const tt = cc.currentTime + 0.02;
+        const tt = cc.currentTime + 0.018;
 
-        // Main melody note
+        // ---- MELODY ----
         const freq = ARP[step % ARP.length];
         const o = cc.createOscillator(); o.type = 'square';
         o.frequency.setValueAtTime(freq, tt);
-        o.frequency.setValueAtTime(freq * 0.995, tt + STEP * 0.7);
         const g = cc.createGain();
         g.gain.setValueAtTime(0, tt);
-        g.gain.linearRampToValueAtTime(0.09, tt + 0.006);
-        g.gain.exponentialRampToValueAtTime(0.001, tt + STEP * 0.85);
-        o.connect(g); g.connect(cc.destination);
-        o.start(tt); o.stop(tt + STEP + 0.04);
+        g.gain.linearRampToValueAtTime(0.10, tt + 0.006);
+        g.gain.exponentialRampToValueAtTime(0.001, tt + STEP * 0.82);
+        o.connect(g); g.connect(masterGain);
+        o.start(tt); o.stop(tt + STEP + 0.03);
 
-        // Counter-melody every 2 steps
+        // Counter-melody (triangle, octave below, every 2 steps)
         if (step % 2 === 1) {
           const f2 = ARP2[~~(step / 2) % ARP2.length];
           const o2 = cc.createOscillator(); o2.type = 'triangle';
-          o2.frequency.value = f2 * 0.5; // octave down
+          o2.frequency.value = f2 * 0.5;
           const g2 = cc.createGain();
-          g2.gain.setValueAtTime(0, tt); g2.gain.linearRampToValueAtTime(0.055, tt + 0.012);
-          g2.gain.exponentialRampToValueAtTime(0.001, tt + STEP * 1.8);
-          o2.connect(g2); g2.connect(cc.destination); o2.start(tt); o2.stop(tt + STEP * 2 + 0.04);
+          g2.gain.setValueAtTime(0, tt); g2.gain.linearRampToValueAtTime(0.06, tt + 0.01);
+          g2.gain.exponentialRampToValueAtTime(0.001, tt + STEP * 1.7);
+          o2.connect(g2); g2.connect(masterGain); o2.start(tt); o2.stop(tt + STEP * 2 + 0.03);
         }
 
-        // Kick on beat (every 4 steps)
+        // ---- BASS (8th notes — punchy attack, short decay) ----
+        if (step % 2 === 0) {
+          const bf = BASS[~~(step / 2) % BASS.length];
+          const blp = cc.createBiquadFilter(); blp.type = 'lowpass'; blp.frequency.value = 380; blp.Q.value = 4;
+          blp.connect(masterGain);
+          // Sawtooth voice
+          const bo = cc.createOscillator(); bo.type = 'sawtooth'; bo.frequency.value = bf;
+          const bg = cc.createGain();
+          bg.gain.setValueAtTime(0, tt);
+          bg.gain.linearRampToValueAtTime(1.6, tt + 0.008);  // hard attack
+          bg.gain.exponentialRampToValueAtTime(0.55, tt + STEP * 0.55); // punchy decay
+          bg.gain.exponentialRampToValueAtTime(0.001, tt + STEP * 1.7);
+          bo.connect(bg); bg.connect(blp); bo.start(tt); bo.stop(tt + STEP * 2 + 0.04);
+          // Sub octave (sine, one octave down)
+          const sub = cc.createOscillator(); sub.type = 'sine'; sub.frequency.value = bf * 0.5;
+          const subg = cc.createGain();
+          subg.gain.setValueAtTime(0, tt);
+          subg.gain.linearRampToValueAtTime(1.2, tt + 0.005);
+          subg.gain.exponentialRampToValueAtTime(0.001, tt + STEP * 1.4);
+          sub.connect(subg); subg.connect(masterGain); sub.start(tt); sub.stop(tt + STEP * 2 + 0.04);
+        }
+
+        // ---- KICK (every 4 steps = quarter note) ----
         if (step % 4 === 0) {
+          // Body: sine sweep 160→30 Hz
           const k = cc.createOscillator(); k.type = 'sine';
-          k.frequency.setValueAtTime(120, tt); k.frequency.exponentialRampToValueAtTime(38, tt + 0.14);
+          k.frequency.setValueAtTime(160, tt);
+          k.frequency.exponentialRampToValueAtTime(30, tt + 0.16);
           const kg = cc.createGain();
-          kg.gain.setValueAtTime(0, tt); kg.gain.linearRampToValueAtTime(0.38, tt + 0.005);
-          kg.gain.exponentialRampToValueAtTime(0.001, tt + 0.18);
-          k.connect(kg); kg.connect(cc.destination); k.start(tt); k.stop(tt + 0.22);
+          kg.gain.setValueAtTime(0, tt); kg.gain.linearRampToValueAtTime(1.0, tt + 0.004);
+          kg.gain.exponentialRampToValueAtTime(0.001, tt + 0.20);
+          k.connect(kg); kg.connect(drumGain); k.start(tt); k.stop(tt + 0.24);
+          // Click transient
+          const kc = cc.createOscillator(); kc.type = 'square'; kc.frequency.value = 800;
+          const kcg = cc.createGain();
+          kcg.gain.setValueAtTime(0.35, tt); kcg.gain.exponentialRampToValueAtTime(0.001, tt + 0.018);
+          kc.connect(kcg); kcg.connect(drumGain); kc.start(tt); kc.stop(tt + 0.022);
         }
 
-        // Snare on beat 2 and 4 (steps 8 and 24 in a 32-step pattern, or simpler: every 8th step offset by 8)
+        // ---- SNARE (beats 2 & 4 = steps 4, 12, 20, 28 in a 32-step bar) ----
         if (step % 8 === 4) {
-          const sb = cc.createBuffer(1, Math.ceil(cc.sampleRate * 0.12), cc.sampleRate);
+          // Noise body
+          const sb = cc.createBuffer(1, Math.ceil(cc.sampleRate * 0.18), cc.sampleRate);
           const sd = sb.getChannelData(0);
-          for (let i = 0; i < sd.length; i++) sd[i] = (Math.random() * 2 - 1) * Math.max(0, 1 - i / sd.length * 3);
+          for (let i = 0; i < sd.length; i++) sd[i] = (Math.random() * 2 - 1) * Math.max(0, 1 - i / sd.length * 2.5);
           const ss = cc.createBufferSource(); ss.buffer = sb;
-          const sf = cc.createBiquadFilter(); sf.type = 'bandpass'; sf.frequency.value = 2400; sf.Q.value = 1.2;
-          const sg = cc.createGain(); sg.gain.setValueAtTime(0.22, tt); sg.gain.exponentialRampToValueAtTime(0.001, tt + 0.12);
-          ss.connect(sf); sf.connect(sg); sg.connect(cc.destination); ss.start(tt); ss.stop(tt + 0.15);
+          const sf = cc.createBiquadFilter(); sf.type = 'bandpass'; sf.frequency.value = 2800; sf.Q.value = 0.9;
+          const sg = cc.createGain(); sg.gain.setValueAtTime(0.7, tt); sg.gain.exponentialRampToValueAtTime(0.001, tt + 0.16);
+          ss.connect(sf); sf.connect(sg); sg.connect(drumGain); ss.start(tt); ss.stop(tt + 0.20);
+          // Tone body (adds punch)
+          const st = cc.createOscillator(); st.type = 'triangle'; st.frequency.value = 220;
+          const stg = cc.createGain();
+          stg.gain.setValueAtTime(0, tt); stg.gain.linearRampToValueAtTime(0.45, tt + 0.003);
+          stg.gain.exponentialRampToValueAtTime(0.001, tt + 0.09);
+          st.connect(stg); stg.connect(drumGain); st.start(tt); st.stop(tt + 0.10);
         }
 
-        // Hi-hat every step (quieter)
-        const hb = cc.createBuffer(1, Math.ceil(cc.sampleRate * 0.04), cc.sampleRate);
+        // ---- OPEN HI-HAT on beats 2 & 4 (longer decay) ----
+        if (step % 8 === 4) {
+          const ohb = cc.createBuffer(1, Math.ceil(cc.sampleRate * 0.22), cc.sampleRate);
+          const ohd = ohb.getChannelData(0);
+          for (let i = 0; i < ohd.length; i++) ohd[i] = Math.random() * 2 - 1;
+          const ohs = cc.createBufferSource(); ohs.buffer = ohb;
+          const ohf = cc.createBiquadFilter(); ohf.type = 'highpass'; ohf.frequency.value = 8000;
+          const ohg = cc.createGain(); ohg.gain.setValueAtTime(0.28, tt); ohg.gain.exponentialRampToValueAtTime(0.001, tt + 0.20);
+          ohs.connect(ohf); ohf.connect(ohg); ohg.connect(drumGain); ohs.start(tt); ohs.stop(tt + 0.24);
+        }
+
+        // ---- CLOSED HI-HAT (every step, accented on 8ths) ----
+        const hb = cc.createBuffer(1, Math.ceil(cc.sampleRate * 0.03), cc.sampleRate);
         const hd = hb.getChannelData(0);
-        for (let i = 0; i < hd.length; i++) hd[i] = (Math.random() * 2 - 1) * Math.max(0, 1 - i / hd.length * 5);
+        for (let i = 0; i < hd.length; i++) hd[i] = (Math.random() * 2 - 1) * Math.max(0, 1 - i / hd.length * 6);
         const hs = cc.createBufferSource(); hs.buffer = hb;
-        const hf = cc.createBiquadFilter(); hf.type = 'highpass'; hf.frequency.value = 7000;
-        const hg = cc.createGain(); hg.gain.setValueAtTime(step % 2 === 0 ? 0.10 : 0.05, tt); hg.gain.exponentialRampToValueAtTime(0.001, tt + 0.04);
-        hs.connect(hf); hf.connect(hg); hg.connect(cc.destination); hs.start(tt); hs.stop(tt + 0.06);
+        const hf = cc.createBiquadFilter(); hf.type = 'highpass'; hf.frequency.value = 9000;
+        const hv = step % 8 === 4 ? 0.0 : step % 2 === 0 ? 0.14 : 0.07; // silent on snare beat, accent on 8th
+        const hg = cc.createGain(); hg.gain.setValueAtTime(hv, tt); hg.gain.exponentialRampToValueAtTime(0.001, tt + 0.03);
+        hs.connect(hf); hf.connect(hg); hg.connect(drumGain); hs.start(tt); hs.stop(tt + 0.04);
 
         step++;
       }, STEP * 1000);
