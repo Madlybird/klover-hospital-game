@@ -18,10 +18,10 @@ function safeEqual(a, b) {
 }
 
 const PUSH_TEXT =
-  '🌙 The Night Shift is open.\n\n' +
-  "Chapter II just unlocked at Klover Hospital. A nightmare you can't wake from. Clock in?";
+  '⚡️ Новая глава разблокирована.\n\n' +
+  'Клинике удалось восстановить повреждённый архив. Ви ждёт — файл открыт всего за 500 монет.';
 
-const BUTTON_TEXT = '🏥 Start the Night Shift';
+const BUTTON_TEXT = '📂 Открыть архив';
 
 // Recipient list comes from env (comma-separated Telegram IDs). Never
 // hardcode real user IDs in source — that leaks PII into the repo.
