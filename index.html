@@ -3526,12 +3526,9 @@ html, body {
   margin: 18px auto 4px;
   max-width: 360px;
   padding: 6px 4px;
-  background-image: url('/assets/story3/1.png');
-  background-size: cover;
-  background-position: center 15%;
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid rgba(0,212,255,0.3);
+  background: none;
+  border: none;
+  color: #1a2a4a;
   cursor: pointer;
   position: relative;
   flex-direction: column;
@@ -3540,19 +3537,11 @@ html, body {
   gap: 2px;
   transition: transform 0.15s, opacity 0.18s;
 }
-.c3-entry::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(0,8,20,0.78) 0%, rgba(0,20,40,0.68) 100%);
-  border-radius: inherit;
-}
-.c3-entry > * { position: relative; z-index: 1; }
-.c3-entry:hover { transform: translateY(-1px); border-color: rgba(0,212,255,0.7); }
+.c3-entry:hover { transform: translateY(-1px); opacity: 0.85; }
 .c3-entry-label {
   font-size: 10px;
   letter-spacing: 3px;
-  color: #00d4ff;
+  color: #e8609a;
   font-weight: 900;
   font-family: 'Nunito', sans-serif;
 }
@@ -3561,12 +3550,12 @@ html, body {
   font-weight: 900;
   letter-spacing: 1px;
   margin-top: 2px;
-  color: #00d4ff;
+  color: #3a8fd4;
   font-family: 'Nunito', sans-serif;
 }
 .c3-entry-sub {
   font-size: 11px;
-  color: #a0d8e8;
+  color: #6a8bab;
   font-weight: 700;
   font-style: italic;
 }
@@ -3575,10 +3564,10 @@ html, body {
   width: 12px;
   height: 12px;
   margin: 14px auto 0;
-  border-right: 2px solid rgba(0,212,255,0.75);
-  border-bottom: 2px solid rgba(0,212,255,0.75);
+  border-right: 2px solid rgba(232,96,154,0.75);
+  border-bottom: 2px solid rgba(232,96,154,0.75);
   transform: rotate(45deg);
-  animation: c2hint-bob 1.4s ease-in-out infinite;
+  animation: c2-hint-bounce 1.5s ease-in-out infinite;
 }
 /* ---- C3 story panels (#screen-c3-intro) ---- */
 .c3p-stage {
