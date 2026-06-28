@@ -4832,7 +4832,7 @@ html, body {
     <div class="levels-grid">
       <div class="level-card" onclick="Game.replayC3Intro()">
         <div class="patient-photo">
-          <img src="/assets/story3/1.png" alt="Vi" class="patient-photo-img">
+          <img src="/assets/story3/1.jpg" alt="Vi" class="patient-photo-img">
         </div>
         <div class="patient-info">
           <div class="id-card-label" data-i18n="c3_story_file">CASE FILE</div>
@@ -4847,7 +4847,7 @@ html, body {
       </div>
       <div class="level-card" id="c3-card-1" onclick="Game.startC3Level(1)">
         <div class="patient-photo">
-          <img src="/assets/story3/3.png" alt="Shard 01" class="patient-photo-img">
+          <img src="/assets/story3/3.jpg" alt="Shard 01" class="patient-photo-img">
         </div>
         <div class="patient-info">
           <div class="id-card-label">MEMORY SHARD</div>
@@ -4862,7 +4862,7 @@ html, body {
       </div>
       <div class="level-card locked" id="c3-card-2" onclick="Game.startC3Level(2)">
         <div class="patient-photo">
-          <img src="/assets/story3/4.png" alt="Shard 02" class="patient-photo-img">
+          <img src="/assets/story3/4.jpg" alt="Shard 02" class="patient-photo-img">
         </div>
         <div class="patient-info">
           <div class="id-card-label">MEMORY SHARD</div>
@@ -4877,7 +4877,7 @@ html, body {
       </div>
       <div class="level-card locked" id="c3-card-3" onclick="Game.startC3Level(3)">
         <div class="patient-photo">
-          <img src="/assets/story3/5.png" alt="Endless" class="patient-photo-img">
+          <img src="/assets/story3/5.jpg" alt="Endless" class="patient-photo-img">
         </div>
         <div class="patient-info">
           <div class="id-card-label">MEMORY SHARD</div>
@@ -5347,8 +5347,8 @@ const COLORS = {
 const COLOR_KEYS = Object.keys(COLORS);
 
 const LEVELS = [
-  { id:1, name:'MAI',     target:5000,     lives:3, speed:800, unlocked: true  },
-  { id:2, name:'VI',      target:12000,    lives:2, speed:560, unlocked: false },
+  { id:1, name:'MAI',     target:5000,     lives:3, speed:533, unlocked: true  },
+  { id:2, name:'VI',      target:12000,    lives:2, speed:373, unlocked: false },
   { id:3, name:'RIK',     target:Infinity, lives:1, speed:680, unlocked: false, endless: true },
 ];
 
@@ -5397,6 +5397,11 @@ const I18N = {
     endless_unlock_yes: 'UNLOCK',
     endless_unlock_no: 'NOT NOW',
     endless_unlocked_toast: 'Endless Ward unlocked — tap to begin',
+    c3_unlock_title: 'CHAPTER III: STATIC',
+    c3_unlock_price: '500 🪙',
+    c3_unlock_confirm: "Access Vi's memories for 500 coins. The archive is corrupted — proceed with caution.",
+    c3_unlocked_toast: 'Chapter III unlocked — the archive is open',
+    c3_locked_sub: 'Unlock for 500 🪙',
     locked: '🔒 LOCKED',
     play: 'PLAY',
     complete: 'COMPLETE',
@@ -5573,12 +5578,12 @@ const I18N = {
     c3_lvl3_name: 'STATIC LOOP',
     c3_lvl3_locked: 'Clear Shard 02 first',
     c3_lvl3_priority: 'No endpoint · Run until the signal dies',
-    c3_p1: "I shouldn't be running this. But I have to know.",
-    c3_p2: 'PATIENT #0 — FILE CORRUPTED. Last access: 3 years ago.',
-    c3_p3: 'Five minutes. Just one look at the archive.',
-    c3_p4: 'Where are the memories? The data is fragmenting—',
-    c3_p5: '...Vi?',
-    c3_p6: "That's impossible. You're gone.",
+    c3_p1: "Maybe I shouldn't have run this protocol. But I have to know.",
+    c3_p2: 'PATIENT #0 — FILE DAMAGED. Last connection: 3 years ago.',
+    c3_p3: "Fine. Just a quick look at the archive and I'll end the session.",
+    c3_p4: 'What? Where are all the memories? The data is fragmented.',
+    c3_p5: 'Vi?',
+    c3_p6: "That's impossible. You no longer exist.",
     c3_p7: 'Thank you for not forgetting.',
     c3_p8: '',
     c3_enter: 'ENTER',
@@ -5626,6 +5631,11 @@ const I18N = {
     endless_unlock_yes: 'ОТКРЫТЬ',
     endless_unlock_no: 'НЕ СЕЙЧАС',
     endless_unlocked_toast: 'Бесконечная палата открыта — нажмите, чтобы начать',
+    c3_unlock_title: 'ГЛАВА III: СТАТИКА',
+    c3_unlock_price: '500 🪙',
+    c3_unlock_confirm: 'Доступ к воспоминаниям Ви за 500 монет. Архив повреждён — действуй осторожно.',
+    c3_unlocked_toast: 'Глава III открыта — архив доступен',
+    c3_locked_sub: 'Открыть за 500 🪙',
     locked: '🔒 ЗАКРЫТО',
     play: 'ИГРАТЬ',
     complete: 'ПРОЙДЕНО',
@@ -5802,12 +5812,12 @@ const I18N = {
     c3_lvl3_name: 'ПЕТЛЯ СТАТИКИ',
     c3_lvl3_locked: 'Сначала пройди Shard 02',
     c3_lvl3_priority: 'Без выхода · Держись, пока сигнал не умрёт',
-    c3_p1: 'Я не должен этого делать. Но мне нужно знать.',
-    c3_p2: 'ПАЦИЕНТ #0 — ФАЙЛ ПОВРЕЖДЁН. Последний доступ: 3 года назад.',
-    c3_p3: 'Пять минут. Один взгляд на архив.',
-    c3_p4: 'Где воспоминания? Данные распадаются—',
-    c3_p5: '...Вай?',
-    c3_p6: 'Это невозможно. Тебя нет.',
+    c3_p1: 'Кажется не стоило мне запускать этот протокол. Но я должен узнать.',
+    c3_p2: 'ПАЦИЕНТ №0 - ФАЙЛ ПОВРЕЖДЕН. Последнее соединение: 3 года назад.',
+    c3_p3: 'Ладно, всего-то быстро загляну в архив и закончу сессию.',
+    c3_p4: 'Что? Где все воспоминания? Данные фрагментированны.',
+    c3_p5: 'Вай?',
+    c3_p6: 'Это невозможно. Тебя больше нет.',
     c3_p7: 'Спасибо, что не забыл.',
     c3_p8: '',
     c3_enter: 'ВОЙТИ',
@@ -6339,11 +6349,13 @@ const Game = (() => {
     const c2hint = document.getElementById('c2-entry-hint');
     if (c2hint) c2hint.style.display = c2Unlocked() ? 'block' : 'none';
 
-    // Chapter 3 entry — dev-only.
+    // Chapter 3 entry — always visible; locked until 500 coins spent.
     const c3entry = document.getElementById('c3-entry');
-    if (c3entry) c3entry.style.display = c3Unlocked() ? 'flex' : 'none';
+    if (c3entry) c3entry.style.display = 'flex';
     const c3hint = document.getElementById('c3-entry-hint');
-    if (c3hint) c3hint.style.display = c3Unlocked() ? 'block' : 'none';
+    if (c3hint) c3hint.style.display = 'block';
+    const c3sub = c3entry && c3entry.querySelector('[data-i18n="c3_sub"]');
+    if (c3sub) c3sub.textContent = c3Unlocked() ? tr('c3_sub') : tr('c3_locked_sub');
   }
 
   // ---- SLIDE TUTORIAL ----
@@ -6504,18 +6516,32 @@ const Game = (() => {
   const C2_PUBLIC = true;
   function c2Unlocked() { return C2_PUBLIC || isDevAccount(); }
 
-  // Chapter 3 ("Static") — Vi's arc. Dev accounts only for now.
-  // Flip to `return true` when the arc ships publicly.
-  function c3Unlocked() { return isDevAccount(); }
+  // Chapter 3 ("Static") — Vi's arc. Unlocked by spending 500 coins,
+  // or always accessible for dev accounts.
+  function c3Unlocked() { return (state.c3unlocked === true) || isDevAccount(); }
 
   function openC3() {
-    if (!c3Unlocked()) return;
+    if (!c3Unlocked()) { tryUnlockC3(); return; }
     if (!state.c3_introSeen) {
       playC3Intro();
     } else {
       updateC3LevelsUI();
       showScreen('c3-levels');
     }
+  }
+
+  function tryUnlockC3() {
+    if (c3Unlocked()) { openC3(); return; }
+    if ((state.coins || 0) < 500) { showToast(tr('not_enough_coins')); return; }
+    const modal = document.getElementById('overlay-endless-unlock');
+    const titleEl = modal && modal.querySelector('[data-i18n="endless_unlock_title"]');
+    const priceEl = modal && modal.querySelector('[data-i18n="endless_unlock_price"]');
+    const noteEl  = modal && modal.querySelector('[data-i18n="endless_unlock_confirm"]');
+    if (titleEl) titleEl.textContent = tr('c3_unlock_title');
+    if (priceEl) priceEl.textContent = tr('c3_unlock_price');
+    if (noteEl)  noteEl.textContent  = tr('c3_unlock_confirm');
+    pendingEndlessUnlock = 'c3';
+    modal.classList.add('active');
   }
 
   function playC3Intro() {
@@ -6995,6 +7021,19 @@ const Game = (() => {
 
   function confirmEndlessUnlock() {
     closeEndlessUnlock();
+    if (pendingEndlessUnlock === 'c3') {
+      if (c3Unlocked()) { openC3(); return; }
+      if ((state.coins || 0) < 500) { showToast(tr('not_enough_coins')); return; }
+      state.coins -= 500;
+      state.c3unlocked = true;
+      Save.save(state);
+      updateMenuCoins();
+      pushProgress();
+      updateLevelsUI();
+      showToast(tr('c3_unlocked_toast'));
+      openC3();
+      return;
+    }
     if (pendingEndlessUnlock === 'c2') {
       if (state.c2_ctEndlessUnlocked) { startC2ClockTower(3); return; }
       if ((state.coins || 0) < 1000) { showToast(tr('not_enough_coins')); return; }
@@ -12570,10 +12609,12 @@ window.tr = tr;
 const C3 = (() => {
   // Preload story artwork + game background
   const _imgs = {};
+  const _imgExt = { 'game-bg': 'png' };
   const _imgVer = { '7': '?v=2' };
   [['p1','1'],['p3','3'],['p4','4'],['p5','5'],['p6','6'],['p7','7'],['gbg','game-bg']].forEach(([key,n]) => {
     const img = new Image();
-    img.src = `/assets/story3/${n}.png${_imgVer[n]||''}`;
+    const ext = _imgExt[n] || 'jpg';
+    img.src = `/assets/story3/${n}.${ext}${_imgVer[n]||''}`;
     _imgs[key] = img;
   });
 
@@ -12646,7 +12687,7 @@ const C3 = (() => {
       ctx.fillStyle='rgba(0,212,255,0.75)'; ctx.font='11px Courier New';
       ctx.fillText('KLAS_ARCHIVE / patient_0',px+10,py+16);
       const lines=['ID: PATIENT_0','NAME: [CORRUPTED]','DOB: [CORRUPTED]','DIAGNOSIS: [REDACTED]',
-                   'TREATMENT: FAILED','-------------------','LAST ACCESS: 3Y AGO','STATUS: ████████'];
+                   'TREATMENT: FAILED','-------------------','LAST CONNECTION: 3Y AGO','STATUS: ████████'];
       const gr = Math.floor(t/220)%lines.length;
       lines.forEach((line,i)=>{
         const fy=py+36+i*20;
