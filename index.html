@@ -6505,9 +6505,9 @@ const Game = (() => {
   const C2_PUBLIC = true;
   function c2Unlocked() { return C2_PUBLIC || isDevAccount(); }
 
-  // Chapter 3 ("Static") — Vi's arc. Unlocked by spending 500 coins,
-  // or always accessible for dev accounts.
-  function c3Unlocked() { return (state.c3unlocked === true) || isDevAccount(); }
+  // Chapter 3 ("Static") — Vi's arc. Now public for all players.
+  const C3_PUBLIC = true;
+  function c3Unlocked() { return C3_PUBLIC || (state.c3unlocked === true) || isDevAccount(); }
 
   function openC3() {
     if (!c3Unlocked()) { tryUnlockC3(); return; }
