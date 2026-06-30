@@ -6058,13 +6058,14 @@ const Sync = (() => {
         body: JSON.stringify({
           ...(referredBy ? { referredBy } : {}),
           platform: window.Telegram?.WebApp?.platform || 'unknown',
+          isNew: !localStorage.getItem('klover_seen_v1'),
         }),
       });
       const text = await res.text();
       let payload;
       try { payload = JSON.parse(text); } catch { payload = text; }
       console.log('[Sync] /api/save-user ->', res.status, payload);
-      if (res.ok) sessionStorage.setItem(key, '1');
+      if (res.ok) { sessionStorage.setItem(key, '1'); localStorage.setItem('klover_seen_v1', '1'); }
     } catch (e) {
       console.error('[Sync] save-user network error:', e);
     }
