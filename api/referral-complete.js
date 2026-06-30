@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 import { createClient } from '@supabase/supabase-js';
 
 const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const REPORT_CHAT_ID = process.env.REPORT_CHAT_ID || '';
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
 
@@ -91,6 +92,25 @@ export default async function handler(req, res) {
     if (updErr) {
       console.warn('[referral-complete] update err (soft):', updErr.message);
       return res.status(200).json({ ok: true, credited: false, degraded: 'db_error' });
+    }
+
+    // Notify the report channel about the successful referral conversion
+    if (REPORT_CHAT_ID && BOT_TOKEN) {
+      const esc = (s) => String(s || '').replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
+      const newUser = verdict.user;
+      const newWho = newUser.username ? `@${esc(newUser.username)}` : `<code>${esc(newUser.id)}</code>`;
+      const refWho = ref.username ? `@${esc(ref.username)}` : `<code>${esc(ref.telegram_id)}</code>`;
+      const text = `🔗 Реферал · ${newWho} пришёл от ${refWho} · +500🪙 реферу`;
+      fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: REPORT_CHAT_ID,
+          text,
+          parse_mode: 'HTML',
+          disable_notification: true,
+        }),
+      }).catch(() => {});
     }
 
     return res.status(200).json({ ok: true, credited: true, referrer: ref.telegram_id, amount: 500 });
