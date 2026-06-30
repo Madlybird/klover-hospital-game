@@ -6101,6 +6101,7 @@ const Sync = (() => {
     },
   };
 })();
+window.Sync = Sync;
 
 // ============================================================
 // MAIN GAME OBJECT
@@ -7831,7 +7832,7 @@ const Game = (() => {
       Save.save(state);
       updateMenuCoins();
       pushProgress();
-      Sync.sendEvent('record', { chapter: 1, level: currentLevel, levelName: 'Lvl ' + currentLevel, score: s, prev });
+      try { Sync.sendEvent('record', { chapter: 1, level: currentLevel, levelName: 'Lvl ' + currentLevel, score: s, prev }); } catch (e) { console.warn('[event] ch1 record:', e); }
       return { isNew: true, prev };
     }
     return { isNew: false, prev };
@@ -7919,7 +7920,7 @@ const Game = (() => {
     Save.save(state);
     updateMenuCoins();
     pushProgress();
-    Sync.sendEvent('level_done', { chapter: 1, level: currentLevel, levelName: 'Lvl ' + currentLevel, score, coinsEarned: earned, coinsTotal: state.coins });
+    try { Sync.sendEvent('level_done', { chapter: 1, level: currentLevel, levelName: 'Lvl ' + currentLevel, score, coinsEarned: earned, coinsTotal: state.coins }); } catch (e) { console.warn('[event] ch1 level_done:', e); }
 
     const rewardEl = document.getElementById('sim-complete-reward');
     if (rewardEl) rewardEl.textContent = tr('sim_earned') + ': +' + earned.toLocaleString() + ' 🪙';
