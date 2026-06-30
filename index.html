@@ -12652,7 +12652,11 @@ const C3 = (() => {
       const w = W(), h = H();
       const img = _imgs[imgKey];
       if (img && img.complete && img.naturalWidth) {
-        ctx.drawImage(img, 0, 0, w, h);
+        const iw = img.naturalWidth, ih = img.naturalHeight;
+        const s = Math.max(w / iw, h / ih);
+        const dw = iw * s, dh = ih * s;
+        ctx.fillStyle = '#010810'; ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
       } else {
         ctx.fillStyle = '#010810'; ctx.fillRect(0,0,w,h);
       }
