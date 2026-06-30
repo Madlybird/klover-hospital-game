@@ -16,17 +16,29 @@ function safeEqual(a, b) {
 
 // Fire-and-forget notify the admin channel that a user opened the app.
 // Called once per session (client already gates with sessionStorage).
-async function notifyChannel(user, referredBy, supabaseStatus) {
+async function notifyChannel(user, referredBy, supabaseStatus, extra) {
   if (!REPORT_CHAT_ID || !BOT_TOKEN) return;
   const esc = (s) => String(s || '').replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
+
+  const platEmoji = { ios: '🍎', android: '🤖', android_x: '🤖', macos: '💻', tdesktop: '💻', weba: '💻', web: '💻', webk: '💻' };
+  const plat = extra?.platform ? (platEmoji[extra.platform] || '📱') + ' ' + extra.platform : '';
+  const premium = user.is_premium ? ' ⭐' : '';
+  const isNew = extra?.isNew;
+
   const lines = [
-    '🆕 <b>New session</b>',
+    (isNew ? '🆕 <b>New player</b>' : '🔁 <b>Session</b>') + (plat ? ' · ' + plat : '') + premium,
     `<code>${esc(user.id)}</code>` +
       (user.username ? ` · @${esc(user.username)}` : '') +
       (user.first_name ? ` · ${esc(user.first_name)}` + (user.last_name ? ' ' + esc(user.last_name) : '') : '') +
-      (user.language_code ? ` · ${esc(user.language_code)}` : ''),
+      (user.language_code ? ` · ${esc(user.language_code).toUpperCase()}` : ''),
   ];
-  if (referredBy) lines.push(`↳ ref: <code>${esc(referredBy)}</code>`);
+  if (referredBy) lines.push(`↳ реф от <code>${esc(referredBy)}</code>`);
+  if (extra?.coins != null || extra?.highScore != null) {
+    const parts = [];
+    if (extra.coins != null) parts.push(`${Number(extra.coins).toLocaleString('ru-RU')}🪙`);
+    if (extra.highScore != null && extra.highScore > 0) parts.push(`🏆 ${Number(extra.highScore).toLocaleString('ru-RU')}`);
+    if (parts.length) lines.push(parts.join('  ·  '));
+  }
   // db status intentionally not shown — only matters for backend health
   try {
     await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
@@ -151,13 +163,14 @@ export default async function handler(req, res) {
 
   const body = readBody(req);
   const referredBy = Number.isFinite(body.referredBy) ? Math.floor(body.referredBy) : null;
+  const platform = typeof body.platform === 'string' ? body.platform.slice(0, 32) : null;
 
   // If Supabase isn't configured (or unreachable), don't 500 — the
   // game's core flow doesn't need it. Still notify the admin channel
   // so user IDs are captured regardless of DB status.
   if (!supabase) {
     console.log('[save-user] supabase unavailable — skipping persistence for', user.id);
-    await notifyChannel(user, referredBy, 'unconfigured');
+    await notifyChannel(user, referredBy, 'unconfigured', { platform, isNew: true });
     return res.status(200).json({ ok: true, degraded: 'supabase_unconfigured', user: { telegram_id: user.id } });
   }
 
@@ -174,7 +187,7 @@ export default async function handler(req, res) {
     let { data, error } = await supabase
       .from('users')
       .upsert(row, { onConflict: 'telegram_id', ignoreDuplicates: false })
-      .select('telegram_id, username, created_at')
+      .select('telegram_id, username, coins, high_score, created_at')
       .single();
 
     if (error && /column|does not exist|schema/i.test(error.message)) {
@@ -189,10 +202,18 @@ export default async function handler(req, res) {
 
     if (error) {
       console.warn('[save-user] supabase error (soft):', error.message);
-      await notifyChannel(user, referredBy, 'db_error');
+      await notifyChannel(user, referredBy, 'db_error', { platform });
       return res.status(200).json({ ok: true, degraded: 'db_error', message: error.message, user: { telegram_id: user.id } });
     }
-    await notifyChannel(user, referredBy, 'ok');
+    const isNew = data?.created_at
+      ? (Date.now() - new Date(data.created_at).getTime()) < 60_000
+      : false;
+    await notifyChannel(user, referredBy, 'ok', {
+      platform,
+      isNew,
+      coins: data?.coins ?? null,
+      highScore: data?.high_score ?? null,
+    });
     return res.status(200).json({ ok: true, user: data });
   } catch (e) {
     // Network/DNS errors when Supabase is gone — soft-fail

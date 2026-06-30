@@ -6055,7 +6055,10 @@ const Sync = (() => {
           'Content-Type': 'application/json',
           'telegram-init-data': initData,
         },
-        body: JSON.stringify(referredBy ? { referredBy } : {}),
+        body: JSON.stringify({
+          ...(referredBy ? { referredBy } : {}),
+          platform: window.Telegram?.WebApp?.platform || 'unknown',
+        }),
       });
       const text = await res.text();
       let payload;
@@ -6086,6 +6089,15 @@ const Sync = (() => {
       const body = pending; pending = null;
       clearTimeout(timer);
       await call('POST', body);
+    },
+    sendEvent(type, data) {
+      const initData = getInitData();
+      if (!initData) return;
+      fetch('/api/event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'telegram-init-data': initData },
+        body: JSON.stringify({ type, ...data }),
+      }).catch(() => {});
     },
   };
 })();
@@ -6512,6 +6524,7 @@ const Game = (() => {
   function openC3() {
     if (!c3Unlocked()) { tryUnlockC3(); return; }
     if (!state.c3_introSeen) {
+      Sync.sendEvent('chapter_unlocked', { chapter: 3 });
       playC3Intro();
     } else {
       updateC3LevelsUI();
@@ -6615,6 +6628,7 @@ const Game = (() => {
   function openC2() {
     if (!c2Unlocked()) return;
     if (!state.c2_introSeen) {
+      Sync.sendEvent('chapter_unlocked', { chapter: 2 });
       playC2IntroPart1();
     } else {
       updateC2LevelsUI();
@@ -6926,11 +6940,12 @@ const Game = (() => {
     requestAnimationFrame(() => {
       C2.ClockTower.startLevel(
         levelId,
-        () => {                                  // win
+        (s) => {                                 // win
           if (levelId === 1) state.c2_ct1complete = true;
           if (levelId === 2) state.c2_ct2complete = true;
           Save.save(state);
           updateC2LevelsUI();
+          Sync.sendEvent('level_done', { chapter: 2, level: levelId, levelName: 'Clock Tower ' + levelId, score: s || 0 });
         },
         (finalScore) => {                        // lose — record endless best
           if (levelId === 3 && (finalScore || 0) > (state.c2_ctBest || 0)) {
@@ -7816,6 +7831,7 @@ const Game = (() => {
       Save.save(state);
       updateMenuCoins();
       pushProgress();
+      Sync.sendEvent('record', { chapter: 1, level: currentLevel, levelName: 'Lvl ' + currentLevel, score: s, prev });
       return { isNew: true, prev };
     }
     return { isNew: false, prev };
@@ -7903,6 +7919,7 @@ const Game = (() => {
     Save.save(state);
     updateMenuCoins();
     pushProgress();
+    Sync.sendEvent('level_done', { chapter: 1, level: currentLevel, levelName: 'Lvl ' + currentLevel, score, coinsEarned: earned, coinsTotal: state.coins });
 
     const rewardEl = document.getElementById('sim-complete-reward');
     if (rewardEl) rewardEl.textContent = tr('sim_earned') + ': +' + earned.toLocaleString() + ' 🪙';
@@ -11447,6 +11464,7 @@ const C2 = (() => {
           if (currentLevel.id === 1) window.__c2_state_set('c2_level1complete', true);
           if (currentLevel.id === 2) window.__c2_state_set('c2_level2complete', true);
         } catch (e) {}
+        try { window.Sync?.sendEvent('level_done', { chapter: 2, level: currentLevel.id, levelName: 'Infection ' + currentLevel.id, score }); } catch (e) {}
       }
       // Show end overlay
       const overlay = document.getElementById('c2g-end-overlay');
@@ -13011,9 +13029,9 @@ const C3 = (() => {
         ti.textContent=window.tr?window.tr('c3_cleared'):'CLEARED';
         ti.style.color='#00d4ff';
         try { C3.Audio.cleared(); } catch(ex){}
-        if (level===1 && !window.__c3_lvl1_was_done) { coinsEarned=80; window.__c3_state_set?.('c3_lvl1complete',true); }
-        if (level===2 && !window.__c3_lvl2_was_done) { coinsEarned=160; window.__c3_state_set?.('c3_lvl2complete',true); }
-        if (level===3) { coinsEarned=Math.max(10,Math.floor(score/100)); window.__c3_state_set?.('c3_lvl3best',Math.max(score,window.__c3_get_best?.()||0)); }
+        if (level===1 && !window.__c3_lvl1_was_done) { coinsEarned=80; window.__c3_state_set?.('c3_lvl1complete',true); try{window.Sync?.sendEvent('level_done',{chapter:3,level:1,levelName:'Shard 01',score,coinsEarned:80});}catch(ex){} }
+        if (level===2 && !window.__c3_lvl2_was_done) { coinsEarned=160; window.__c3_state_set?.('c3_lvl2complete',true); try{window.Sync?.sendEvent('level_done',{chapter:3,level:2,levelName:'Shard 02',score,coinsEarned:160});}catch(ex){} }
+        if (level===3) { coinsEarned=Math.max(10,Math.floor(score/100)); const _prev=window.__c3_get_best?.()||0; const _best=Math.max(score,_prev); window.__c3_state_set?.('c3_lvl3best',_best); if(score>_prev&&score>0){try{window.Sync?.sendEvent('record',{chapter:3,levelName:'Static Loop',score,prev:_prev});}catch(ex){}} }
       } else {
         ti.textContent=window.tr?window.tr('c3_failed'):'SIGNAL LOST';
         ti.style.color='#ff4060';
