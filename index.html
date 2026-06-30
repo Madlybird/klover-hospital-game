@@ -13029,8 +13029,8 @@ const C3 = (() => {
         ti.textContent=window.tr?window.tr('c3_cleared'):'CLEARED';
         ti.style.color='#00d4ff';
         try { C3.Audio.cleared(); } catch(ex){}
-        if (level===1 && !window.__c3_lvl1_was_done) { coinsEarned=80; window.__c3_state_set?.('c3_lvl1complete',true); try{window.Sync?.sendEvent('level_done',{chapter:3,level:1,levelName:'Shard 01',score,coinsEarned:80});}catch(ex){} }
-        if (level===2 && !window.__c3_lvl2_was_done) { coinsEarned=160; window.__c3_state_set?.('c3_lvl2complete',true); try{window.Sync?.sendEvent('level_done',{chapter:3,level:2,levelName:'Shard 02',score,coinsEarned:160});}catch(ex){} }
+        if (level===1) { if (!window.__c3_lvl1_was_done) { coinsEarned=80; window.__c3_state_set?.('c3_lvl1complete',true); } try{window.Sync?.sendEvent('level_done',{chapter:3,level:1,levelName:'Shard 01',score,coinsEarned:window.__c3_lvl1_was_done?0:80});}catch(ex){} }
+        if (level===2) { if (!window.__c3_lvl2_was_done) { coinsEarned=160; window.__c3_state_set?.('c3_lvl2complete',true); } try{window.Sync?.sendEvent('level_done',{chapter:3,level:2,levelName:'Shard 02',score,coinsEarned:window.__c3_lvl2_was_done?0:160});}catch(ex){} }
         if (level===3) { coinsEarned=Math.max(10,Math.floor(score/100)); const _prev=window.__c3_get_best?.()||0; const _best=Math.max(score,_prev); window.__c3_state_set?.('c3_lvl3best',_best); if(score>_prev&&score>0){try{window.Sync?.sendEvent('record',{chapter:3,levelName:'Static Loop',score,prev:_prev});}catch(ex){}} }
       } else {
         ti.textContent=window.tr?window.tr('c3_failed'):'SIGNAL LOST';
