@@ -55,6 +55,12 @@ function buildMessage(type, body, user) {
     return `🔓 Chapter ${body.chapter} · ${name} · ${w}`;
   }
 
+  if (type === 'ad_watched') {
+    const earned = body.coinsEarned ? ` · +${fmt(body.coinsEarned)}🪙` : '';
+    const total = body.coinsTotal != null ? ` · итого ${fmt(body.coinsTotal)}🪙` : '';
+    return `📺 Hospital TV${earned}${total} · ${w}`;
+  }
+
   if (type === 'record') {
     const ch = body.chapter || '?';
     const name = body.levelName ? ` · ${esc(body.levelName)}` : '';

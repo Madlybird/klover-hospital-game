@@ -12,6 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700;1,800&family=Barlow+Condensed:ital,wght@0,400;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://unpkg.com/@tonconnect/ui@2.4.4/dist/tonconnect-ui.min.js" integrity="sha384-sSX7t/8RIb6F0lgKBLCCytcRdsJv/+lBzIvFAnTlX7HymE9i9wCFIFOQ4iH7dJWO" crossorigin="anonymous"></script>
+<script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 <style>
 :root {
   --color-bg: #0a1a3a;
@@ -5031,10 +5032,10 @@ html, body {
     </div>
     <div class="htv-stage">
       <div class="htv-overlay">
-        <div class="htv-tag" data-i18n="htv_tag">COMING SOON</div>
-        <div class="htv-soon" data-i18n="htv_soon">NOT YET RELEASED</div>
-        <div class="htv-sub" data-i18n="htv_sub">Hospital TV hasn't aired yet. Get notified the moment it goes live.</div>
-        <button class="htv-notify-btn" id="htv-notify-btn" onclick="Game.notifyHospitalTv()" data-i18n="htv_notify">Notify me (+100)</button>
+        <div class="htv-tag" data-i18n="htv_tag">ON AIR</div>
+        <div class="htv-soon" id="htv-reward-label">+200</div>
+        <div class="htv-sub" id="htv-status-sub" data-i18n="htv_sub_ready">Watch a short ad for a coin dose.</div>
+        <button class="htv-notify-btn" id="htv-notify-btn" onclick="Game.watchHospitalAd()" data-i18n="htv_watch_btn">Watch (+200)</button>
       </div>
     </div>
   </div>
@@ -5351,12 +5352,15 @@ const I18N = {
     menu_referral: 'Patient records',
     menu_shop: 'Medicine cabinet',
     menu_hospital_tv: 'Hospital TV',
-    htv_tag: 'COMING SOON',
-    htv_soon: 'NOT YET RELEASED',
-    htv_sub: "Diagnosis pending. We'll page you at launch.",
-    htv_notify: 'Notify me',
-    htv_notified: "You're on the list ✓",
-    htv_reward_toast: '+100 coins — we\'ll let you know!',
+    htv_tag: 'ON AIR',
+    htv_sub_ready: 'Watch a short ad for a coin dose.',
+    htv_sub_cooldown: 'Back in {n}s',
+    htv_sub_capped: 'Come back tomorrow for more',
+    htv_watch_btn: 'Watch (+{n})',
+    htv_watch_cooldown: 'Back in {n}s',
+    htv_watch_capped: 'Come back tomorrow',
+    htv_watch_toast: '+{n} coins!',
+    htv_nofill_toast: 'No ad available right now — try again soon',
     menu_settings: 'Settings',
     connect: '◉ CONNECT',
     connect_wallet: 'CONNECT WALLET',
@@ -5585,12 +5589,15 @@ const I18N = {
     menu_referral: 'Карта пациента',
     menu_shop: 'Аптечка',
     menu_hospital_tv: 'Больничное ТВ',
-    htv_tag: 'СКОРО',
-    htv_soon: 'ЕЩЁ НЕ ВЫШЛО',
-    htv_sub: 'Диагноз уточняется. Вызовем вас на запуске.',
-    htv_notify: 'Сообщить мне',
-    htv_notified: 'Вы в списке ✓',
-    htv_reward_toast: '+100 монет — мы вам сообщим!',
+    htv_tag: 'ЭФИР',
+    htv_sub_ready: 'Посмотрите рекламу — получите монеты.',
+    htv_sub_cooldown: 'Через {n}с',
+    htv_sub_capped: 'Заходите завтра ещё',
+    htv_watch_btn: 'Смотреть (+{n})',
+    htv_watch_cooldown: 'Через {n}с',
+    htv_watch_capped: 'Приходите завтра',
+    htv_watch_toast: '+{n} монет!',
+    htv_nofill_toast: 'Реклама пока недоступна — попробуйте позже',
     menu_settings: 'Настройки',
     connect: '◉ ПОДКЛЮЧИТЬ',
     connect_wallet: 'ПОДКЛЮЧИТЬ КОШЕЛЁК',
@@ -6257,7 +6264,7 @@ const Game = (() => {
     if (name === 'referral') updateReferralUI();
     if (name === 'settings') updateSettingsUI();
     if (name === 'shop') renderShop();
-    if (name === 'hospital-tv') updateHospitalTvUI();
+    if (name === 'hospital-tv') { updateHospitalTvUI(); startHtvTicker(); } else { stopHtvTicker(); }
     if (name === 'levels') updateLevelsUI();
     if (name === 'c2-levels') updateC2LevelsUI();
     if (name === 'c3-levels') updateC3LevelsUI();
@@ -6783,38 +6790,106 @@ const Game = (() => {
     showToast(tr('c2_soon_toast'));
   }
 
-  // ---- HOSPITAL TV (coming soon + one-time notify reward) ----
-  const HTV_NOTIFY_KEY = 'klover_htv_notified';
+  // ---- HOSPITAL TV (Adsgram rewarded video) ----
+  const HTV_AD_STATE_KEY = 'klover_htv_ad_state';
+  const HTV_BLOCK_ID = '37139';
+  const HTV_REWARD_SCALE = [200, 150, 100, 75, 50];
+  const HTV_DAILY_CAP = HTV_REWARD_SCALE.length;
+  const HTV_COOLDOWN_MS = 90 * 1000;
+  let htvAdController = null;
+  let htvTickerId = null;
 
-  function htvNotified() {
-    try { return localStorage.getItem(HTV_NOTIFY_KEY) === '1'; } catch (e) { return false; }
+  function htvToday() {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  function getHtvAdState() {
+    let s;
+    try { s = JSON.parse(localStorage.getItem(HTV_AD_STATE_KEY) || 'null'); } catch (e) { s = null; }
+    if (!s || s.date !== htvToday()) s = { date: htvToday(), count: 0, lastTs: 0 };
+    return s;
+  }
+
+  function saveHtvAdState(s) {
+    try { localStorage.setItem(HTV_AD_STATE_KEY, JSON.stringify(s)); } catch (e) {}
+  }
+
+  function getHtvAdController() {
+    if (htvAdController) return htvAdController;
+    if (!window.Adsgram) return null;
+    htvAdController = window.Adsgram.init({ blockId: HTV_BLOCK_ID });
+    return htvAdController;
+  }
+
+  function startHtvTicker() {
+    stopHtvTicker();
+    htvTickerId = setInterval(updateHospitalTvUI, 1000);
+  }
+
+  function stopHtvTicker() {
+    if (htvTickerId) { clearInterval(htvTickerId); htvTickerId = null; }
   }
 
   function updateHospitalTvUI() {
     const btn = document.getElementById('htv-notify-btn');
+    const sub = document.getElementById('htv-status-sub');
+    const rewardLabel = document.getElementById('htv-reward-label');
     if (!btn) return;
-    if (htvNotified()) {
-      btn.textContent = tr('htv_notified');
+    const s = getHtvAdState();
+
+    if (s.count >= HTV_DAILY_CAP) {
+      btn.textContent = tr('htv_watch_capped');
       btn.classList.add('claimed');
+      if (rewardLabel) rewardLabel.textContent = '—';
+      if (sub) sub.textContent = tr('htv_sub_capped');
+      return;
+    }
+
+    const reward = HTV_REWARD_SCALE[s.count];
+    const cooldownLeft = HTV_COOLDOWN_MS - (Date.now() - (s.lastTs || 0));
+    if (rewardLabel) rewardLabel.textContent = '+' + reward;
+
+    if (cooldownLeft > 0) {
+      const secs = Math.ceil(cooldownLeft / 1000);
+      btn.textContent = tr('htv_watch_cooldown').replace('{n}', secs);
+      btn.classList.add('claimed');
+      if (sub) sub.textContent = tr('htv_sub_cooldown').replace('{n}', secs);
     } else {
-      btn.textContent = tr('htv_notify');
+      btn.textContent = tr('htv_watch_btn').replace('{n}', reward);
       btn.classList.remove('claimed');
+      if (sub) sub.textContent = tr('htv_sub_ready');
     }
   }
 
-  function notifyHospitalTv() {
-    if (htvNotified()) return;
-    try { localStorage.setItem(HTV_NOTIFY_KEY, '1'); } catch (e) {}
-    state.coins = (state.coins || 0) + 100;
-    Save.save(state);
-    updateMenuCoins();
-    pushProgress();
-    spawnHtvCoinFloat();
-    updateHospitalTvUI();
-    showToast(tr('htv_reward_toast'));
-    if (window.Telegram?.WebApp?.HapticFeedback) {
-      Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-    }
+  function watchHospitalAd() {
+    const s = getHtvAdState();
+    if (s.count >= HTV_DAILY_CAP) return;
+    if (Date.now() - (s.lastTs || 0) < HTV_COOLDOWN_MS) return;
+
+    const controller = getHtvAdController();
+    if (!controller) { showToast(tr('htv_nofill_toast')); return; }
+
+    controller.show().then(() => {
+      const cur = getHtvAdState();
+      const reward = HTV_REWARD_SCALE[Math.min(cur.count, HTV_REWARD_SCALE.length - 1)];
+      cur.count += 1;
+      cur.lastTs = Date.now();
+      saveHtvAdState(cur);
+
+      state.coins = (state.coins || 0) + reward;
+      Save.save(state);
+      updateMenuCoins();
+      pushProgress();
+      spawnHtvCoinFloat();
+      updateHospitalTvUI();
+      showToast(tr('htv_watch_toast').replace('{n}', reward));
+      if (window.Telegram?.WebApp?.HapticFeedback) {
+        Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+      }
+      try { Sync.sendEvent('ad_watched', { coinsEarned: reward, coinsTotal: state.coins }); } catch (e) {}
+    }).catch(() => {
+      showToast(tr('htv_nofill_toast'));
+    });
   }
 
   function spawnHtvCoinFloat() {
@@ -8753,7 +8828,7 @@ const Game = (() => {
     setLang,
     toggleTonConnect,
     renderShop,
-    notifyHospitalTv,
+    watchHospitalAd,
     rotateCW: () => { if (gameRunning && !paused && currentPair) rotatePair(1); },
     rotateCCW: () => { if (gameRunning && !paused && currentPair) rotatePair(-1); },
     closeRecordScreen,
